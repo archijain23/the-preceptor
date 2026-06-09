@@ -1,35 +1,34 @@
-export default function Logo() {
+/* Celestial eye / all-seeing cosmic mark */
+export default function Logo({ size = 36 }) {
   return (
     <svg
-      width="140"
-      height="32"
-      viewBox="0 0 140 32"
+      width={size}
+      height={size}
+      viewBox="0 0 36 36"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-label="The Preceptor"
+      aria-label="The Preceptor logo"
+      role="img"
     >
-      {/* Star/celestial mark */}
-      <circle cx="10" cy="16" r="3" stroke="currentColor" strokeWidth="1.5" />
-      <line x1="10" y1="10" x2="10" y2="8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="10" y1="22" x2="10" y2="24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="4" y1="16" x2="2" y2="16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="16" y1="16" x2="18" y2="16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="5.86" y1="11.86" x2="4.44" y2="10.44" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="14.14" y1="20.14" x2="15.56" y2="21.56" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="14.14" y1="11.86" x2="15.56" y2="10.44" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="5.86" y1="20.14" x2="4.44" y2="21.56" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      {/* Wordmark */}
-      <text
-        x="26"
-        y="21"
-        fontFamily="'Cormorant Garamond', Georgia, serif"
-        fontSize="18"
-        fontWeight="500"
-        fill="currentColor"
-        letterSpacing="0.02em"
-      >
-        The Preceptor
-      </text>
+      {/* Outer ring */}
+      <circle cx="18" cy="18" r="16" stroke="#d4a820" strokeWidth="0.75" opacity="0.6" />
+      {/* Inner ring */}
+      <circle cx="18" cy="18" r="10" stroke="#d4a820" strokeWidth="0.5" opacity="0.4" />
+      {/* Eye outline */}
+      <path
+        d="M6 18 C10 11, 26 11, 30 18 C26 25, 10 25, 6 18Z"
+        stroke="#d4a820"
+        strokeWidth="1"
+        fill="none"
+      />
+      {/* Iris */}
+      <circle cx="18" cy="18" r="4" stroke="#d4a820" strokeWidth="0.75" fill="none" />
+      {/* Pupil */}
+      <circle cx="18" cy="18" r="1.5" fill="#d4a820" opacity="0.9" />
+      {/* Star points */}
+      <line x1="18" y1="2" x2="18" y2="5" stroke="#d4a820" strokeWidth="0.75" opacity="0.5" />
+      <line x1="18" y1="31" x2="18" y2="34" stroke="#d4a820" strokeWidth="0.75" opacity="0.5" />
+      <line x1="2" y1="18" x2="5" y2="18" stroke="#d4a820" strokeWidth="0.75" opacity="0.5" />
+      <line x1="31" y1="18" x2="34" y2="18" stroke="#d4a820" strokeWidth="0.75" opacity="0.5" />
     </svg>
-  )
+  );
 }

@@ -1,14 +1,15 @@
-import { useState } from 'react'
-import StepServiceSelect from './steps/StepServiceSelect'
-import StepBirthDetails from './steps/StepBirthDetails'
-import StepCalEmbed from './steps/StepCalEmbed'
-import StepConfirmation from './steps/StepConfirmation'
+import { useState } from 'react';
+import StepService from './StepService';
+import StepDetails from './StepDetails';
+import StepCalEmbed from './StepCalEmbed';
+import StepConfirm from './StepConfirm';
+import styles from './BookingWizard.module.css';
 
-const STEPS = ['Select Service', 'Your Details', 'Choose Time', 'Confirm']
+const STEPS = ['Choose Service', 'Your Details', 'Pick a Time', 'Confirm'];
 
 export default function BookingWizard() {
-  const [step, setStep] = useState(0)
-  const [formData, setFormData] = useState({
+  const [step, setStep] = useState(0);
+  const [booking, setBooking] = useState({
     service: null,
     name: '',
     email: '',
@@ -16,31 +17,36 @@ export default function BookingWizard() {
     birthTime: '',
     birthPlace: '',
     question: '',
-  })
+  });
 
-  const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1))
-  const back = () => setStep((s) => Math.max(s - 1, 0))
-  const update = (data) => setFormData((prev) => ({ ...prev, ...data }))
+  const next = (data) => {
+    if (data) setBooking(b => ({ ...b, ...data }));
+    setStep(s => Math.min(s + 1, STEPS.length - 1));
+  };
+
+  const back = () => setStep(s => Math.max(s - 1, 0));
 
   return (
-    <div className="booking-wizard">
-      {/* Progress Bar */}
-      <div className="wizard-progress" role="progressbar" aria-valuenow={step + 1} aria-valuemax={STEPS.length}>
+    <div className={styles.wizard}>
+      {/* Step indicator */}
+      <nav className={styles.stepNav} aria-label="Booking progress">
         {STEPS.map((label, i) => (
-          <div key={label} className={`wizard-step ${i <= step ? 'active' : ''}`}>
-            <span className="wizard-step-num">{i + 1}</span>
-            <span className="wizard-step-label">{label}</span>
+          <div
+            key={label}
+            className={`${styles.stepItem} ${i === step ? styles.active : ''} ${i < step ? styles.done : ''}`}
+          >
+            <span className={styles.stepNum}>{i < step ? '✓' : i + 1}</span>
+            <span className={styles.stepLabel}>{label}</span>
           </div>
         ))}
-      </div>
+      </nav>
 
-      {/* Step Content */}
-      <div className="wizard-content">
-        {step === 0 && <StepServiceSelect formData={formData} update={update} next={next} />}
-        {step === 1 && <StepBirthDetails formData={formData} update={update} next={next} back={back} />}
-        {step === 2 && <StepCalEmbed formData={formData} next={next} back={back} />}
-        {step === 3 && <StepConfirmation formData={formData} back={back} />}
+      <div className={styles.body}>
+        {step === 0 && <StepService booking={booking} next={next} />}
+        {step === 1 && <StepDetails booking={booking} next={next} back={back} />}
+        {step === 2 && <StepCalEmbed booking={booking} next={next} back={back} />}
+        {step === 3 && <StepConfirm booking={booking} back={back} />}
       </div>
     </div>
-  )
+  );
 }
