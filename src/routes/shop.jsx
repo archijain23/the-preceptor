@@ -1,17 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { Package } from 'lucide-react'
 import { useState } from 'react'
 
-export const Route = createFileRoute('/shop')({
-  head: () => ({ meta: [{ title: 'Shop — The Preceptor' }] }),
-  component: ShopPage,
-})
-
 const eyebrow = { fontFamily: 'Satoshi, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'oklch(0.82 0.12 85)', opacity: 0.8 }
 const goldBtn = { display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'oklch(0.82 0.12 85)', color: 'oklch(0.1 0.02 272)', fontFamily: 'Satoshi, sans-serif', fontSize: '0.8rem', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '0.85rem 2rem', borderRadius: '9999px', fontWeight: 600, border: 'none', cursor: 'pointer' }
 
-function ShopPage() {
+export default function ShopPage() {
   const [submitted, setSubmitted] = useState(false)
 
   return (

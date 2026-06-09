@@ -1,17 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Send, CheckCircle2 } from 'lucide-react'
 
-export const Route = createFileRoute('/contact')({
-  head: () => ({ meta: [{ title: 'Contact — The Preceptor' }] }),
-  component: ContactPage,
-})
-
 const eyebrow = { fontFamily: 'Satoshi, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'oklch(0.82 0.12 85)', opacity: 0.8 }
 const inputStyle = { width: '100%', background: 'oklch(0.12 0.022 272 / 0.5)', border: '1px solid oklch(0.82 0.12 85 / 0.18)', borderRadius: '0.75rem', padding: '0.85rem 1.1rem', fontFamily: 'Satoshi, sans-serif', fontSize: '0.875rem', color: 'oklch(0.9 0.01 85)', outline: 'none', boxSizing: 'border-box' }
 
-function ContactPage() {
+export default function ContactPage() {
   const [sent, setSent] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   const update = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }))

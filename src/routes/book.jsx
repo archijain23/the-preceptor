@@ -1,12 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight, ArrowLeft, Star, Briefcase, Heart, Moon, Sparkles, BookOpen, ExternalLink, CheckCircle2 } from 'lucide-react'
-
-export const Route = createFileRoute('/book')({
-  head: () => ({ meta: [{ title: 'Book a Session — The Preceptor' }] }),
-  component: BookPage,
-})
 
 const services = [
   { id: 'birth-chart', icon: Star, title: 'Birth Chart Reading', desc: 'A cinematic decode of your natal sky — purpose, gifts, and life arc.', duration: '60 min' },
@@ -44,7 +38,7 @@ function CalEmbed({ service }) {
   )
 }
 
-function BookPage() {
+export default function BookPage() {
   const [step, setStep] = useState(0)
   const [selected, setSelected] = useState(null)
 

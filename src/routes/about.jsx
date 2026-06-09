@@ -1,11 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin } from 'lucide-react'
-
-export const Route = createFileRoute('/about')({
-  head: () => ({ meta: [{ title: 'About — The Preceptor' }] }),
-  component: AboutPage,
-})
 
 function Reveal({ children, delay = 0 }) {
   return (
@@ -28,7 +22,7 @@ const eyebrow = { fontFamily: 'Satoshi, sans-serif', fontSize: '0.65rem', letter
 const displayH = { fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, color: 'oklch(0.96 0.01 85)', lineHeight: 1.1 }
 const lead = { fontFamily: 'Satoshi, sans-serif', fontSize: 'clamp(1rem, 1.5vw, 1.2rem)', color: 'oklch(0.6 0.02 272)', lineHeight: 1.7 }
 
-function AboutPage() {
+export default function AboutPage() {
   return (
     <>
       <section style={{ ...sectionStyle, paddingTop: 'clamp(6rem, 12vw, 10rem)', background: 'oklch(0.08 0.022 272)', textAlign: 'center' }}>

@@ -1,11 +1,6 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { Star, Briefcase, Heart, Moon, Sparkles, BookOpen, ArrowRight } from 'lucide-react'
-
-export const Route = createFileRoute('/services')({
-  head: () => ({ meta: [{ title: 'Services — The Preceptor' }] }),
-  component: ServicesPage,
-})
 
 const services = [
   { icon: Star, title: 'Birth Chart Reading', desc: 'A cinematic decode of your natal sky — purpose, gifts, and life arc. Delivered as a 60-minute private video session with a written summary.', duration: '60 min', ideal: 'Ideal for first-time seekers and those at major life crossroads.' },
@@ -18,7 +13,7 @@ const services = [
 
 const eyebrow = { fontFamily: 'Satoshi, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'oklch(0.82 0.12 85)', opacity: 0.8 }
 
-function ServicesPage() {
+export default function ServicesPage() {
   return (
     <section style={{ padding: 'clamp(6rem, 12vw, 10rem) 1.5rem', background: 'oklch(0.08 0.022 272)', minHeight: '100dvh' }}>
       <div style={{ maxWidth: '72rem', margin: '0 auto' }}>

@@ -1,9 +1,7 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
-import { ArrowRight, ArrowLeft, Star, Sparkles, Heart, Briefcase, Moon, BookOpen, ChevronDown, Quote, Award } from 'lucide-react'
-import { useRef, useState, useMemo, useEffect } from 'react'
-
-export const Route = createFileRoute('/')({ component: Home })
+import { ArrowRight, ArrowLeft, Star, Sparkles, Heart, Briefcase, Moon, BookOpen, ChevronDown, Quote } from 'lucide-react'
+import { useRef, useState, useEffect } from 'react'
 
 const services = [
   { icon: Star, title: 'Birth Chart Reading', desc: 'A cinematic decode of your natal sky — purpose, gifts, and life arc.' },
@@ -15,10 +13,10 @@ const services = [
 ]
 
 const testimonials = [
-  { name: 'Amelia R.', country: 'New York, USA', text: 'The most precise reading I\'ve ever had. It felt like sitting with a wise friend who could see decades ahead.', rating: 5 },
-  { name: 'Daniel K.', country: 'London, UK', text: 'Calm, confident, and breathtakingly accurate. The Preceptor gave me a map I didn\'t know I needed.', rating: 5 },
+  { name: 'Amelia R.', country: 'New York, USA', text: "The most precise reading I've ever had. It felt like sitting with a wise friend who could see decades ahead.", rating: 5 },
+  { name: 'Daniel K.', country: 'London, UK', text: "Calm, confident, and breathtakingly accurate. The Preceptor gave me a map I didn't know I needed.", rating: 5 },
   { name: 'Priya S.', country: 'Toronto, CA', text: 'A truly luxurious experience. Insightful, grounded and deeply transformative.', rating: 5 },
-  { name: 'Marcus T.', country: 'Los Angeles, USA', text: 'I\'ve worked with multiple astrologers. None compare. The clarity I received reshaped my career.', rating: 5 },
+  { name: 'Marcus T.', country: 'Los Angeles, USA', text: "I've worked with multiple astrologers. None compare. The clarity I received reshaped my career.", rating: 5 },
   { name: 'Lina M.', country: 'Berlin, DE', text: 'Every word landed. The session was poetic, precise and quietly powerful.', rating: 5 },
 ]
 
@@ -51,7 +49,7 @@ function Reveal({ children, delay = 0, className }) {
   )
 }
 
-function Home() {
+export default function Home() {
   const heroRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '25%'])
@@ -69,7 +67,7 @@ function Home() {
   return (
     <>
       {/* HERO */}
-      <section ref={heroRef} className="relative min-h-[100dvh] flex flex-col items-center justify-center overflow-hidden" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, oklch(0.22 0.08 272 / 0.9) 0%, oklch(0.08 0.02 272) 100%)' }}>
+      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, oklch(0.22 0.08 272 / 0.9) 0%, oklch(0.08 0.02 272) 100%)' }}>
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 max-w-5xl mx-auto px-6 text-center flex flex-col items-center gap-8">
           <Reveal>
             <div className="flex items-center gap-3">
@@ -86,7 +84,7 @@ function Home() {
           </Reveal>
           <Reveal delay={0.2}>
             <p style={{ fontFamily: 'Satoshi, sans-serif', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', color: 'oklch(0.7 0.02 272)', maxWidth: '42rem', lineHeight: 1.7 }}>
-              Cinematic, deeply personal astrology consultations for high-intention seekers — clarity in love, career, and life\'s defining chapters.
+              Cinematic, deeply personal astrology consultations for high-intention seekers — clarity in love, career, and life's defining chapters.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
@@ -122,8 +120,7 @@ function Home() {
             <Reveal><span style={{ fontFamily: 'Satoshi, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'oklch(0.82 0.12 85)', opacity: 0.8 }}>What We Offer</span></Reveal>
             <Reveal delay={0.1}>
               <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 300, color: 'oklch(0.96 0.01 85)', marginTop: '1rem', lineHeight: 1.2 }}>
-                Sessions crafted around{' '}
-                <em style={{ color: 'oklch(0.82 0.12 85)' }}>what you need to know.</em>
+                Sessions crafted around{' '}<em style={{ color: 'oklch(0.82 0.12 85)' }}>what you need to know.</em>
               </h2>
             </Reveal>
           </div>
@@ -195,7 +192,7 @@ function Home() {
 
       {/* STATS */}
       <section style={{ padding: 'clamp(4rem, 8vw, 6rem) 1.5rem', background: 'oklch(0.09 0.022 272)' }}>
-        <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem', textAlign: 'center' }} className="md:grid-cols-4">
+        <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem', textAlign: 'center' }}>
           {achievements.map((a, i) => (
             <Reveal key={a.label} delay={i * 0.08}>
               <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: 'oklch(0.82 0.12 85)', fontWeight: 300 }}>{a.value}</p>
