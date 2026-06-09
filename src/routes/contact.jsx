@@ -1,7 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { z } from "zod";
 import { Mail, Phone, MapPin, Send, Instagram, Youtube, Linkedin, Clock, Globe2, ShieldCheck, Sparkles, ChevronDown, ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { siteConfig } from "@/content/site";
@@ -10,9 +9,9 @@ export default function ContactPageWrapper() {
   return (
     <>
       <Helmet>
-        <title>Contact — Begin Your Journey | The Precetor</title>
-        <meta name="description" content="Reach The Precetor for premium private astrology consultations. White-glove onboarding for clients in the US and worldwide." />
-        <meta property="og:title" content="Contact The Precetor" />
+        <title>Contact — Begin Your Journey | The Preceptor</title>
+        <meta name="description" content="Reach The Preceptor for premium private astrology consultations. White-glove onboarding for clients in the US and worldwide." />
+        <meta property="og:title" content="Contact The Preceptor" />
         <meta property="og:description" content="Begin your journey toward clarity with a private spiritual consultation." />
       </Helmet>
       <ContactPage />
@@ -20,15 +19,15 @@ export default function ContactPageWrapper() {
   );
 }
 
-const schema = z.object({
-  name: z.string().trim().min(2, "Please enter your full name").max(100),
-  email: z.string().trim().email("Enter a valid email").max(255),
-  phone: z.string().trim().max(40).optional().or(z.literal("")),
-  country: z.string().trim().max(80).optional().or(z.literal("")),
-  consultationType: z.string().trim().max(80).optional().or(z.literal("")),
-  subject: z.string().trim().min(2, "Please add a subject").max(150),
-  message: z.string().trim().min(10, "Please share a few sentences").max(2000),
-});
+// Native JS validation — no zod dependency needed
+function validateForm(data) {
+  const errors = {};
+  if (!data.name || data.name.trim().length < 2) errors.name = "Please enter your full name";
+  if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) errors.email = "Enter a valid email";
+  if (!data.subject || data.subject.trim().length < 2) errors.subject = "Please add a subject";
+  if (!data.message || data.message.trim().length < 10) errors.message = "Please share a few sentences";
+  return errors;
+}
 
 const initial = { name: "", email: "", phone: "", country: "", consultationType: "", subject: "", message: "" };
 
@@ -55,18 +54,13 @@ function ContactPage() {
   const [openFaq, setOpenFaq] = useState(0);
 
   const update = (k) => (e) => {
-    setData({ ...data, [k]: e.target.value });
+    setData((prev) => ({ ...prev, [k]: e.target.value }));
   };
 
   const submit = (e) => {
     e.preventDefault();
-    const result = schema.safeParse(data);
-    if (!result.success) {
-      const fieldErrors = {};
-      result.error.issues.forEach((i) => {
-        const key = i.path[0];
-        fieldErrors[key] = i.message;
-      });
+    const fieldErrors = validateForm(data);
+    if (Object.keys(fieldErrors).length > 0) {
       setErrors(fieldErrors);
       return;
     }
@@ -138,7 +132,7 @@ function ContactPage() {
                 {[
                   { Icon: Mail, label: "Email", value: siteConfig.email, href: `mailto:${siteConfig.email}` },
                   { Icon: Phone, label: "Phone", value: siteConfig.phone, href: `tel:${siteConfig.phone.replace(/[^+\d]/g, "")}` },
-                  { Icon: MapPin, label: "Studio", value: "Worldwide · Online consultations" },
+                  { Icon: MapPin, label: "Studio", value: "Worldwide \u00b7 Online consultations" },
                 ].map(({ Icon, label, value, href }) => (
                   <li key={label} className="flex items-start gap-4">
                     <span className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-gold shrink-0">
@@ -224,7 +218,7 @@ function ContactPage() {
                   <input value={data.subject} onChange={update("subject")} className={inputCls} placeholder="What can we help you with?" />
                 </Field>
                 <Field label="Your Message" error={errors.message} className="sm:col-span-2">
-                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what's on your mind…" />
+                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what's on your mind\u2026" />
                 </Field>
               </div>
 
