@@ -25,17 +25,15 @@ export default function HomeWrapper() {
   return (
     <>
       <Helmet>
-        <title>The Precetor — Premium Astrology Consultations</title>
+        <title>The Preceptor — Premium Astrology Consultations</title>
         <meta name="description" content="Cinematic astrology consultations and spiritual guidance for high-intention clients in the US and across the world." />
-        <meta property="og:title" content="The Precetor — Premium Astrology Consultations" />
+        <meta property="og:title" content="The Preceptor — Premium Astrology Consultations" />
         <meta property="og:description" content="Modern luxury astrology, birth chart readings, and spiritual consultations." />
       </Helmet>
       <HomeContent />
     </>
   );
 }
-
-function HomeContent() {
 
 const services = [
   {
@@ -80,7 +78,7 @@ const testimonials = [
   {
     name: "Daniel K.",
     country: "London, UK",
-    text: "Calm, confident, and breathtakingly accurate. The Precetor gave me a map I didn't know I needed.",
+    text: "Calm, confident, and breathtakingly accurate. The Preceptor gave me a map I didn't know I needed.",
     rating: 5,
   },
   {
@@ -363,4 +361,374 @@ function Hero() {
           ].join(", "),
           WebkitMaskComposite: "source-in, source-in",
         }}
+      >
+        <img
+          src={heroImg}
+          alt="The Preceptor — astrology guide"
+          className="w-full h-full object-cover object-top"
+          loading="eager"
+        />
+      </motion.div>
+
+      {/* ── 9. Hero text content ── */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 w-full pt-28 pb-24 lg:pb-32">
+        <div className="max-w-xl lg:max-w-2xl">
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            className="flex items-center gap-2.5 mb-6"
+          >
+            <span className="text-gold">✦</span>
+            <span className="text-xs uppercase tracking-[0.28em] text-gold/80">Premium Astrology Consultations</span>
+          </motion.div>
+
+          <StaggeredHeading
+            line1="Read the Stars,"
+            line2Gold="Shape Your Destiny"
+            delay={0.2}
+          />
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.85, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-8 text-muted-foreground max-w-md leading-relaxed"
+            style={{ fontSize: "clamp(1rem, 1.5vw, 1.15rem)" }}
+          >
+            Precision astrology for high-intention seekers. Cinematic readings that decode your birth chart with depth, clarity, and presence.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-10 flex flex-wrap gap-4"
+          >
+            <Link
+              to="/book"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-medium hover:scale-[1.03] hover:shadow-gold transition-all duration-300"
+            >
+              Book a Session
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              to="/services"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full glass-card text-foreground hover:scale-[1.03] transition-all duration-300"
+            >
+              Explore Services
+            </Link>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* ── 10. Scroll hint ── */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.2, duration: 1 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+      >
+        <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Scroll</span>
+        <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 1.8, repeat: Infinity }}>
+          <ChevronDown className="w-4 h-4 text-gold/60" />
+        </motion.div>
+      </motion.div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   ABOUT
+═══════════════════════════════════════════════════════ */
+function About() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], [40, -40]);
+
+  return (
+    <section ref={ref} className="relative py-32 lg:py-40 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+        {/* Image */}
+        <Reveal className="relative">
+          <motion.div style={{ y }} className="relative aspect-[3/4] rounded-2xl overflow-hidden">
+            <img
+              src={aboutImg}
+              alt="About The Preceptor"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
+          </motion.div>
+          <div className="absolute -bottom-6 -right-6 w-36 h-36 rounded-2xl glass-card flex flex-col items-center justify-center gap-1 shadow-gold">
+            <span className="text-gold font-serif text-3xl">✦</span>
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">Since 2012</span>
+          </div>
+        </Reveal>
+
+        {/* Text */}
+        <div className="space-y-8">
+          <Reveal>
+            <span className="text-xs uppercase tracking-[0.28em] text-gold/80">About</span>
+            <h2 className="mt-4 font-serif text-4xl lg:text-5xl leading-[1.1]">
+              Where Ancient Wisdom Meets Modern Clarity
+            </h2>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <p className="text-muted-foreground leading-relaxed">
+              With over a decade of practice, The Preceptor has guided thousands of seekers across 47 countries. Rooted in Vedic astrology and enriched by Tarot and intuitive counsel, every session is a rare blend of precision and presence.
+            </p>
+          </Reveal>
+          <Reveal delay={0.2}>
+            <p className="text-muted-foreground leading-relaxed">
+              Sessions are private, recorded, and tailored. No generic readings — only the deep, personalised guidance your chart uniquely calls for.
+            </p>
+          </Reveal>
+          <Reveal delay={0.3}>
+            <Link
+              to="/about"
+              className="inline-flex items-center gap-2 text-sm text-gold hover:gap-3 transition-all duration-300"
+            >
+              Learn more <ArrowRight className="w-4 h-4" />
+            </Link>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   SERVICES
+═══════════════════════════════════════════════════════ */
+function Services() {
+  return (
+    <section className="relative py-32 lg:py-40 overflow-hidden">
+      <div className="absolute inset-0 bg-hero opacity-60 pointer-events-none" />
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
+        <Reveal className="text-center mb-16">
+          <span className="text-xs uppercase tracking-[0.28em] text-gold/80">Services</span>
+          <h2 className="mt-4 font-serif text-4xl lg:text-5xl">What We Offer</h2>
+        </Reveal>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.map((s, i) => (
+            <Reveal key={s.title} delay={i * 0.07}>
+              <div className="glass-card rounded-2xl p-8 h-full hover:scale-[1.02] hover:shadow-gold transition-all duration-300 group">
+                <s.icon className="w-7 h-7 text-gold mb-5 group-hover:scale-110 transition-transform duration-300" />
+                <h3 className="font-serif text-xl mb-3">{s.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal className="text-center mt-14">
+          <Link
+            to="/services"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full glass-card hover:scale-[1.03] hover:shadow-gold transition-all duration-300"
+          >
+            View All Services <ArrowRight className="w-4 h-4" />
+          </Link>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   TESTIMONIALS
+═══════════════════════════════════════════════════════ */
+function Testimonials() {
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(
+      () => setActive((p) => (p + 1) % testimonials.length),
+      testimonialSlideInterval,
+    );
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <section className="relative py-32 lg:py-40 overflow-hidden">
+      <div className="max-w-4xl mx-auto px-6 lg:px-10 text-center">
+        <Reveal>
+          <span className="text-xs uppercase tracking-[0.28em] text-gold/80">Testimonials</span>
+          <h2 className="mt-4 font-serif text-4xl lg:text-5xl">Words From Clients</h2>
+        </Reveal>
+
+        <div className="mt-16 relative min-h-[220px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="glass-card rounded-2xl p-10 lg:p-14"
+            >
+              <Quote className="w-8 h-8 text-gold/40 mx-auto mb-6" />
+              <p className="font-serif text-xl lg:text-2xl leading-relaxed text-foreground">
+                &ldquo;{testimonials[active].text}&rdquo;
+              </p>
+              <div className="mt-8 flex flex-col items-center gap-1">
+                <span className="font-medium">{testimonials[active].name}</span>
+                <span className="text-xs text-muted-foreground tracking-wider">{testimonials[active].country}</span>
+                <div className="flex gap-0.5 mt-2">
+                  {Array.from({ length: testimonials[active].rating }).map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        <div className="flex items-center justify-center gap-3 mt-8">
+          <button
+            onClick={() => setActive((p) => (p - 1 + testimonials.length) % testimonials.length)}
+            className="w-9 h-9 rounded-full glass-card flex items-center justify-center hover:scale-110 transition-transform"
+            aria-label="Previous testimonial"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          {testimonials.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                i === active ? "bg-gold w-5" : "bg-border"
+              }`}
+              aria-label={`Go to testimonial ${i + 1}`}
+            />
+          ))}
+          <button
+            onClick={() => setActive((p) => (p + 1) % testimonials.length)}
+            className="w-9 h-9 rounded-full glass-card flex items-center justify-center hover:scale-110 transition-transform"
+            aria-label="Next testimonial"
+          >
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   ACHIEVEMENTS
+═══════════════════════════════════════════════════════ */
+function Achievements() {
+  return (
+    <section className="relative py-24 overflow-hidden">
+      <div className="absolute inset-0 bg-hero opacity-40 pointer-events-none" />
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          {achievements.map((a, i) => (
+            <Reveal key={a.label} delay={i * 0.08}>
+              <div className="text-center">
+                <p className="font-serif text-4xl lg:text-5xl text-gold">{a.value}</p>
+                <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">{a.label}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   FAQ
+═══════════════════════════════════════════════════════ */
+function Faq() {
+  const [open, setOpen] = useState(null);
+
+  return (
+    <section className="relative py-32 lg:py-40 overflow-hidden">
+      <div className="max-w-3xl mx-auto px-6 lg:px-10">
+        <Reveal className="text-center mb-14">
+          <span className="text-xs uppercase tracking-[0.28em] text-gold/80">FAQ</span>
+          <h2 className="mt-4 font-serif text-4xl lg:text-5xl">Common Questions</h2>
+        </Reveal>
+
+        <div className="space-y-3">
+          {faqs.map((faq, i) => (
+            <Reveal key={i} delay={i * 0.05}>
+              <div className="glass-card rounded-xl overflow-hidden">
+                <button
+                  className="w-full flex items-center justify-between px-7 py-5 text-left"
+                  onClick={() => setOpen(open === i ? null : i)}
+                  aria-expanded={open === i}
+                >
+                  <span className="font-medium pr-4">{faq.q}</span>
+                  <motion.div animate={{ rotate: open === i ? 180 : 0 }} transition={{ duration: 0.3 }}>
+                    <ChevronDown className="w-4 h-4 text-gold shrink-0" />
+                  </motion.div>
+                </button>
+                <AnimatePresence initial={false}>
+                  {open === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <p className="px-7 pb-6 text-muted-foreground text-sm leading-relaxed">{faq.a}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   CTA
+═══════════════════════════════════════════════════════ */
+function CTA() {
+  return (
+    <section className="relative py-32 lg:py-44 overflow-hidden">
+      <div className="absolute inset-0 bg-hero opacity-60 pointer-events-none" />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 60% at 50% 50%, oklch(0.28 0.10 255 / 0.35), transparent 70%)",
+        }}
       />
+      <div className="absolute inset-0 starfield opacity-40" aria-hidden />
+
+      <div className="relative max-w-3xl mx-auto px-6 text-center">
+        <Reveal>
+          <span className="text-gold font-serif text-4xl">✦</span>
+          <h2 className="mt-6 font-serif text-4xl lg:text-6xl leading-[1.08]">
+            Your Stars Are Waiting
+          </h2>
+          <p className="mt-6 text-muted-foreground max-w-lg mx-auto leading-relaxed">
+            Book a private session and receive the clarity, direction, and cosmic insight you've been searching for.
+          </p>
+          <div className="mt-10 flex flex-wrap gap-4 justify-center">
+            <Link
+              to="/book"
+              className="inline-flex items-center gap-2 px-10 py-4 rounded-full bg-primary text-primary-foreground font-medium hover:scale-[1.03] hover:shadow-gold transition-all duration-300"
+            >
+              Book a Session <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 px-10 py-4 rounded-full glass-card hover:scale-[1.03] transition-all duration-300"
+            >
+              Get in Touch
+            </Link>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
