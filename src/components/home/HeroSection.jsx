@@ -1,118 +1,245 @@
-import { Link } from '@tanstack/react-router';
-import { motion } from 'framer-motion';
-import { ArrowRight, Star } from 'lucide-react';
-import { Reveal } from '@/components/site/Reveal.jsx';
+import { motion, useMemo } from "framer-motion";
+import { ArrowRight, Star, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
+import heroImg from "@/assets/hero-section.jpg";
+
+// ── Ambient drifting gold particle ──────────────────────────────────────────
+function Particle({ x, y, size, delay, duration }) {
+  return (
+    <motion.span
+      aria-hidden
+      initial={{ opacity: 0, y: 0 }}
+      animate={{
+        opacity: [0, 0.7, 0.4, 0.8, 0],
+        y: [0, -60, -120],
+        x: [0, (Math.random() - 0.5) * 40],
+      }}
+      transition={{
+        duration,
+        delay,
+        repeat: Infinity,
+        ease: "easeInOut",
+        repeatDelay: Math.random() * 4 + 2,
+      }}
+      style={{
+        position: "absolute",
+        left: `${x}%`,
+        top: `${y}%`,
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        background: "oklch(0.82 0.12 85 / 0.75)",
+        boxShadow: "0 0 6px 2px oklch(0.82 0.12 85 / 0.45)",
+        pointerEvents: "none",
+      }}
+    />
+  );
+}
+
+// ── Word-by-word staggered heading ───────────────────────────────────────────
+function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
+  const words1 = line1.split(" ");
+  const words2 = line2Gold.split(" ");
+
+  const wordVariant = {
+    hidden: { opacity: 0, x: -22, filter: "blur(4px)" },
+    visible: (i) => ({
+      opacity: 1, x: 0, filter: "blur(0px)",
+      transition: { delay: delay + i * 0.09, duration: 0.75, ease: [0.22, 1, 0.36, 1] },
+    }),
+  };
+
+  return (
+    <h1
+      className="mt-8 leading-[1.04]"
+      style={{
+        fontFamily: "var(--font-serif)",
+        fontSize: "clamp(2.75rem, 6vw + 0.5rem, 5.75rem)",
+        letterSpacing: "-0.025em",
+        fontWeight: 400,
+      }}
+    >
+      <span className="block overflow-hidden">
+        {words1.map((word, i) => (
+          <motion.span key={i} custom={i} variants={wordVariant} initial="hidden" animate="visible"
+            className="inline-block mr-[0.28em] last:mr-0">
+            {word}
+          </motion.span>
+        ))}
+      </span>
+      <span className="block overflow-hidden mt-1">
+        {words2.map((word, i) => (
+          <motion.span key={i} custom={words1.length + i} variants={wordVariant} initial="hidden" animate="visible"
+            className="inline-block mr-[0.28em] last:mr-0 bg-gradient-gold">
+            {word}
+          </motion.span>
+        ))}
+      </span>
+    </h1>
+  );
+}
 
 export function HeroSection() {
+  const particles = useMemo(
+    () => Array.from({ length: 18 }, (_, idx) => ({
+      id: idx,
+      x: ((idx * 37 + 11) % 90) + 5,
+      y: ((idx * 53 + 17) % 80) + 10,
+      size: (idx % 3) + 1.5,
+      delay: idx * 0.45,
+      duration: 5 + (idx % 5),
+    })),
+    [],
+  );
+
   return (
-    <section className="relative min-h-[100svh] flex items-center overflow-hidden">
-      {/* Starfield layers */}
-      <div className="absolute inset-0 starfield" aria-hidden="true" />
-      <div className="absolute inset-0 starfield-glow" aria-hidden="true" />
-      <div className="absolute inset-0 shooting-star" aria-hidden="true" />
+    <section className="relative overflow-hidden min-h-[100svh] flex items-center shooting-star">
+      {/* Nebula gradient */}
+      <div className="absolute inset-0" style={{
+        background: [
+          "radial-gradient(ellipse 80% 60% at 72% 28%, oklch(0.28 0.10 255 / 0.65), transparent 58%)",
+          "radial-gradient(ellipse 60% 50% at 18% 78%, oklch(0.35 0.10 30 / 0.22), transparent 58%)",
+          "radial-gradient(ellipse 50% 60% at 55% 55%, oklch(0.22 0.07 280 / 0.30), transparent 65%)",
+        ].join(", "),
+      }} />
 
-      {/* Nebula orbs */}
-      <div className="nebula-orb orb-indigo w-[600px] -top-32 -left-20" />
-      <div className="nebula-orb orb-mauve w-[500px] top-20 right-0" />
-      <div className="nebula-orb orb-amber w-[400px] bottom-0 left-1/3" />
+      {/* Starfield */}
+      <div className="absolute inset-0 starfield starfield-glow" aria-hidden />
 
-      <div className="container-luxe relative z-10 pt-32 pb-20 w-full">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left — text */}
-          <div>
-            <Reveal>
-              <div className="flex items-center gap-3 mb-8">
-                <div className="h-px w-12 bg-gradient-to-r from-transparent to-gold/60" />
-                <span className="eyebrow">Private Consultations</span>
-              </div>
-            </Reveal>
+      {/* Particles */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden>
+        {particles.map((p) => <Particle key={p.id} {...p} />)}
+      </div>
 
-            <Reveal delay={0.1}>
-              <h1 className="display-serif text-balance mb-6">
-                Navigate Life by{' '}
-                <span className="display-italic bg-gradient-gold">the Stars</span>
-              </h1>
-            </Reveal>
+      {/* Purple nebula fog */}
+      <motion.div aria-hidden initial={{ opacity: 0 }}
+        animate={{ x: [0, 38, 0], opacity: [0.28, 0.5, 0.28] }}
+        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 1.6 }}
+        className="absolute -top-24 -left-24 w-[65%] h-[85%] pointer-events-none blur-3xl"
+        style={{ background: "radial-gradient(ellipse at center, oklch(0.52 0.09 295 / 0.30), transparent 62%)" }}
+      />
 
-            <Reveal delay={0.2}>
-              <p className="lead mb-10">
-                Personalised astrology consultations for those seeking clarity, direction and a deeper
-                understanding of the cosmic patterns shaping their journey.
-              </p>
-            </Reveal>
+      {/* Amber nebula fog */}
+      <motion.div aria-hidden initial={{ opacity: 0 }}
+        animate={{ x: [0, -28, 0], opacity: [0.2, 0.38, 0.2] }}
+        transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 2.2 }}
+        className="absolute bottom-0 right-0 w-[58%] h-[65%] pointer-events-none blur-3xl"
+        style={{ background: "radial-gradient(ellipse at center, oklch(0.38 0.10 38 / 0.22), transparent 60%)" }}
+      />
 
-            <Reveal delay={0.3}>
-              <div className="flex flex-wrap items-center gap-4">
-                <Link to="/book" className="btn-primary">
-                  Book a Session
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <a href="/#services" className="btn-secondary">
-                  Explore Services
-                </a>
-              </div>
-            </Reveal>
+      {/* Hero figure */}
+      <motion.div initial={{ opacity: 0, y: 48, scale: 1.06 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 2.6, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute inset-y-0 right-0 w-full lg:w-[68%] xl:w-[62%] pointer-events-none"
+        style={{
+          WebkitMaskImage: [
+            "linear-gradient(to right, transparent 0%, black 30%, black 80%, transparent 100%)",
+            "linear-gradient(to bottom, transparent 0%, black 12%, black 80%, transparent 100%)",
+            "radial-gradient(ellipse 75% 80% at 62% 44%, black 30%, rgba(0,0,0,0.55) 62%, transparent 88%)",
+          ].join(", "),
+          maskImage: [
+            "linear-gradient(to right, transparent 0%, black 30%, black 80%, transparent 100%)",
+            "linear-gradient(to bottom, transparent 0%, black 12%, black 80%, transparent 100%)",
+            "radial-gradient(ellipse 75% 80% at 62% 44%, black 30%, rgba(0,0,0,0.55) 62%, transparent 88%)",
+          ].join(", "),
+          WebkitMaskComposite: "source-in, source-in",
+          maskComposite: "intersect, intersect",
+        }}
+      >
+        <motion.div className="absolute inset-0" animate={{ y: [0, -16, 0] }}
+          transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 2.6 }}>
+          <img src={heroImg} alt="The Precetor — celestial guide"
+            fetchPriority="high" decoding="async" width={900} height={1200}
+            className="absolute inset-0 w-full h-full object-cover object-center lg:scale-[1.18] mix-blend-luminosity"
+            style={{ opacity: 0.88 }}
+          />
+        </motion.div>
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to right, oklch(0.10 0.025 270) 0%, oklch(0.10 0.025 270 / 0.55) 22%, transparent 55%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, oklch(0.10 0.025 270) 0%, oklch(0.10 0.025 270 / 0.45) 15%, transparent 45%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, oklch(0.10 0.025 270 / 0.6) 0%, transparent 30%)" }} />
+      </motion.div>
 
-            <Reveal delay={0.4}>
-              <div className="flex items-center gap-6 mt-12 pt-8 border-t border-border/40">
-                <div className="flex -space-x-2">
-                  {['SL', 'AM', 'EV', 'JO'].map((initials) => (
-                    <div
-                      key={initials}
-                      className="w-9 h-9 rounded-full glass-card border border-gold/20 flex items-center justify-center text-xs font-medium text-gold"
-                    >
-                      {initials}
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <div className="flex gap-0.5 mb-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Trusted by 1,200+ clients in 48 countries</p>
-                </div>
-              </div>
-            </Reveal>
-          </div>
+      {/* Left readability gradient */}
+      <div className="absolute inset-y-0 left-0 pointer-events-none w-full lg:w-[58%]"
+        style={{ background: "linear-gradient(to right, oklch(0.10 0.025 270) 38%, oklch(0.10 0.025 270 / 0.75) 58%, transparent 100%)" }}
+      />
 
-          {/* Right — decorative cosmic chart */}
-          <Reveal delay={0.15} className="hidden lg:flex items-center justify-center">
+      {/* Page vignette */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: "linear-gradient(to bottom, oklch(0.10 0.025 270 / 0.5) 0%, transparent 18%, transparent 75%, oklch(0.10 0.025 270) 100%)" }}
+      />
+
+      {/* Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 pt-32 pb-24 lg:py-40 w-full">
+        <div className="max-w-[52rem] lg:max-w-[46rem]">
+          <motion.span initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.25, duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card text-xs uppercase tracking-[0.28em] text-gold">
+            <motion.span animate={{ rotate: [0, 18, -12, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 3 }}>
+              <Sparkles className="w-3 h-3" />
+            </motion.span>
+            Premium Astrology
+          </motion.span>
+
+          <StaggeredHeading line1="Modern guidance," line2Gold="written in the stars." delay={0.45} />
+
+          <motion.p initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.15, duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-8 text-lg md:text-xl max-w-xl leading-relaxed"
+            style={{ color: "oklch(0.7 0.02 80)" }}>
+            Cinematic, deeply personal astrology consultations for high-intention seekers — designed
+            for clarity in love, career, and life's defining chapters.
+          </motion.p>
+
+          <motion.div initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.4, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-10 flex flex-wrap gap-4">
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 120, repeat: Infinity, ease: 'linear' }}
-              className="relative w-80 h-80"
-            >
-              {/* Outer ring */}
-              <svg viewBox="0 0 320 320" className="absolute inset-0 w-full h-full opacity-30">
-                <circle cx="160" cy="160" r="150" fill="none" stroke="oklch(0.82 0.12 85 / 0.25)" strokeWidth="1" strokeDasharray="4 8" />
-                <circle cx="160" cy="160" r="120" fill="none" stroke="oklch(0.82 0.12 85 / 0.15)" strokeWidth="1" strokeDasharray="2 6" />
-                <circle cx="160" cy="160" r="90" fill="none" stroke="oklch(0.82 0.12 85 / 0.20)" strokeWidth="0.5" />
-                {/* Zodiac tick marks */}
-                {[...Array(12)].map((_, i) => {
-                  const angle = (i * 30 - 90) * (Math.PI / 180);
-                  const x1 = 160 + 148 * Math.cos(angle);
-                  const y1 = 160 + 148 * Math.sin(angle);
-                  const x2 = 160 + 138 * Math.cos(angle);
-                  const y2 = 160 + 138 * Math.sin(angle);
-                  return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="oklch(0.82 0.12 85 / 0.50)" strokeWidth="1.5" />;
-                })}
-              </svg>
-              {/* Centre star */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <motion.div
-                  animate={{ scale: [1, 1.08, 1] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                  className="text-6xl text-gold/80 font-serif"
-                >
-                  ✦
-                </motion.div>
-              </div>
+              animate={{ boxShadow: ["0 0 0 0 oklch(0.82 0.12 85 / 0.0)", "0 0 0 10px oklch(0.82 0.12 85 / 0.12)", "0 0 0 20px oklch(0.82 0.12 85 / 0.0)"] }}
+              transition={{ duration: 2.8, repeat: Infinity, ease: "easeOut", delay: 2.5 }}
+              className="rounded-full">
+              <Link to="/book" className="btn-primary group">
+                Book a Session
+                <motion.span animate={{ x: [0, 3, 0] }}
+                  transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut", delay: 3 }}>
+                  <ArrowRight className="w-4 h-4" />
+                </motion.span>
+              </Link>
             </motion.div>
-          </Reveal>
+            <a href="#services" className="btn-secondary">Explore Services</a>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            transition={{ delay: 1.8, duration: 0.9 }}
+            className="mt-14 flex items-center gap-5 text-sm" style={{ color: "oklch(0.7 0.02 80)" }}>
+            <div className="flex gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <motion.span key={i} initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.9 + i * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
+                  <Star className="w-4 h-4 fill-gold text-gold" />
+                </motion.span>
+              ))}
+            </div>
+            <span>Trusted by 8,400+ clients across 47 countries</span>
+          </motion.div>
         </div>
       </div>
+
+      {/* Scroll cue */}
+      <motion.div initial={{ opacity: 0 }}
+        animate={{ y: [0, 9, 0], opacity: [0, 0.5, 0.75, 0.4] }}
+        transition={{
+          opacity: { delay: 2.4, duration: 1.2, ease: "easeOut" },
+          y: { duration: 3.2, repeat: Infinity, delay: 2.4 },
+        }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 select-none flex flex-col items-center gap-2">
+        <span className="text-[0.6rem] uppercase tracking-[0.38em]" style={{ color: "oklch(0.82 0.12 85 / 0.60)" }}>Scroll</span>
+        <motion.span animate={{ opacity: [0.4, 1, 0.4], scaleY: [0.6, 1, 0.6] }}
+          transition={{ duration: 1.8, repeat: Infinity }}
+          className="block w-px h-6" style={{ background: "oklch(0.82 0.12 85 / 0.45)" }}
+        />
+      </motion.div>
     </section>
   );
 }

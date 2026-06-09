@@ -1,33 +1,109 @@
-import { motion } from 'framer-motion'
-import { Package } from 'lucide-react'
-import { useState } from 'react'
+import { motion } from "framer-motion";
+import { Sparkles, BookOpen, Gem, GraduationCap, Bell } from "lucide-react";
+import { useState } from "react";
+import { Reveal } from "@/components/site/Reveal";
 
-const eyebrow = { fontFamily: 'Satoshi, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'oklch(0.82 0.12 85)', opacity: 0.8 }
-const goldBtn = { display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'oklch(0.82 0.12 85)', color: 'oklch(0.1 0.02 272)', fontFamily: 'Satoshi, sans-serif', fontSize: '0.8rem', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '0.85rem 2rem', borderRadius: '9999px', fontWeight: 600, border: 'none', cursor: 'pointer' }
+const previews = [
+  {
+    icon: BookOpen,
+    t: "Astrology Reports",
+    d: "Personalised written natal and yearly forecasts.",
+  },
+  {
+    icon: Gem,
+    t: "Spiritual Products",
+    d: "Hand-curated objects for your altar and rituals.",
+  },
+  {
+    icon: GraduationCap,
+    t: "Courses & Ebooks",
+    d: "Self-paced learning to read your own chart.",
+  },
+];
 
 export default function ShopPage() {
-  const [submitted, setSubmitted] = useState(false)
+  const [email, setEmail] = useState("");
+  const [done, setDone] = useState(false);
 
   return (
-    <section style={{ padding: 'clamp(6rem, 12vw, 10rem) 1.5rem', background: 'oklch(0.08 0.022 272)', minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ maxWidth: '36rem', textAlign: 'center' }}>
-        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
-          <div style={{ width: '4rem', height: '4rem', borderRadius: '50%', background: 'oklch(0.82 0.12 85 / 0.1)', border: '1px solid oklch(0.82 0.12 85 / 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Package size={28} style={{ color: 'oklch(0.82 0.12 85)' }} />
-          </div>
-          <span style={eyebrow}>Coming Soon</span>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 300, color: 'oklch(0.96 0.01 85)', lineHeight: 1.15 }}>The Shop is being <em style={{ color: 'oklch(0.82 0.12 85)' }}>carefully curated.</em></h1>
-          <p style={{ fontFamily: 'Satoshi, sans-serif', fontSize: '1rem', color: 'oklch(0.6 0.02 272)', lineHeight: 1.7 }}>Digital rituals, chart reports, learning resources, and curated offerings are coming soon.</p>
-          {submitted
-            ? <p style={{ ...eyebrow, opacity: 1, color: 'oklch(0.82 0.12 85)' }}>You are on the list!</p>
-            : (
-              <form onSubmit={e => { e.preventDefault(); setSubmitted(true) }} style={{ display: 'flex', gap: '0.75rem', width: '100%', maxWidth: '28rem' }}>
-                <input type="email" required placeholder="your@email.com" style={{ flex: 1, background: 'oklch(0.12 0.022 272 / 0.6)', border: '1px solid oklch(0.82 0.12 85 / 0.2)', borderRadius: '9999px', padding: '0.75rem 1.25rem', fontFamily: 'Satoshi, sans-serif', fontSize: '0.875rem', color: 'oklch(0.9 0.01 85)', outline: 'none' }} />
-                <button type="submit" style={goldBtn}>Notify Me</button>
-              </form>
-            )}
-        </motion.div>
-      </div>
-    </section>
-  )
+    <div className="bg-hero starfield min-h-screen">
+      <section className="max-w-5xl mx-auto px-6 lg:px-10 py-24 lg:py-32 text-center">
+        <Reveal>
+          <motion.div
+            animate={{ rotate: [0, 360] }}
+            transition={{
+              duration: 60,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            className="w-20 h-20 mx-auto rounded-full gold-border flex items-center justify-center"
+          >
+            <Sparkles className="w-8 h-8 text-gold" />
+          </motion.div>
+
+          <span className="mt-8 inline-block text-xs uppercase tracking-[0.3em] text-gold">
+            Shop
+          </span>
+
+          <h1 className="mt-4 text-6xl md:text-7xl">
+            Coming Soon.
+          </h1>
+
+          <p className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto">
+            A curated collection of reports, products, ebooks and courses —
+            crafted with the same care as our consultations.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.15}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setDone(true);
+
+              // Add API call here
+              console.log("Email:", email);
+            }}
+            className="mt-12 max-w-md mx-auto glass-card rounded-full p-2 flex items-center"
+          >
+            <Bell className="w-5 h-5 text-gold mx-4" />
+
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Notify me at launch"
+              type="email"
+              required
+              className="flex-1 bg-transparent focus:outline-none px-2 py-2 text-sm"
+            />
+
+            <button
+              type="submit"
+              className="px-6 py-3 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:scale-[1.02] transition"
+            >
+              {done ? "On the list ✓" : "Notify Me"}
+            </button>
+          </form>
+        </Reveal>
+
+        <div className="mt-20 grid md:grid-cols-3 gap-6">
+          {previews.map((p, i) => (
+            <Reveal key={p.t} delay={i * 0.08}>
+              <div className="glass-card rounded-2xl p-8 hover:shadow-gold transition">
+                <p.icon className="w-7 h-7 text-gold mx-auto" />
+
+                <h3 className="mt-5 text-xl">
+                  {p.t}
+                </h3>
+
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {p.d}
+                </p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
 }

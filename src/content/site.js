@@ -1,17 +1,40 @@
+// CMS-ready content configuration.
+// Replace these constants with calls to your CMS (Sanity, Contentful, etc.) when ready.
+
 export const siteConfig = {
-  name: 'The Preceptor',
-  tagline: 'Celestial Guidance for the Modern Soul',
+  name: "The Precetor",
+  tagline: "Modern guidance, written in the stars.",
   description:
-    'Private astrology consultations — birth chart, career, relationships and spiritual guidance for clients worldwide.',
-  email: 'consult@thepreceptor.com',
-  instagram: 'https://instagram.com/thepreceptor',
-  twitter: 'https://twitter.com/thepreceptor',
+    "Cinematic, deeply personal astrology consultations for high-intention seekers — clarity in love, career, and life's defining chapters.",
+  email: "hello@theprecetor.com",
+  phone: "+1 (212) 555-0117",
+  social: {
+    instagram: "https://instagram.com/theprecetor",
+    youtube: "https://youtube.com/@theprecetor",
+    linkedin: "https://linkedin.com/company/theprecetor",
+  },
 };
 
 export const navLinks = [
-  { label: 'Home', to: '/' },
-  { label: 'About', hash: '/#about' },
-  { label: 'Services', hash: '/#services' },
-  { label: 'Testimonials', hash: '/#testimonials' },
-  { label: 'Contact', to: '/contact' },
+  { to: "/", label: "Home", hash: undefined },
+  { to: "/about", label: "About", hash: undefined },
+  { to: null, label: "Services", hash: "#services" },
+  { to: "/testimonials", label: "Testimonials", hash: undefined },
+  { to: "/shop", label: "Shop", hash: undefined },
+  { to: "/contact", label: "Contact", hash: undefined },
 ];
+
+export const footerLinks = {
+  explore: [
+    { to: "/", label: "Home" },
+    { to: "/about", label: "About" },
+    { to: "/testimonials", label: "Testimonials" },
+    { to: "/book", label: "Book a Session" },
+    { to: "/shop", label: "Shop" },
+  ],
+  legal: [
+    { to: "/privacy", label: "Privacy Policy" },
+    { to: "/terms", label: "Terms & Conditions" },
+    { to: "/contact", label: "Contact" },
+  ],
+}

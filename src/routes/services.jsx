@@ -1,54 +1,142 @@
-import { Link } from '@tanstack/react-router'
-import { motion } from 'framer-motion'
-import { Star, Briefcase, Heart, Moon, Sparkles, BookOpen, ArrowRight } from 'lucide-react'
+import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowRight, Star, Briefcase, Heart, Moon, Sparkles, BookOpen, CheckCircle } from "lucide-react";
+import { Reveal } from "@/components/site/Reveal";
+import { SERVICES, SITE } from "@/utils/constants";
 
-const services = [
-  { icon: Star, title: 'Birth Chart Reading', desc: 'A cinematic decode of your natal sky — purpose, gifts, and life arc. Delivered as a 60-minute private video session with a written summary.', duration: '60 min', ideal: 'Ideal for first-time seekers and those at major life crossroads.' },
-  { icon: Briefcase, title: 'Career Guidance', desc: 'Strategic timing and direction aligned with your dharma and professional ambition.', duration: '60 min', ideal: 'Ideal for founders, executives, and career transitions.' },
-  { icon: Heart, title: 'Relationship Consultation', desc: 'Synastry and composite chart analysis for love, family, and key partnerships.', duration: '60 min', ideal: 'Ideal for couples, those seeking partnership, or navigating family dynamics.' },
-  { icon: Moon, title: 'Tarot Reading', desc: 'Intuitive symbolic readings for clarity at decisive personal crossroads.', duration: '45 min', ideal: 'Ideal for those seeking a second perspective on a specific situation.' },
-  { icon: Sparkles, title: 'Spiritual Consultation', desc: 'Personal practices, daily rituals, and Vedic remedies for inner alignment.', duration: '60 min', ideal: 'Ideal for those on a conscious spiritual path seeking structured guidance.' },
-  { icon: BookOpen, title: 'Kundli Analysis', desc: 'Deep Vedic chart analysis with predictive timelines, dasha periods, and written report.', duration: '90 min', ideal: 'Ideal for those who want the most comprehensive session available.' },
-]
-
-const eyebrow = { fontFamily: 'Satoshi, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'oklch(0.82 0.12 85)', opacity: 0.8 }
-
-export default function ServicesPage() {
+export default function ServicesWrapper() {
   return (
-    <section style={{ padding: 'clamp(6rem, 12vw, 10rem) 1.5rem', background: 'oklch(0.08 0.022 272)', minHeight: '100dvh' }}>
-      <div style={{ maxWidth: '72rem', margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <span style={eyebrow}>What We Offer</span>
-            <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2.5rem, 6vw, 5rem)', fontWeight: 300, color: 'oklch(0.96 0.01 85)', lineHeight: 1.1, marginTop: '1rem' }}>Every session,{' '}<em style={{ color: 'oklch(0.82 0.12 85)' }}>crafted for you.</em></h1>
-            <p style={{ fontFamily: 'Satoshi, sans-serif', fontSize: '1.05rem', color: 'oklch(0.6 0.02 272)', marginTop: '1.25rem', maxWidth: '36rem', margin: '1.25rem auto 0', lineHeight: 1.7 }}>Each offering is a focused, private session — designed around your story, your questions, your moment.</p>
-          </motion.div>
+    <>
+      <Helmet>
+        <title>Astrology Services — The Precetor</title>
+        <meta name="description" content="Explore birth chart readings, relationship consultations, career astrology, Kundli analysis, Tarot, and spiritual guidance. Premium sessions for discerning seekers." />
+        <meta property="og:title" content="Astrology Services — The Precetor" />
+        <meta property="og:description" content="Premium astrology consultation services — individually crafted for clarity in love, career, and life's defining chapters." />
+      </Helmet>
+      <ServicesPage />
+    </>
+  );
+}
+
+const ICON_MAP = { Star, Briefcase, Heart, Moon, Sparkles, BookOpen };
+
+const INCLUDES = [
+  "Private 1-on-1 video session",
+  "Full session recording delivered within 24h",
+  "Written summary of key themes",
+  "Follow-up Q&A via email (48h window)",
+  "Timezone-aware scheduling",
+];
+
+function ServicesPage() {
+  return (
+    <main className="min-h-screen">
+      {/* Hero */}
+      <section className="relative py-36 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,oklch(0.28_0.10_255_/_0.45),transparent_65%)]" />
+        <div className="absolute inset-0 starfield" aria-hidden />
+        <div className="relative max-w-4xl mx-auto px-6 lg:px-10 text-center z-10">
+          <motion.span initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="text-xs uppercase tracking-[0.3em] text-gold">
+            — What We Offer
+          </motion.span>
+          <motion.h1 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-5"
+            style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)", fontWeight: 400 }}>
+            Sessions designed for
+            <span className="block bg-gradient-gold"> the discerning seeker.</span>
+          </motion.h1>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            transition={{ delay: 0.25, duration: 0.9 }}
+            className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
+            Every consultation is a private, one-on-one experience — unhurried, deeply personal, and focused entirely on your questions.
+          </motion.p>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {services.map((s, i) => {
-            const Icon = s.icon
-            return (
-              <motion.div key={s.title} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-40px' }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: i * 0.06 }}
-                style={{ background: 'oklch(0.12 0.022 272 / 0.6)', border: '1px solid oklch(0.82 0.12 85 / 0.15)', borderRadius: '1.25rem', padding: 'clamp(1.5rem, 3vw, 2.5rem)', backdropFilter: 'blur(12px)', display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: '1.5rem 2rem', alignItems: 'center' }}>
-                <div style={{ width: '3rem', height: '3rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'oklch(0.82 0.12 85 / 0.1)', border: '1px solid oklch(0.82 0.12 85 / 0.25)', flexShrink: 0 }}>
-                  <Icon size={18} style={{ color: 'oklch(0.82 0.12 85)' }} />
-                </div>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
-                    <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.2rem, 2vw, 1.5rem)', color: 'oklch(0.96 0.01 85)', fontWeight: 500 }}>{s.title}</h3>
-                    <span style={{ ...eyebrow, opacity: 1 }}>{s.duration}</span>
-                  </div>
-                  <p style={{ fontFamily: 'Satoshi, sans-serif', fontSize: '0.9rem', color: 'oklch(0.6 0.02 272)', lineHeight: 1.7, marginBottom: '0.5rem' }}>{s.desc}</p>
-                  <p style={{ fontFamily: 'Satoshi, sans-serif', fontSize: '0.8rem', color: 'oklch(0.82 0.12 85)', opacity: 0.7 }}>{s.ideal}</p>
-                </div>
-                <Link to="/book" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', border: '1px solid oklch(0.82 0.12 85 / 0.4)', color: 'oklch(0.82 0.12 85)', fontFamily: 'Satoshi, sans-serif', fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', padding: '0.65rem 1.25rem', borderRadius: '9999px', textDecoration: 'none', whiteSpace: 'nowrap', background: 'transparent' }}>
-                  Book <ArrowRight size={12} />
-                </Link>
-              </motion.div>
-            )
-          })}
+      </section>
+
+      {/* Service cards */}
+      <section className="py-20 bg-cosmic-deep relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none section-glow-services" aria-hidden />
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {SERVICES.map((s, i) => {
+              const Icon = ICON_MAP[s.icon];
+              return (
+                <Reveal key={s.slug} delay={i * 0.06}>
+                  <motion.div whileHover={{ y: -6 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    className="glass-card rounded-2xl p-8 flex flex-col gap-6 group hover:border-primary/40 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.06),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative z-10 flex flex-col gap-4 h-full">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <h2 className="text-2xl font-serif">{s.title}</h2>
+                        <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
+                      </div>
+                      <div className="flex items-center justify-between pt-4 border-t border-gold/10">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs px-2 py-0.5 rounded-full border border-gold/20 text-gold">{s.duration}</span>
+                        </div>
+                        <span className="font-serif text-xl text-gold">{s.price}</span>
+                      </div>
+                      <Link to="/book"
+                        className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-gold hover:text-foreground transition group/link">
+                        Book this session
+                        <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
+                      </Link>
+                    </div>
+                  </motion.div>
+                </Reveal>
+              );
+            })}
+          </div>
         </div>
-      </div>
-    </section>
-  )
+      </section>
+
+      {/* What's included */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="max-w-4xl mx-auto px-6 lg:px-10 text-center">
+          <Reveal>
+            <span className="text-xs uppercase tracking-[0.3em] text-gold">Every Session</span>
+            <h2 className="mt-4 text-3xl md:text-4xl">What's always included.</h2>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <ul className="mt-10 grid sm:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
+              {INCLUDES.map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-gold flex-shrink-0 mt-0.5" />
+                  <span className="text-muted-foreground">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* CTA strip */}
+      <section className="py-24">
+        <div className="max-w-3xl mx-auto px-6 text-center">
+          <Reveal>
+            <h2 className="text-3xl md:text-4xl">Ready to book?</h2>
+            <p className="mt-4 text-muted-foreground">
+              Choose your session type and reserve your private time. Slots fill up — early scheduling is recommended.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4 justify-center">
+              <Link to="/book" className="btn-primary">
+                Reserve a Session <ArrowRight className="w-4 h-4" />
+              </Link>
+              <a href={`mailto:${SITE.email}`} className="btn-secondary">
+                Have a question?
+              </a>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+    </main>
+  );
 }

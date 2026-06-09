@@ -1,29 +1,34 @@
-import { Link } from '@tanstack/react-router';
-import { ArrowRight } from 'lucide-react';
-import { Reveal } from '@/components/site/Reveal.jsx';
+import { motion } from "framer-motion";
+import { Sun, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Reveal } from "@/components/site/Reveal";
 
 export function CtaSection() {
   return (
-    <section className="section relative">
-      <div className="absolute inset-0 section-glow-cta pointer-events-none" />
-      <div className="absolute inset-0 starfield" aria-hidden="true" />
-      <div className="container-luxe relative z-10 text-center">
+    <section className="py-32 relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none section-glow-cta" aria-hidden />
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,oklch(0.82_0.12_85_/_0.07),transparent_60%)] blur-3xl" />
+      </div>
+      <div className="max-w-5xl mx-auto px-6 lg:px-10 relative z-10">
         <Reveal>
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="h-px w-12 bg-gradient-to-r from-transparent to-gold/60" />
-            <span className="eyebrow">Begin Your Journey</span>
-            <div className="h-px w-12 bg-gradient-to-l from-transparent to-gold/60" />
-          </div>
-          <h2 className="text-balance mb-6">Ready to Read<br /><em>Your Stars?</em></h2>
-          <p className="lead mx-auto text-center mb-10">
-            Reserve a private session and receive celestial guidance tailored to your exact cosmic blueprint.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link to="/book" className="btn-primary">
-              Book a Session
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link to="/contact" className="btn-secondary">Get in Touch</Link>
+          <div className="relative rounded-3xl overflow-hidden glass-card p-12 md:p-20 text-center">
+            <div className="absolute inset-0 bg-hero opacity-60" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.15),transparent_40%)]" />
+            <div className="relative z-10">
+              <motion.div animate={{ rotate: [0, 15, -10, 0], scale: [1, 1.12, 1] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}>
+                <Sun className="w-10 h-10 text-gold mx-auto" />
+              </motion.div>
+              <h2 className="mt-6 text-4xl md:text-5xl">Begin your reading.</h2>
+              <p className="mt-5 text-muted-foreground max-w-xl mx-auto">
+                A single conversation can shift the trajectory of a decade. Reserve your private session today.
+              </p>
+              <Link to="/book"
+                className="mt-10 inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-medium shadow-gold hover:scale-[1.02] transition">
+                Book Your Session <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </Reveal>
       </div>

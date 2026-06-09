@@ -1,110 +1,708 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, ArrowLeft, Star, Briefcase, Heart, Moon, Sparkles, BookOpen, ExternalLink, CheckCircle2 } from 'lucide-react'
-
-const services = [
-  { id: 'birth-chart', icon: Star, title: 'Birth Chart Reading', desc: 'A cinematic decode of your natal sky — purpose, gifts, and life arc.', duration: '60 min' },
-  { id: 'career', icon: Briefcase, title: 'Career Guidance', desc: 'Strategic timing and direction aligned with your dharma.', duration: '60 min' },
-  { id: 'relationship', icon: Heart, title: 'Relationship Consultation', desc: 'Synastry and compatibility guidance for love and partnership.', duration: '60 min' },
-  { id: 'tarot', icon: Moon, title: 'Tarot Reading', desc: 'Intuitive readings at decisive crossroads.', duration: '45 min' },
-  { id: 'spiritual', icon: Sparkles, title: 'Spiritual Consultation', desc: 'Practices and remedies for inner alignment.', duration: '60 min' },
-  { id: 'kundli', icon: BookOpen, title: 'Kundli Analysis', desc: 'Deep Vedic chart with predictive timelines.', duration: '90 min' },
-]
-
-const CAL_USERNAME = import.meta.env.VITE_CALCOM_USERNAME || ''
-const CAL_EVENT = import.meta.env.VITE_CALCOM_EVENT_SLUG || 'consultation-60min'
-
-const eyebrow = { fontFamily: 'Satoshi, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'oklch(0.82 0.12 85)', opacity: 0.8 }
-const goldBtn = { display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'oklch(0.82 0.12 85)', color: 'oklch(0.1 0.02 272)', fontFamily: 'Satoshi, sans-serif', fontSize: '0.8rem', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '0.85rem 2rem', borderRadius: '9999px', fontWeight: 600, border: 'none', cursor: 'pointer' }
-
-function CalEmbed({ service }) {
-  if (!CAL_USERNAME) {
-    return (
-      <div style={{ background: 'oklch(0.12 0.022 272 / 0.6)', border: '1px solid oklch(0.82 0.12 85 / 0.2)', borderRadius: '1.25rem', padding: '4rem 2rem', textAlign: 'center', backdropFilter: 'blur(12px)' }}>
-        <CheckCircle2 size={36} style={{ color: 'oklch(0.82 0.12 85)', margin: '0 auto 1.5rem' }} />
-        <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.75rem', color: 'oklch(0.96 0.01 85)', marginBottom: '1rem' }}>Almost there!</h3>
-        <p style={{ fontFamily: 'Satoshi, sans-serif', fontSize: '0.9rem', color: 'oklch(0.6 0.02 272)', maxWidth: '32rem', margin: '0 auto 2rem', lineHeight: 1.7 }}>
-          Cal.com is not yet configured. Add <code style={{ color: 'oklch(0.82 0.12 85)' }}>VITE_CALCOM_USERNAME</code> to <code style={{ color: 'oklch(0.82 0.12 85)' }}>.env.local</code> to activate live booking.
-        </p>
-        <a href="https://cal.com" target="_blank" rel="noopener noreferrer" style={goldBtn}>Set up Cal.com <ExternalLink size={14} /></a>
-        <p style={{ ...eyebrow, marginTop: '1.5rem' }}>Selected: {service.title}</p>
-      </div>
-    )
-  }
-  return (
-    <div style={{ width: '100%', height: '600px', borderRadius: '1.25rem', overflow: 'hidden', border: '1px solid oklch(0.82 0.12 85 / 0.2)' }}>
-      <iframe src={`https://cal.com/${CAL_USERNAME}/${CAL_EVENT}?service=${service.id}`} width="100%" height="100%" frameBorder="0" title={`Book ${service.title}`} />
-    </div>
-  )
-}
+import { Helmet } from "react-helmet-async";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ArrowRight,
+  ArrowLeft,
+  CheckCircle2,
+  Sparkles,
+  Globe2,
+  Clock,
+  CalendarDays,
+  Video,
+  Mail,
+  ShieldCheck,
+} from "lucide-react";
+import { Reveal } from "@/components/site/Reveal";
 
 export default function BookPage() {
-  const [step, setStep] = useState(0)
-  const [selected, setSelected] = useState(null)
+  return (
+    <>
+      <Helmet>
+        <title>Book a Session — The Precetor</title>
+        <meta name="description" content="Reserve a private astrology consultation with The Precetor. Timezone-aware scheduling, premium experience for international clients." />
+        <meta property="og:title" content="Book a Session — The Precetor" />
+        <meta property="og:description" content="Premium astrology consultation booking — birth chart, career, relationships, and more." />
+      </Helmet>
+      <BookPageContent />
+    </>
+  );
+}
+
+// ----- Types & constants -----
+const initialForm = {
+  fullName: "",
+  email: "",
+  phone: "",
+  country: "",
+  city: "",
+  dob: "",
+  tob: "",
+  pob: "",
+  consultationType: "Birth Chart Reading",
+  language: "English",
+  concern: "",
+};
+
+const consultationTypes = [
+  "Birth Chart Reading",
+  "Career Guidance",
+  "Relationship Consultation",
+  "Tarot Reading",
+  "Spiritual Consultation",
+  "Kundli Analysis",
+];
+
+const languages = ["English", "Hindi", "Spanish", "French", "Arabic", "Mandarin"];
+
+// Astrologer base timezone & slot offsets (in IST hours of day)
+const ASTROLOGER_TZ = "Asia/Kolkata";
+const ASTROLOGER_SLOTS_IST = [10, 12.5, 15, 17.5, 20, 21.5];
+const SESSION_DURATION_MIN = 60;
+
+// Common timezones for fallback dropdown
+const COMMON_TZ = [
+  "America/New_York",
+  "America/Chicago",
+  "America/Denver",
+  "America/Los_Angeles",
+  "Europe/London",
+  "Europe/Paris",
+  "Europe/Berlin",
+  "Asia/Dubai",
+  "Asia/Kolkata",
+  "Asia/Singapore",
+  "Asia/Tokyo",
+  "Australia/Sydney",
+];
+
+// ----- Helpers -----
+function getTzOffsetLabel(tz) {
+  try {
+    const dtf = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      timeZoneName: "shortOffset",
+    });
+    const parts = dtf.formatToParts(new Date());
+    const off = parts.find((p) => p.type === "timeZoneName")?.value ?? "";
+    const abbr = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      timeZoneName: "short",
+    })
+      .formatToParts(new Date())
+      .find((p) => p.type === "timeZoneName")?.value ?? "";
+    return { abbr, off };
+  } catch {
+    return { abbr: "", off: "" };
+  }
+}
+
+function istHourToUserDate(baseDate, istHour) {
+  // Build the slot date as IST then return a Date (UTC moment)
+  const y = baseDate.getFullYear();
+  const m = baseDate.getMonth() + 1;
+  const d = baseDate.getDate();
+  const hh = Math.floor(istHour);
+  const mm = Math.round((istHour - hh) * 60);
+  // IST is UTC+5:30
+  const utcMs = Date.UTC(y, m - 1, d, hh - 5, mm - 30);
+  return new Date(utcMs);
+}
+
+function formatInTz(date, tz, opts) {
+  return new Intl.DateTimeFormat("en-US", { timeZone: tz, ...opts }).format(date);
+}
+
+// ----- Page -----
+function BookPageContent() {
+  const [step, setStep] = useState(0); // 0 intro, 1 details, 2 timezone, 3 slot, 4 summary, 5 confirmed
+  const [form, setForm] = useState(initialForm);
+  const [tz, setTz] = useState("UTC");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedSlot, setSelectedSlot] = useState(null);
+
+  useEffect(() => {
+    try {
+      const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (detected) setTz(detected);
+    } catch {
+      setTz("UTC");
+    }
+  }, []);
+
+  const tzLabel = useMemo(() => getTzOffsetLabel(tz), [tz]);
+
+  const stepLabels = ["Intro", "Your Details", "Timezone", "Choose Time", "Review", "Confirmed"];
+  const progressSteps = stepLabels.slice(1, 5); // hide intro & confirmed in bar
 
   return (
-    <section style={{ padding: 'clamp(6rem, 12vw, 10rem) 1.5rem', background: 'oklch(0.08 0.022 272)', minHeight: '100dvh' }}>
-      <div style={{ maxWidth: '56rem', margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-          <span style={eyebrow}>Private Consultation</span>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(3rem, 7vw, 5.5rem)', fontWeight: 300, color: 'oklch(0.96 0.01 85)', lineHeight: 1.05, marginTop: '1rem' }}>
-            Book your <em style={{ color: 'oklch(0.82 0.12 85)' }}>session.</em>
-          </h1>
-        </div>
+    <div className="bg-hero starfield min-h-screen relative overflow-hidden">
+      {/* Ambient glow */}
+      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full opacity-30 blur-3xl"
+           style={{ background: "radial-gradient(circle, var(--gold) 0%, transparent 60%)" }} />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginBottom: '3rem' }}>
-          {['Choose Service', 'Schedule'].map((label, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: i <= step ? 'oklch(0.82 0.12 85)' : 'oklch(0.45 0.02 272)' }}>
-                <div style={{ width: '1.75rem', height: '1.75rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600, fontFamily: 'Satoshi, sans-serif', border: `1px solid ${i <= step ? 'oklch(0.82 0.12 85)' : 'oklch(0.3 0.02 272)'}`, background: i <= step ? 'oklch(0.82 0.12 85 / 0.1)' : 'transparent' }}>{i + 1}</div>
-                <span style={{ fontFamily: 'Satoshi, sans-serif', fontSize: '0.8rem' }}>{label}</span>
+      <section className="relative max-w-6xl mx-auto px-6 lg:px-10 py-16 lg:py-24">
+        {/* Progress bar (hidden on intro & confirmed) */}
+        {step > 0 && step < 5 && (
+          <Reveal>
+            <div className="max-w-3xl mx-auto mb-12">
+              <div className="flex items-center gap-3">
+                {progressSteps.map((s, i) => {
+                  const idx = i + 1;
+                  const active = step >= idx;
+                  return (
+                    <div key={s} className="flex-1">
+                      <div
+                        className={`h-[3px] rounded-full transition-all duration-500 ${
+                          active ? "bg-gold shadow-gold" : "bg-muted"
+                        }`}
+                      />
+                      <p
+                        className={`mt-2 text-[10px] md:text-xs uppercase tracking-[0.25em] ${
+                          active ? "text-gold" : "text-muted-foreground"
+                        }`}
+                      >
+                        {s}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
-              {i < 1 && <div style={{ width: '3rem', height: '1px', background: step > i ? 'oklch(0.82 0.12 85 / 0.5)' : 'oklch(0.2 0.02 272)' }} />}
             </div>
-          ))}
-        </div>
+          </Reveal>
+        )}
 
         <AnimatePresence mode="wait">
           {step === 0 && (
-            <motion.div key="step-0" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: '1rem' }}>
-                {services.map((s) => {
-                  const Icon = s.icon
-                  const isActive = selected?.id === s.id
+            <StepWrap key="intro">
+              <IntroStep onStart={() => setStep(1)} />
+            </StepWrap>
+          )}
+          {step === 1 && (
+            <StepWrap key="details">
+              <DetailsStep
+                form={form}
+                setForm={setForm}
+                onNext={() => setStep(2)}
+                onBack={() => setStep(0)}
+              />
+            </StepWrap>
+          )}
+          {step === 2 && (
+            <StepWrap key="tz">
+              <TimezoneStep
+                tz={tz}
+                setTz={setTz}
+                tzLabel={tzLabel}
+                onNext={() => setStep(3)}
+                onBack={() => setStep(1)}
+              />
+            </StepWrap>
+          )}
+          {step === 3 && (
+            <StepWrap key="slot">
+              <SlotStep
+                tz={tz}
+                tzLabel={tzLabel}
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                selectedSlot={selectedSlot}
+                setSelectedSlot={setSelectedSlot}
+                onNext={() => setStep(4)}
+                onBack={() => setStep(2)}
+              />
+            </StepWrap>
+          )}
+          {step === 4 && (
+            <StepWrap key="summary">
+              <SummaryStep
+                form={form}
+                tz={tz}
+                tzLabel={tzLabel}
+                selectedSlot={selectedSlot}
+                onConfirm={() => setStep(5)}
+                onBack={() => setStep(3)}
+              />
+            </StepWrap>
+          )}
+          {step === 5 && (
+            <StepWrap key="done">
+              <ConfirmedStep
+                form={form}
+                tz={tz}
+                tzLabel={tzLabel}
+                selectedSlot={selectedSlot}
+              />
+            </StepWrap>
+          )}
+        </AnimatePresence>
+      </section>
+    </div>
+  );
+}
+
+function StepWrap({ children }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -16 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// ----- Step 1: Intro -----
+function IntroStep({ onStart }) {
+  return (
+    <div className="text-center max-w-3xl mx-auto pt-8">
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-gold"
+      >
+        <Sparkles className="w-3.5 h-3.5" /> Private Consultation
+      </motion.span>
+      <h1 className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold">
+        Begin Your Spiritual Consultation
+      </h1>
+      <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto">
+        A calm, private space to explore your chart with clarity and care. Each
+        session is crafted around your story — guided by quiet intention.
+      </p>
+
+      <div className="mt-12 grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+        {[
+          { icon: Clock, label: "60 minute session" },
+          { icon: Video, label: "Online — private 1:1" },
+          { icon: Globe2, label: "Your local timezone" },
+        ].map((item, i) => (
+          <motion.div
+            key={item.label}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + i * 0.1 }}
+            className="glass-card rounded-2xl p-5"
+          >
+            <item.icon className="w-5 h-5 text-gold mx-auto" />
+            <p className="mt-3 text-sm text-foreground/90">{item.label}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      <motion.button
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+        onClick={onStart}
+        className="mt-12 inline-flex items-center gap-2 px-9 py-4 rounded-full bg-primary text-primary-foreground font-medium shadow-gold hover:scale-[1.03] transition"
+      >
+        Start Booking <ArrowRight className="w-4 h-4" />
+      </motion.button>
+
+      <p className="mt-6 text-xs text-muted-foreground tracking-wide">
+        Estimated 3 minutes · Confirmed by email within 12 hours
+      </p>
+    </div>
+  );
+}
+
+// ----- Step 2: Details -----
+function DetailsStep({ form, setForm, onNext, onBack }) {
+  const update = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  const valid =
+    form.fullName && form.email && form.country && form.dob && form.tob && form.pob;
+
+  return (
+    <div className="max-w-3xl mx-auto">
+      <SectionTitle eyebrow="Step 1" title="Share a few details" subtitle="Used solely to prepare your reading. Always private." />
+
+      <div className="mt-10 glass-card rounded-3xl p-8 md:p-10 shadow-elegant">
+        <Group title="Basic Information">
+          <Field label="Full Name" value={form.fullName} onChange={update("fullName")} required />
+          <Field label="Email Address" type="email" value={form.email} onChange={update("email")} required />
+          <Field label="Phone Number" type="tel" value={form.phone} onChange={update("phone")} />
+          <div className="grid md:grid-cols-2 gap-5">
+            <Field label="Country" value={form.country} onChange={update("country")} required />
+            <Field label="City" value={form.city} onChange={update("city")} />
+          </div>
+        </Group>
+
+        <Divider />
+
+        <Group title="Astrology Information">
+          <div className="grid md:grid-cols-2 gap-5">
+            <Field label="Date of Birth" type="date" value={form.dob} onChange={update("dob")} required />
+            <Field label="Exact Time of Birth" type="time" value={form.tob} onChange={update("tob")} required />
+          </div>
+          <Field label="Place of Birth" value={form.pob} onChange={update("pob")} required />
+        </Group>
+
+        <Divider />
+
+        <Group title="Session Details">
+          <div className="grid md:grid-cols-2 gap-5">
+            <SelectField label="Consultation Type" value={form.consultationType} onChange={update("consultationType")} options={consultationTypes} />
+            <SelectField label="Preferred Language" value={form.language} onChange={update("language")} options={languages} />
+          </div>
+          <TextAreaField label="Main Concern / Questions" value={form.concern} onChange={update("concern")} placeholder="Share what you'd love clarity on..." />
+        </Group>
+
+        <NavRow onBack={onBack} onNext={onNext} nextDisabled={!valid} />
+      </div>
+    </div>
+  );
+}
+
+// ----- Step 3: Timezone -----
+function TimezoneStep({ tz, setTz, tzLabel, onNext, onBack }) {
+  return (
+    <div className="max-w-2xl mx-auto">
+      <SectionTitle eyebrow="Step 2" title="Confirm your timezone" subtitle="Available session times are automatically shown in your local timezone." />
+
+      <div className="mt-10 glass-card rounded-3xl p-8 md:p-10 shadow-elegant text-center">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full gold-border mx-auto">
+          <Globe2 className="w-7 h-7 text-gold" />
+        </div>
+
+        <p className="mt-6 text-sm uppercase tracking-[0.3em] text-muted-foreground">Your Timezone</p>
+        <h3 className="mt-2 text-3xl md:text-4xl">{tz.replace(/_/g, " ")}</h3>
+        <p className="mt-2 text-gold tracking-wide">
+          {tzLabel.abbr} {tzLabel.off && `(${tzLabel.off})`}
+        </p>
+
+        <div className="mt-8 text-left">
+          <label className="text-sm text-muted-foreground">Change timezone (optional)</label>
+          <select
+            value={tz}
+            onChange={(e) => setTz(e.target.value)}
+            className="mt-2 w-full bg-secondary/50 border border-border rounded-xl px-4 py-3 text-foreground focus:border-gold focus:outline-none transition"
+          >
+            {[tz, ...COMMON_TZ.filter((t) => t !== tz)].map((t) => (
+              <option key={t} value={t}>
+                {t.replace(/_/g, " ")}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <NavRow onBack={onBack} onNext={onNext} />
+      </div>
+    </div>
+  );
+}
+
+// ----- Step 4: Slot selection -----
+function SlotStep({ tz, tzLabel, selectedDate, setSelectedDate, selectedSlot, setSelectedSlot, onNext, onBack }) {
+  // Build a 14-day rolling window from tomorrow
+  const days = useMemo(() => {
+    const arr = [];
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    for (let i = 1; i <= 14; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      arr.push(d);
+    }
+    return arr;
+  }, []);
+
+  const slots = useMemo(() => {
+    if (!selectedDate) return [];
+    return ASTROLOGER_SLOTS_IST.map((h) => istHourToUserDate(selectedDate, h));
+  }, [selectedDate]);
+
+  // Disable Sundays for variety
+  const isUnavailable = (d) => d.getDay() === 0;
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      <SectionTitle eyebrow="Step 3" title="Choose a time" subtitle="All session times are displayed in your local timezone." />
+
+      <div className="mt-6 inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-gold">
+        <Globe2 className="w-3.5 h-3.5" /> {tzLabel.abbr || tz} {tzLabel.off && `· ${tzLabel.off}`}
+      </div>
+
+      <div className="mt-8 glass-card rounded-3xl p-6 md:p-10 shadow-elegant">
+        <div className="flex items-center gap-3 mb-6">
+          <CalendarDays className="w-5 h-5 text-gold" />
+          <h3 className="text-xl">Select a date</h3>
+        </div>
+
+        <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3">
+          {days.map((d) => {
+            const disabled = isUnavailable(d);
+            const isSelected = selectedDate?.toDateString() === d.toDateString();
+            return (
+              <button
+                key={d.toISOString()}
+                disabled={disabled}
+                onClick={() => {
+                  setSelectedDate(d);
+                }}
+                className={`group rounded-2xl p-3 text-center border transition-all ${
+                  disabled
+                    ? "opacity-30 cursor-not-allowed border-border"
+                    : isSelected
+                    ? "border-gold bg-gold/10 shadow-gold"
+                    : "border-border hover:border-gold/50 hover:bg-secondary/50"
+                }`}
+              >
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {d.toLocaleDateString("en-US", { weekday: "short" })}
+                </div>
+                <div className={`mt-1 text-2xl ${isSelected ? "text-gold" : ""}`}>
+                  {d.getDate()}
+                </div>
+                <div className="text-[10px] text-muted-foreground">
+                  {d.toLocaleDateString("en-US", { month: "short" })}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <AnimatePresence mode="wait">
+          {selectedDate && (
+            <motion.div
+              key={selectedDate.toISOString()}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="mt-10"
+            >
+              <div className="flex items-center gap-3 mb-5">
+                <Clock className="w-5 h-5 text-gold" />
+                <h3 className="text-xl">
+                  Available times —{" "}
+                  <span className="text-muted-foreground">
+                    {selectedDate.toLocaleDateString("en-US", {
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </h3>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {slots.map((s) => {
+                  const isSel = selectedSlot?.getTime() === s.getTime();
+                  const label = formatInTz(s, tz, { hour: "numeric", minute: "2-digit", hour12: true });
                   return (
-                    <button key={s.id} onClick={() => setSelected(s)} aria-pressed={isActive}
-                      style={{ background: isActive ? 'oklch(0.82 0.12 85 / 0.06)' : 'oklch(0.12 0.022 272 / 0.6)', border: `1px solid ${isActive ? 'oklch(0.82 0.12 85)' : 'oklch(0.82 0.12 85 / 0.12)'}`, borderRadius: '0.875rem', padding: '1.75rem', textAlign: 'left', cursor: 'pointer', backdropFilter: 'blur(12px)', transition: 'all 0.25s' }}>
-                      <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-                        <div style={{ width: '2.25rem', height: '2.25rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${isActive ? 'oklch(0.82 0.12 85)' : 'oklch(0.82 0.12 85 / 0.2)'}`, background: isActive ? 'oklch(0.82 0.12 85 / 0.15)' : 'oklch(0.82 0.12 85 / 0.05)', flexShrink: 0 }}>
-                          <Icon size={14} style={{ color: isActive ? 'oklch(0.82 0.12 85)' : 'oklch(0.55 0.02 272)' }} />
-                        </div>
-                        <div>
-                          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', color: 'oklch(0.96 0.01 85)', marginBottom: '0.35rem' }}>{s.title}</p>
-                          <p style={{ fontFamily: 'Satoshi, sans-serif', fontSize: '0.8rem', color: 'oklch(0.55 0.02 272)', lineHeight: 1.6 }}>{s.desc}</p>
-                          <p style={{ ...eyebrow, marginTop: '0.75rem', display: 'block' }}>{s.duration}</p>
-                        </div>
-                      </div>
+                    <button
+                      key={s.toISOString()}
+                      onClick={() => setSelectedSlot(s)}
+                      className={`rounded-xl px-4 py-4 border transition-all ${
+                        isSel
+                          ? "border-gold bg-gold/10 text-gold shadow-gold"
+                          : "border-border hover:border-gold/50 hover:bg-secondary/50"
+                      }`}
+                    >
+                      {label}
                     </button>
-                  )
+                  );
                 })}
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2rem' }}>
-                <button onClick={() => selected && setStep(1)} disabled={!selected} style={{ ...goldBtn, opacity: selected ? 1 : 0.4, cursor: selected ? 'pointer' : 'not-allowed' }}>
-                  Choose Date &amp; Time <ArrowRight size={15} />
-                </button>
-              </div>
-            </motion.div>
-          )}
-          {step === 1 && selected && (
-            <motion.div key="step-1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
-              <button onClick={() => setStep(0)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'Satoshi, sans-serif', fontSize: '0.85rem', color: 'oklch(0.55 0.02 272)', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '1.5rem' }}>
-                <ArrowLeft size={14} /> Back to services
-              </button>
-              <CalEmbed service={selected} />
+              <p className="mt-4 text-xs text-muted-foreground">
+                Times converted from astrologer's timezone ({ASTROLOGER_TZ.replace(/_/g, " ")}) to yours automatically.
+              </p>
             </motion.div>
           )}
         </AnimatePresence>
+
+        <NavRow onBack={onBack} onNext={onNext} nextDisabled={!selectedSlot} nextLabel="Review Booking" />
       </div>
-    </section>
-  )
+    </div>
+  );
+}
+
+// ----- Step 5: Summary -----
+function SummaryStep({ form, tz, tzLabel, selectedSlot, onConfirm, onBack }) {
+  const dateStr = selectedSlot
+    ? formatInTz(selectedSlot, tz, { weekday: "long", month: "long", day: "numeric", year: "numeric" })
+    : "";
+  const timeStr = selectedSlot
+    ? formatInTz(selectedSlot, tz, { hour: "numeric", minute: "2-digit", hour12: true })
+    : "";
+
+  return (
+    <div className="max-w-2xl mx-auto">
+      <SectionTitle eyebrow="Step 4" title="Review your session" subtitle="A quiet moment to confirm everything is right." />
+
+      <div className="mt-10 glass-card rounded-3xl p-8 md:p-10 shadow-elegant">
+        <SummaryRow label="Client" value={form.fullName} />
+        <SummaryRow label="Consultation" value={form.consultationType} />
+        <SummaryRow label="Language" value={form.language} />
+        <SummaryRow label="Date" value={dateStr} />
+        <SummaryRow label="Time" value={`${timeStr} · ${tzLabel.abbr || tz}`} />
+        <SummaryRow label="Duration" value={`${SESSION_DURATION_MIN} minutes`} />
+        <SummaryRow label="Format" value="Private online video session" last />
+
+        <div className="mt-8 flex items-start gap-3 p-4 rounded-2xl bg-secondary/40 border border-border">
+          <ShieldCheck className="w-5 h-5 text-gold shrink-0 mt-0.5" />
+          <p className="text-sm text-muted-foreground">
+            Your details are kept private and used only to prepare your reading.
+            A confirmation and meeting link will be sent to <span className="text-foreground">{form.email}</span>.
+          </p>
+        </div>
+
+        <NavRow onBack={onBack} onNext={onConfirm} nextLabel="Confirm Booking" />
+      </div>
+    </div>
+  );
+}
+
+function SummaryRow({ label, value, last }) {
+  return (
+    <div className={`flex items-center justify-between py-4 ${last ? "" : "border-b border-border/60"}`}>
+      <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">{label}</span>
+      <span className="text-sm md:text-base text-right">{value || "—"}</span>
+    </div>
+  );
+}
+
+// ----- Step 6: Confirmed -----
+function ConfirmedStep({ form, tz, tzLabel, selectedSlot }) {
+  const dateStr = selectedSlot
+    ? formatInTz(selectedSlot, tz, { weekday: "long", month: "long", day: "numeric" })
+    : "";
+  const timeStr = selectedSlot
+    ? formatInTz(selectedSlot, tz, { hour: "numeric", minute: "2-digit", hour12: true })
+    : "";
+
+  return (
+    <div className="max-w-2xl mx-auto text-center">
+      <motion.div
+        initial={{ scale: 0.6, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className="relative inline-flex items-center justify-center w-24 h-24 rounded-full"
+        style={{ background: "radial-gradient(circle, color-mix(in oklab, var(--gold) 40%, transparent), transparent 70%)" }}
+      >
+        <CheckCircle2 className="w-14 h-14 text-gold" />
+      </motion.div>
+
+      <h2 className="mt-8 text-4xl md:text-5xl bg-gradient-gold">Your Session Has Been Reserved</h2>
+      <p className="mt-4 text-muted-foreground max-w-md mx-auto">
+        Thank you, {form.fullName.split(" ")[0] || "friend"}. Your private consultation has been
+        gently placed on the calendar.
+      </p>
+
+      <div className="mt-10 glass-card rounded-3xl p-8 shadow-elegant text-left">
+        <SummaryRow label="Date" value={dateStr} />
+        <SummaryRow label="Time" value={`${timeStr} · ${tzLabel.abbr || tz}`} />
+        <SummaryRow label="Consultation" value={form.consultationType} />
+        <SummaryRow label="Sent to" value={form.email} last />
+      </div>
+
+      <div className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground">
+        <Mail className="w-4 h-4 text-gold" />
+        A confirmation email and meeting details have been sent to your inbox.
+      </div>
+    </div>
+  );
+}
+
+// ----- Shared UI -----
+function SectionTitle({ eyebrow, title, subtitle }) {
+  return (
+    <div className="text-center max-w-2xl mx-auto">
+      <span className="text-xs uppercase tracking-[0.35em] text-gold">{eyebrow}</span>
+      <h2 className="mt-3 text-4xl md:text-5xl">{title}</h2>
+      {subtitle && <p className="mt-4 text-muted-foreground">{subtitle}</p>}
+    </div>
+  );
+}
+
+function Group({ title, children }) {
+  return (
+    <div className="space-y-5">
+      <h4 className="text-xs uppercase tracking-[0.3em] text-gold">{title}</h4>
+      {children}
+    </div>
+  );
+}
+
+function Divider() {
+  return <div className="my-8 h-px bg-gradient-to-r from-transparent via-border to-transparent" />;
+}
+
+function Field({ label, value, onChange, type = "text", required }) {
+  return (
+    <label className="block group">
+      <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground group-focus-within:text-gold transition">
+        {label}{required && " *"}
+      </span>
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        required={required}
+        className="mt-2 w-full bg-secondary/40 border border-border rounded-xl px-4 py-3.5 text-foreground focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold/40 transition"
+      />
+    </label>
+  );
+}
+
+function SelectField({ label, value, onChange, options }) {
+  return (
+    <label className="block group">
+      <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground group-focus-within:text-gold transition">
+        {label}
+      </span>
+      <select
+        value={value}
+        onChange={onChange}
+        className="mt-2 w-full bg-secondary/40 border border-border rounded-xl px-4 py-3.5 text-foreground focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold/40 transition"
+      >
+        {options.map((o) => (
+          <option key={o} value={o}>{o}</option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function TextAreaField({ label, value, onChange, placeholder }) {
+  return (
+    <label className="block group">
+      <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground group-focus-within:text-gold transition">
+        {label}
+      </span>
+      <textarea
+        rows={4}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="mt-2 w-full bg-secondary/40 border border-border rounded-xl px-4 py-3.5 text-foreground focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold/40 transition resize-none"
+      />
+    </label>
+  );
+}
+
+function NavRow({ onBack, onNext, nextDisabled, nextLabel = "Continue" }) {
+  return (
+    <div className="mt-10 flex items-center gap-3">
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-full gold-border hover:bg-secondary transition text-sm"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
+      )}
+      <button
+        onClick={onNext}
+        disabled={nextDisabled}
+        className="ml-auto inline-flex items-center gap-2 px-7 py-3 rounded-full bg-primary text-primary-foreground font-medium shadow-gold hover:scale-[1.02] transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+      >
+        {nextLabel} <ArrowRight className="w-4 h-4" />
+      </button>
+    </div>
+  );
 }

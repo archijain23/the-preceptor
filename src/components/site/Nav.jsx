@@ -1,26 +1,30 @@
-import { Link, useRouterState } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import { Menu, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { navLinks, siteConfig } from '@/content/site.js';
+import { NavLink, Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { navLinks, siteConfig } from "@/content/site";
 
-export function Nav() {
+export default function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { location } = useRouterState();
+  const location = useLocation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => { setOpen(false); }, [location.pathname]);
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   return (
@@ -31,13 +35,15 @@ export function Nav() {
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
-            ? 'backdrop-blur-xl bg-background/70 border-b border-border/60 shadow-elegant'
-            : 'bg-transparent border-b border-transparent'
+            ? "backdrop-blur-xl bg-background/70 border-b border-border/60 shadow-elegant"
+            : "bg-transparent border-b border-transparent"
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 group">
-            <span className="text-gold font-serif text-2xl group-hover:rotate-12 transition-transform duration-500">✦</span>
+            <span className="text-gold font-serif text-2xl group-hover:rotate-12 transition-transform duration-500">
+              ✦
+            </span>
             <span className="font-serif text-xl tracking-wide">{siteConfig.name}</span>
           </Link>
 
@@ -53,17 +59,17 @@ export function Nav() {
                   <span className="absolute -bottom-2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
                 </a>
               ) : (
-                <Link
+                <NavLink
                   key={l.to}
                   to={l.to}
-                  className="nav-link text-muted-foreground hover:text-foreground transition-colors relative group"
-                  activeProps={{ className: 'nav-link text-foreground' }}
-                  activeOptions={{ exact: l.to === '/' }}
+                  className={({ isActive }) =>
+                    `nav-link text-muted-foreground hover:text-foreground transition-colors relative group ${isActive ? "text-foreground" : ""}`
+                  }
                 >
                   {l.label}
                   <span className="absolute -bottom-2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                </Link>
-              )
+                </NavLink>
+              ),
             )}
           </nav>
 
@@ -77,7 +83,7 @@ export function Nav() {
           <button
             className="lg:hidden text-foreground relative w-10 h-10 flex items-center justify-center"
             onClick={() => setOpen(!open)}
-            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-label={open ? "Close menu" : "Open menu"}
           >
             <motion.span animate={{ rotate: open ? 90 : 0, opacity: open ? 0 : 1 }} className="absolute">
               <Menu className="w-6 h-6" />
@@ -92,7 +98,9 @@ export function Nav() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
             className="lg:hidden fixed inset-0 z-40 bg-background/95 backdrop-blur-2xl"
           >
@@ -103,14 +111,14 @@ export function Nav() {
                   key={l.label}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + i * 0.07, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{
+                    delay: 0.1 + i * 0.07,
+                    duration: 0.6,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
                 >
                   {l.hash ? (
-                    <a
-                      href={l.hash}
-                      onClick={() => setOpen(false)}
-                      className="font-serif text-4xl text-foreground hover:text-gold transition-colors"
-                    >
+                    <a href={l.hash} onClick={() => setOpen(false)} className="font-serif text-4xl text-foreground hover:text-gold transition-colors">
                       {l.label}
                     </a>
                   ) : (
@@ -120,15 +128,8 @@ export function Nav() {
                   )}
                 </motion.div>
               ))}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.6 }}
-                className="mt-6"
-              >
-                <Link
-                  to="/book"
-                  className="inline-flex items-center px-8 py-4 rounded-full bg-primary text-primary-foreground font-medium shadow-gold"
-                >
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.6 }} className="mt-6">
+                <Link to="/book" className="inline-flex items-center px-8 py-4 rounded-full bg-primary text-primary-foreground font-medium shadow-gold">
                   Book a Session
                 </Link>
               </motion.div>
