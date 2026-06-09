@@ -1,4 +1,2 @@
-import { createRouter } from '@tanstack/react-router';
-import { routeTree } from './routeTree.gen.js';
-
-export const router = createRouter({ routeTree });
+// Alias shim — kept for any legacy imports.
+export { routeTree } from './routeTree.js';

@@ -1,7 +1,3 @@
-import { createRouter } from '@tanstack/react-router';
-import { routeTree } from './routeTree.gen';
-
-export const router = createRouter({
-  routeTree,
-  defaultPreload: 'intent',
-});
+// This file is intentionally left as a re-export shim.
+// The real router is created in main.jsx using src/routeTree.js.
+export { routeTree } from './routeTree.js';
