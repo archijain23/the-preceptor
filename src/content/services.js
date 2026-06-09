@@ -1,38 +1,56 @@
-/**
- * Static services data.
- * Phase 1: Replace with Sanity CMS queries (see docs/INTEGRATIONS.md).
- */
 export const services = [
   {
-    id: 'natal-chart',
-    icon: '☽',
-    title: 'Natal Chart Reading',
-    description: 'A deep dive into your birth chart — personality, life purpose, karmic lessons, and major life themes.',
+    id: 'birth-chart',
+    icon: '✦',
+    title: 'Birth Chart Reading',
+    description:
+      'A comprehensive analysis of your natal chart revealing life purpose, personality patterns, karmic influences and hidden potentials.',
     duration: '60 min',
+    price: '$120',
+  },
+  {
+    id: 'career',
+    icon: '◈',
+    title: 'Career Guidance',
+    description:
+      'Align your professional path with your cosmic blueprint. Identify auspicious timing for launches, transitions and decisions.',
+    duration: '45 min',
+    price: '$90',
+  },
+  {
+    id: 'relationships',
+    icon: '⊕',
+    title: 'Relationship Consultation',
+    description:
+      'Synastry and composite chart analysis to illuminate compatibility, growth areas and the karmic threads between two souls.',
+    duration: '60 min',
+    price: '$130',
+  },
+  {
+    id: 'tarot',
+    icon: '⟡',
+    title: 'Tarot Reading',
+    description:
+      'Intuitive tarot guidance channelling archetypal wisdom for clarity on specific questions or a broader life overview.',
+    duration: '30 min',
+    price: '$65',
+  },
+  {
+    id: 'spiritual',
+    icon: '✧',
+    title: 'Spiritual Consultation',
+    description:
+      'Deep-dive conversations integrating astrology, mindfulness and spiritual tools to support your awakening journey.',
+    duration: '75 min',
     price: '$150',
   },
   {
-    id: 'relationship',
-    icon: '♎',
-    title: 'Relationship Synastry',
-    description: 'Compatibility analysis between two birth charts — understanding dynamics, challenges, and strengths.',
+    id: 'kundli',
+    icon: '◎',
+    title: 'Kundli Analysis',
+    description:
+      'Vedic astrology birth chart analysis covering dashas, yogas, planetary periods and remedial measures.',
     duration: '60 min',
-    price: '$175',
+    price: '$110',
   },
-  {
-    id: 'solar-return',
-    icon: '☀',
-    title: 'Solar Return Reading',
-    description: 'Your personal new year forecast — what themes, opportunities, and challenges the coming year holds.',
-    duration: '45 min',
-    price: '$120',
-  },
-  {
-    id: 'transit',
-    icon: '♃',
-    title: 'Transit Forecast',
-    description: 'Current planetary transits and how they affect you right now — career, love, and life decisions.',
-    duration: '45 min',
-    price: '$120',
-  },
-]
+];
