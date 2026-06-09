@@ -14,8 +14,12 @@ import NotFound from "./routes/not-found";
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Cosmic background layers — must be outside main content flow */}
+      <div id="cosmic-bg" aria-hidden="true" />
+      <div id="cosmic-grain" aria-hidden="true" />
+
       <Nav />
-      <main className="flex-1">
+      <main className="flex-1 pt-20">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
