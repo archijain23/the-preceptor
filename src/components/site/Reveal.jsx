@@ -30,3 +30,5 @@ export function Reveal({
     </motion.div>
   );
 }
+
+export default Reveal;
