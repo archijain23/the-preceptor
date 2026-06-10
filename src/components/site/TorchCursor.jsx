@@ -1,20 +1,5 @@
 import { useEffect, useRef } from "react";
 
-/**
- * TorchCursor
- * -----------
- * Renders a full-viewport fixed overlay that shows a warm golden radial-gradient
- * "torch" glow wherever the cursor (or touch point) sits. Completely
- * pointer-events-none so it never blocks clicks. Uses a single div whose
- * background-image is updated directly on the DOM element (no React state /
- * re-render) for maximum performance via requestAnimationFrame.
- *
- * Customise:
- *   --torch-size   : radius of the beam  (default 380px)
- *   --torch-color  : inner glow OKLCH    (default warm gold)
- *   --torch-mid    : mid-ring color      (default amber tint)
- *   --torch-opacity: overall opacity     (default 0.18)
- */
 export default function TorchCursor() {
   const overlayRef = useRef(null);
   const posRef = useRef({ x: -9999, y: -9999 });
@@ -25,21 +10,21 @@ export default function TorchCursor() {
     const el = overlayRef.current;
     if (!el) return;
 
-    // Config
-    const SIZE = 420;           // px radius of torch beam
-    const INNER = "oklch(0.88 0.18 78 / 0.55)";   // warm gold core
-    const MID   = "oklch(0.72 0.14 65 / 0.22)";   // amber mid-ring
-    const OUTER = "oklch(0.55 0.10 55 / 0.08)";   // deep amber fade
-    const EDGE  = "transparent";                   // hard cutoff
+    // Config — tune these to taste
+    const SIZE  = 480;                              // px radius of beam
+    const INNER = "oklch(0.97 0.20 85 / 0.72)";    // bright champagne-gold core
+    const MID   = "oklch(0.85 0.17 75 / 0.38)";    // warm honey mid-ring
+    const OUTER = "oklch(0.68 0.12 65 / 0.14)";    // soft amber fade
+    const EDGE  = "transparent";                    // hard cutoff
 
     function render() {
       const { x, y } = posRef.current;
       el.style.background = [
         `radial-gradient(${SIZE}px circle at ${x}px ${y}px,`,
         `  ${INNER} 0%,`,
-        `  ${MID}   28%,`,
+        `  ${MID}   25%,`,
         `  ${OUTER} 55%,`,
-        `  ${EDGE}  75%)`,
+        `  ${EDGE}  72%)`,
       ].join("\n");
       rafRef.current = null;
     }
@@ -70,7 +55,6 @@ export default function TorchCursor() {
       schedule();
     }
 
-    // Hide torch when cursor leaves the window
     function onMouseLeave() {
       activeRef.current = false;
       el.style.opacity = "0";
@@ -99,7 +83,7 @@ export default function TorchCursor() {
         pointerEvents: "none",
         opacity: 0,
         transition: "opacity 0.6s ease",
-        mixBlendMode: "screen",   // blends the gold glow luminously over dark bg
+        mixBlendMode: "screen",
         willChange: "background",
       }}
     />
