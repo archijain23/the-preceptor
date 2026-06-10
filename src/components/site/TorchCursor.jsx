@@ -10,12 +10,11 @@ export default function TorchCursor() {
     const el = overlayRef.current;
     if (!el) return;
 
-    // Config — tune these to taste
-    const SIZE  = 480;                              // px radius of beam
-    const INNER = "oklch(0.97 0.20 85 / 0.72)";    // bright champagne-gold core
-    const MID   = "oklch(0.85 0.17 75 / 0.38)";    // warm honey mid-ring
-    const OUTER = "oklch(0.68 0.12 65 / 0.14)";    // soft amber fade
-    const EDGE  = "transparent";                    // hard cutoff
+    const SIZE  = 250;
+    const INNER = "oklch(0.55 0.18 78 / 0.10)";
+    const MID   = "oklch(0.34 0.14 75 / 0.18)";
+    const OUTER = "oklch(0.22 0.10 65 / 0.02)";
+    const EDGE  = "transparent";
 
     function render() {
       const { x, y } = posRef.current;
