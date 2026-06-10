@@ -47,30 +47,25 @@ export default function Nav() {
             <span className="font-serif text-xl tracking-wide">{siteConfig.name}</span>
           </Link>
 
+          {/* BUG FIX: removed hash branch — all navLinks now use `to` so we
+              always render NavLink (React Router). The old `l.hash` path was
+              rendering a plain <a href="#services"> which is a relative anchor
+              and resolves against the current URL path. */}
           <nav className="hidden lg:flex items-center gap-10">
-            {navLinks.map((l) =>
-              l.hash ? (
-                <a
-                  key={l.label}
-                  href={l.hash}
-                  className="nav-link text-muted-foreground hover:text-foreground transition-colors relative group"
-                >
-                  {l.label}
-                  <span className="absolute -bottom-2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                </a>
-              ) : (
-                <NavLink
-                  key={l.to}
-                  to={l.to}
-                  className={({ isActive }) =>
-                    `nav-link text-muted-foreground hover:text-foreground transition-colors relative group ${isActive ? "text-foreground" : ""}`
-                  }
-                >
-                  {l.label}
-                  <span className="absolute -bottom-2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                </NavLink>
-              ),
-            )}
+            {navLinks.map((l) => (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                className={({ isActive }) =>
+                  `nav-link text-muted-foreground hover:text-foreground transition-colors relative group${
+                    isActive ? " text-foreground" : ""
+                  }`
+                }
+              >
+                {l.label}
+                <span className="absolute -bottom-2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+              </NavLink>
+            ))}
           </nav>
 
           <Link
@@ -85,10 +80,16 @@ export default function Nav() {
             onClick={() => setOpen(!open)}
             aria-label={open ? "Close menu" : "Open menu"}
           >
-            <motion.span animate={{ rotate: open ? 90 : 0, opacity: open ? 0 : 1 }} className="absolute">
+            <motion.span
+              animate={{ rotate: open ? 90 : 0, opacity: open ? 0 : 1 }}
+              className="absolute"
+            >
               <Menu className="w-6 h-6" />
             </motion.span>
-            <motion.span animate={{ rotate: open ? 0 : -90, opacity: open ? 1 : 0 }} className="absolute">
+            <motion.span
+              animate={{ rotate: open ? 0 : -90, opacity: open ? 1 : 0 }}
+              className="absolute"
+            >
               <X className="w-6 h-6" />
             </motion.span>
           </button>
@@ -108,7 +109,7 @@ export default function Nav() {
             <nav className="relative h-full flex flex-col items-center justify-center gap-8 px-8">
               {navLinks.map((l, i) => (
                 <motion.div
-                  key={l.label}
+                  key={l.to}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
@@ -117,19 +118,25 @@ export default function Nav() {
                     ease: [0.22, 1, 0.36, 1],
                   }}
                 >
-                  {l.hash ? (
-                    <a href={l.hash} onClick={() => setOpen(false)} className="font-serif text-4xl text-foreground hover:text-gold transition-colors">
-                      {l.label}
-                    </a>
-                  ) : (
-                    <Link to={l.to} className="font-serif text-4xl text-foreground hover:text-gold transition-colors">
-                      {l.label}
-                    </Link>
-                  )}
+                  <Link
+                    to={l.to}
+                    onClick={() => setOpen(false)}
+                    className="font-serif text-4xl text-foreground hover:text-gold transition-colors"
+                  >
+                    {l.label}
+                  </Link>
                 </motion.div>
               ))}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.6 }} className="mt-6">
-                <Link to="/book" className="inline-flex items-center px-8 py-4 rounded-full bg-primary text-primary-foreground font-medium shadow-gold">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+                className="mt-6"
+              >
+                <Link
+                  to="/book"
+                  className="inline-flex items-center px-8 py-4 rounded-full bg-primary text-primary-foreground font-medium shadow-gold"
+                >
                   Book a Session
                 </Link>
               </motion.div>
