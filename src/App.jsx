@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Nav from "./components/site/Nav";
 import Footer from "./components/site/Footer";
+import TorchCursor from "./components/site/TorchCursor";
 import Home from "./routes/index";
 import About from "./routes/about";
 import Book from "./routes/book";
@@ -14,9 +15,12 @@ import NotFound from "./routes/not-found";
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Cosmic background layers — must be outside main content flow */}
+      {/* Cosmic background layers */}
       <div id="cosmic-bg" aria-hidden="true" />
       <div id="cosmic-grain" aria-hidden="true" />
+
+      {/* Golden torch cursor — fixed overlay, pointer-events-none */}
+      <TorchCursor />
 
       <Nav />
       <main className="flex-1 pt-20">
