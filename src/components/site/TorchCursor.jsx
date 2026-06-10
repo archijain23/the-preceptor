@@ -10,10 +10,10 @@ export default function TorchCursor() {
     const el = overlayRef.current;
     if (!el) return;
 
-    const SIZE  = 250;
-    const INNER = "oklch(0.55 0.18 78 / 0.10)";
-    const MID   = "oklch(0.34 0.14 75 / 0.18)";
-    const OUTER = "oklch(0.22 0.10 65 / 0.02)";
+    const SIZE  = 350;
+    const INNER = "oklch(0.72 0.18 78 / 0.20)";
+    const MID   = "oklch(0.55 0.14 75 / 0.18)";
+    const OUTER = "oklch(0.34 0.10 65 / 0.08)";
     const EDGE  = "transparent";
 
     function render() {
