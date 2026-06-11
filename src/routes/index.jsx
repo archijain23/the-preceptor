@@ -91,8 +91,8 @@ const testimonialSlideInterval = 6000;
 
 const achievements = [
   { value: "12+", label: "Years of Practice" },
-  { value: "8,400", label: "Sessions Delivered" },
-  { value: "47", label: "Countries Served" },
+  { value: "2,500+", label: "Sessions Delivered" },
+  { value: "18+", label: "Countries Served" },
   { value: "4.98", label: "Average Rating" },
 ];
 
@@ -119,9 +119,6 @@ const faqs = [
   },
 ];
 
-/* ─────────────────────────────────────────────
-   Ambient particle — single drifting gold dot
-───────────────────────────────────────────── */
 function Particle({ x, y, size, delay, duration }) {
   return (
     <motion.span
@@ -154,9 +151,6 @@ function Particle({ x, y, size, delay, duration }) {
   );
 }
 
-/* ─────────────────────────────────────────────
-   Word-by-word staggered heading
-───────────────────────────────────────────── */
 function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
   const words1 = line1.split(" ");
   const words2 = line2Gold.split(" ");
@@ -247,9 +241,6 @@ export default function HomePage() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════
-   HERO
-═══════════════════════════════════════════════════════ */
 function Hero() {
   const particles = useMemo(
     () =>
@@ -266,8 +257,6 @@ function Hero() {
 
   return (
     <section className="relative overflow-hidden min-h-[100svh] flex items-center shooting-star">
-
-      {/* ── 1. Hero nebula gradient ── */}
       <div
         className="absolute inset-0"
         style={{
@@ -278,21 +267,13 @@ function Hero() {
           ].join(", "),
         }}
       />
-
-      {/* ── 2a. Star dots + warm gold stars ── */}
       <div className="absolute inset-0 starfield" aria-hidden />
-
-      {/* ── 2b. Blurred glow halos around star positions ── */}
       <div className="absolute inset-0 starfield-glow" aria-hidden />
-
-      {/* ── 3. Ambient particles ── */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden>
         {particles.map((p) => (
           <Particle key={p.id} {...p} />
         ))}
       </div>
-
-      {/* ── 4. Left purple nebula fog ── */}
       <motion.div
         aria-hidden
         initial={{ opacity: 0 }}
@@ -304,8 +285,6 @@ function Hero() {
             "radial-gradient(ellipse at center, oklch(0.52 0.09 295 / 0.30), transparent 62%)",
         }}
       />
-
-      {/* ── 5. Right warm amber nebula fog ── */}
       <motion.div
         aria-hidden
         initial={{ opacity: 0 }}
@@ -317,8 +296,6 @@ function Hero() {
             "radial-gradient(ellipse at center, oklch(0.38 0.10 38 / 0.22), transparent 60%)",
         }}
       />
-
-      {/* ── 6. Cloud layer A ── */}
       <motion.div
         aria-hidden
         animate={{ x: [0, 55, 0], opacity: [0.18, 0.32, 0.18] }}
@@ -330,8 +307,6 @@ function Hero() {
           mixBlendMode: "screen",
         }}
       />
-
-      {/* ── 7. Cloud layer B ── */}
       <motion.div
         aria-hidden
         animate={{ x: [0, -45, 0], opacity: [0.12, 0.26, 0.12] }}
@@ -343,8 +318,6 @@ function Hero() {
           mixBlendMode: "screen",
         }}
       />
-
-      {/* ── 8. Hero figure ── */}
       <motion.div
         initial={{ opacity: 0, y: 48, scale: 1.06 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -379,7 +352,6 @@ function Hero() {
             style={{ opacity: 0.88 }}
           />
         </motion.div>
-
         <div
           className="absolute inset-0"
           style={{
@@ -401,7 +373,6 @@ function Hero() {
               "linear-gradient(to bottom, oklch(0.10 0.025 270 / 0.6) 0%, transparent 30%)",
           }}
         />
-
         <motion.div
           aria-hidden
           initial={{ opacity: 0 }}
@@ -412,7 +383,6 @@ function Hero() {
             background: "radial-gradient(circle, oklch(0.82 0.12 85 / 0.40), transparent 65%)",
           }}
         />
-
         <motion.div
           aria-hidden
           animate={{ opacity: [0.2, 0.38, 0.2] }}
@@ -424,8 +394,6 @@ function Hero() {
           }}
         />
       </motion.div>
-
-      {/* ── 9. Left readability gradient ── */}
       <div
         className="absolute inset-y-0 left-0 pointer-events-none w-full lg:w-[58%]"
         style={{
@@ -433,8 +401,6 @@ function Hero() {
             "linear-gradient(to right, oklch(0.10 0.025 270) 38%, oklch(0.10 0.025 270 / 0.75) 58%, transparent 100%)",
         }}
       />
-
-      {/* ── 10. Top + bottom page vignette ── */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -442,10 +408,6 @@ function Hero() {
             "linear-gradient(to bottom, oklch(0.10 0.025 270 / 0.5) 0%, transparent 18%, transparent 75%, oklch(0.10 0.025 270) 100%)",
         }}
       />
-
-      {/* ══════════════════════════════════════
-          CONTENT
-      ══════════════════════════════════════ */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 pt-32 pb-24 lg:py-40 w-full">
         <div className="max-w-[52rem] lg:max-w-[46rem]">
           <motion.span
@@ -507,7 +469,6 @@ function Hero() {
                 </motion.span>
               </Link>
             </motion.div>
-
             <a href="#services" className="btn-secondary">
               Explore Services
             </a>
@@ -532,12 +493,10 @@ function Hero() {
                 </motion.span>
               ))}
             </div>
-            <span>Trusted by 8,400+ clients across 47 countries</span>
+            <span>Trusted by 2,500+ clients across 18+ countries</span>
           </motion.div>
         </div>
       </div>
-
-      {/* ── Scroll cue ── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ y: [0, 9, 0], opacity: [0, 0.5, 0.75, 0.4] }}
@@ -564,15 +523,9 @@ function Hero() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════
-   ABOUT
-═══════════════════════════════════════════════════════ */
 function About() {
   const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["8%", "-8%"]);
   const imgScale = useTransform(scrollYProgress, [0, 1], [1.08, 1.18]);
   const glowOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.25, 0.55, 0.25]);
@@ -580,25 +533,13 @@ function About() {
   return (
     <section ref={ref} className="relative py-32 md:py-40 lg:py-48 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none section-glow-about" aria-hidden />
-
       <div className="absolute inset-0 pointer-events-none">
-        <motion.div
-          style={{ opacity: glowOpacity }}
-          className="absolute top-1/4 -left-32 w-[55%] aspect-square rounded-full bg-[radial-gradient(circle,oklch(0.55_0.08_310_/_0.35),transparent_65%)] blur-3xl"
-        />
-        <motion.div
-          style={{ opacity: glowOpacity }}
-          className="absolute bottom-0 -right-40 w-[60%] aspect-square rounded-full bg-[radial-gradient(circle,oklch(0.82_0.12_85_/_0.18),transparent_65%)] blur-3xl"
-        />
+        <motion.div style={{ opacity: glowOpacity }} className="absolute top-1/4 -left-32 w-[55%] aspect-square rounded-full bg-[radial-gradient(circle,oklch(0.55_0.08_310_/_0.35),transparent_65%)] blur-3xl" />
+        <motion.div style={{ opacity: glowOpacity }} className="absolute bottom-0 -right-40 w-[60%] aspect-square rounded-full bg-[radial-gradient(circle,oklch(0.82_0.12_85_/_0.18),transparent_65%)] blur-3xl" />
       </div>
-
       <div className="star-cluster absolute inset-0" aria-hidden />
-
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-12 gap-12 lg:gap-20 items-center">
-        <motion.div
-          style={{ y }}
-          className="lg:col-span-6 relative aspect-[4/5] lg:aspect-[5/6] order-1 lg:order-none"
-        >
+        <motion.div style={{ y }} className="lg:col-span-6 relative aspect-[4/5] lg:aspect-[5/6] order-1 lg:order-none">
           <div className="absolute -inset-10 bg-[radial-gradient(ellipse_at_center,oklch(0.82_0.12_85_/_0.15),transparent_70%)] blur-2xl pointer-events-none" />
           <motion.div
             initial={{ opacity: 0, scale: 1.05 }}
@@ -607,57 +548,30 @@ function About() {
             transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
             className="absolute inset-0 overflow-hidden"
             style={{
-              WebkitMaskImage:
-                "radial-gradient(ellipse 75% 80% at 50% 50%, black 45%, rgba(0,0,0,0.55) 75%, transparent 100%)",
-              maskImage:
-                "radial-gradient(ellipse 75% 80% at 50% 50%, black 45%, rgba(0,0,0,0.55) 75%, transparent 100%)",
+              WebkitMaskImage: "radial-gradient(ellipse 75% 80% at 50% 50%, black 45%, rgba(0,0,0,0.55) 75%, transparent 100%)",
+              maskImage: "radial-gradient(ellipse 75% 80% at 50% 50%, black 45%, rgba(0,0,0,0.55) 75%, transparent 100%)",
             }}
           >
-            <motion.img
-              src={aboutImg}
-              alt="The Preceptor — guiding presence"
-              loading="lazy"
-              decoding="async"
-              style={{ scale: imgScale }}
-              className="w-full h-full object-cover mix-blend-luminosity opacity-90"
-            />
+            <motion.img src={aboutImg} alt="The Preceptor — guiding presence" loading="lazy" decoding="async" style={{ scale: imgScale }} className="w-full h-full object-cover mix-blend-luminosity opacity-90" />
             <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-transparent to-background/70" />
             <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-transparent" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_40%,oklch(0.82_0.12_85_/_0.14),transparent_60%)]" />
           </motion.div>
-          <motion.span
-            animate={{ y: [0, -10, 0], opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-6 right-6 text-gold font-serif text-3xl select-none"
-            aria-hidden
-          >
-            ✦
-          </motion.span>
+          <motion.span animate={{ y: [0, -10, 0], opacity: [0.5, 1, 0.5] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }} className="absolute top-6 right-6 text-gold font-serif text-3xl select-none" aria-hidden>✦</motion.span>
         </motion.div>
-
         <div className="lg:col-span-6 lg:pl-4">
-          <Reveal>
-            <span className="eyebrow">— Our Practice</span>
-          </Reveal>
+          <Reveal><span className="eyebrow">— Our Practice</span></Reveal>
           <Reveal delay={0.08}>
             <h2 className="mt-6 text-balance">
-              A modern astrologer
-              <br />
+              A modern astrologer<br />
               <span className="display-italic text-gold">for a modern world.</span>
             </h2>
           </Reveal>
           <Reveal delay={0.16}>
-            <p className="mt-8 lead text-pretty">
-              For over twelve years, The Preceptor has guided executives, artists, and seekers
-              through life's most pivotal chapters — translating classical Vedic and Western
-              astrology into language that is grounded, modern, and quietly powerful.
-            </p>
+            <p className="mt-8 lead text-pretty">For over twelve years, The Preceptor has guided executives, artists, and seekers through life's most pivotal chapters — translating classical Vedic and Western astrology into language that is grounded, modern, and quietly powerful.</p>
           </Reveal>
           <Reveal delay={0.22}>
-            <p className="mt-5 text-muted-foreground leading-relaxed max-w-xl">
-              Our philosophy is simple: the stars do not predict your fate — they reveal your
-              design. We help you read it.
-            </p>
+            <p className="mt-5 text-muted-foreground leading-relaxed max-w-xl">Our philosophy is simple: the stars do not predict your fate — they reveal your design. We help you read it.</p>
           </Reveal>
           <Reveal delay={0.3}>
             <div className="mt-12 grid grid-cols-2 gap-5 max-w-md">
@@ -667,9 +581,7 @@ function About() {
               ].map((s) => (
                 <div key={s.l} className="border-l border-gold/40 pl-5">
                   <p className="font-serif text-3xl text-gold num-old">{s.n}</p>
-                  <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mt-2">
-                    {s.l}
-                  </p>
+                  <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mt-2">{s.l}</p>
                 </div>
               ))}
             </div>
@@ -680,15 +592,11 @@ function About() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════
-   SERVICES
-═══════════════════════════════════════════════════════ */
 function Services() {
   return (
     <section id="services" className="py-32 relative bg-cosmic-deep overflow-hidden">
       <div className="absolute inset-0 pointer-events-none section-glow-services" aria-hidden />
       <div className="cosmic-stars absolute inset-0 pointer-events-none" aria-hidden />
-
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-[50%] h-[60%] bg-[radial-gradient(ellipse_at_top_right,oklch(0.55_0.08_310_/_0.15),transparent_65%)] blur-3xl" />
         <div className="absolute bottom-0 left-0 w-[40%] h-[50%] bg-[radial-gradient(ellipse_at_bottom_left,oklch(0.82_0.12_85_/_0.08),transparent_65%)] blur-3xl" />
@@ -697,19 +605,12 @@ function Services() {
         <Reveal className="text-center max-w-2xl mx-auto">
           <span className="text-xs uppercase tracking-[0.3em] text-gold">Services</span>
           <h2 className="mt-4 text-4xl md:text-5xl">Consultations crafted with intention.</h2>
-          <p className="mt-5 text-muted-foreground">
-            Each offering is a focused, cinematic session — designed around what you actually need
-            to know.
-          </p>
+          <p className="mt-5 text-muted-foreground">Each offering is a focused, cinematic session — designed around what you actually need to know.</p>
         </Reveal>
         <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((s, i) => (
             <Reveal key={s.title} delay={i * 0.05}>
-              <motion.div
-                whileHover={{ y: -6 }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="glass-card rounded-2xl p-8 h-full group cursor-pointer hover:border-primary/40 relative overflow-hidden"
-              >
+              <motion.div whileHover={{ y: -6 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }} className="glass-card rounded-2xl p-8 h-full group cursor-pointer hover:border-primary/40 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.07),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative z-10">
                   <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center group-hover:bg-primary/20 transition">
@@ -717,9 +618,7 @@ function Services() {
                   </div>
                   <h3 className="mt-6 text-2xl">{s.title}</h3>
                   <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
-                  <div className="mt-6 flex items-center gap-2 text-gold text-sm opacity-0 group-hover:opacity-100 transition">
-                    Learn more <ArrowRight className="w-3 h-3" />
-                  </div>
+                  <div className="mt-6 flex items-center gap-2 text-gold text-sm opacity-0 group-hover:opacity-100 transition">Learn more <ArrowRight className="w-3 h-3" /></div>
                 </div>
               </motion.div>
             </Reveal>
@@ -730,9 +629,6 @@ function Services() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════
-   TESTIMONIALS
-═══════════════════════════════════════════════════════ */
 function Testimonials() {
   const [i, setI] = useState(0);
 
@@ -745,17 +641,13 @@ function Testimonials() {
   }, []);
 
   if (!testimonials.length) return null;
-
   const t = testimonials[i];
-
-  const goPrevious = () =>
-    setI((current) => (current + testimonials.length - 1) % testimonials.length);
+  const goPrevious = () => setI((current) => (current + testimonials.length - 1) % testimonials.length);
   const goNext = () => setI((current) => (current + 1) % testimonials.length);
 
   return (
     <section className="py-32 relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none section-glow-testimonials" aria-hidden />
-
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] aspect-square rounded-full bg-[radial-gradient(circle,oklch(0.55_0.08_310_/_0.12),transparent_65%)] blur-3xl" />
       </div>
@@ -766,22 +658,13 @@ function Testimonials() {
         </Reveal>
         <Reveal delay={0.1}>
           <AnimatePresence mode="wait">
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-14 glass-card rounded-3xl p-12 relative overflow-hidden"
-            >
+            <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} className="mt-14 glass-card rounded-3xl p-12 relative overflow-hidden">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.07),transparent_40%)]" />
               <div className="relative z-10">
                 <Quote className="w-10 h-10 text-gold/30 mx-auto" />
                 <p className="mt-6 font-serif text-2xl md:text-3xl leading-relaxed">"{t.text}"</p>
                 <div className="mt-8 flex justify-center gap-1">
-                  {[...Array(t.rating)].map((_, k) => (
-                    <Star key={k} className="w-4 h-4 fill-gold text-gold" />
-                  ))}
+                  {[...Array(t.rating)].map((_, k) => (<Star key={k} className="w-4 h-4 fill-gold text-gold" />))}
                 </div>
                 <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
@@ -789,45 +672,18 @@ function Testimonials() {
                     <p className="text-xs text-muted-foreground">{t.country}</p>
                   </div>
                   <div className="flex items-center justify-center gap-3">
-                    <button
-                      onClick={goPrevious}
-                      aria-label="Previous review"
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gold/30 text-gold transition hover:bg-gold/10"
-                    >
-                      <ArrowLeft className="w-4 h-4" />
-                    </button>
+                    <button onClick={goPrevious} aria-label="Previous review" className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gold/30 text-gold transition hover:bg-gold/10"><ArrowLeft className="w-4 h-4" /></button>
                     <div className="flex items-center gap-2">
-                      {testimonials.map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setI(index)}
-                          aria-label={`View review ${index + 1}`}
-                          className={`h-2 rounded-full transition-all ${
-                            index === i ? "w-8 bg-gold" : "w-2 bg-muted"
-                          }`}
-                        />
-                      ))}
+                      {testimonials.map((_, index) => (<button key={index} onClick={() => setI(index)} aria-label={`View review ${index + 1}`} className={`h-2 rounded-full transition-all ${index === i ? "w-8 bg-gold" : "w-2 bg-muted"}`} />))}
                     </div>
-                    <button
-                      onClick={goNext}
-                      aria-label="Next review"
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gold/30 text-gold transition hover:bg-gold/10"
-                    >
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
+                    <button onClick={goNext} aria-label="Next review" className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gold/30 text-gold transition hover:bg-gold/10"><ArrowRight className="w-4 h-4" /></button>
                   </div>
                 </div>
               </div>
             </motion.div>
           </AnimatePresence>
           <div className="mt-8 flex justify-center">
-            <Link
-              to="/testimonials"
-              className="inline-flex items-center gap-2 text-gold font-medium hover:text-foreground transition"
-            >
-              View more testimonials
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            <Link to="/testimonials" className="inline-flex items-center gap-2 text-gold font-medium hover:text-foreground transition">View more testimonials <ArrowRight className="w-4 h-4" /></Link>
           </div>
         </Reveal>
       </div>
@@ -835,21 +691,15 @@ function Testimonials() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════
-   ACHIEVEMENTS
-═══════════════════════════════════════════════════════ */
 function Achievements() {
   return (
     <section className="py-32 bg-cosmic-deep relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none section-glow-achievements" aria-hidden />
-
       <div className="absolute inset-0 bg-hero opacity-50" />
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[55%] h-[50%] bg-[radial-gradient(ellipse_at_top,oklch(0.82_0.12_85_/_0.1),transparent_65%)] blur-3xl" />
       </div>
-
       <div className="cosmic-stars absolute inset-0 pointer-events-none" aria-hidden />
-
       <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
         <Reveal className="text-center max-w-2xl mx-auto">
           <span className="text-xs uppercase tracking-[0.3em] text-gold">Recognition</span>
@@ -874,32 +724,18 @@ function Achievements() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════
-   FAQ
-═══════════════════════════════════════════════════════ */
 function Faq() {
   const [open, setOpen] = useState(0);
   return (
     <section className="py-32 relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none section-glow-faq" aria-hidden />
-
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute bottom-0 right-0 w-[45%] h-[55%] bg-[radial-gradient(ellipse_at_bottom_right,oklch(0.55_0.08_310_/_0.15),transparent_65%)] blur-3xl" />
       </div>
       <div className="max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-2 gap-16 items-start relative z-10">
         <Reveal>
-          <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="relative aspect-square rounded-3xl overflow-hidden gold-border shadow-elegant lg:sticky lg:top-32"
-          >
-            <img
-              src={qnaImg}
-              alt="Cosmic question space"
-              loading="lazy"
-              decoding="async"
-              className="w-full h-full object-cover"
-            />
+          <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="relative aspect-square rounded-3xl overflow-hidden gold-border shadow-elegant lg:sticky lg:top-32">
+            <img src={qnaImg} alt="Cosmic question space" loading="lazy" decoding="async" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
           </motion.div>
         </Reveal>
@@ -912,26 +748,11 @@ function Faq() {
             {faqs.map((f, i) => (
               <Reveal key={f.q} delay={i * 0.05}>
                 <div className="glass-card rounded-2xl overflow-hidden">
-                  <button
-                    onClick={() => setOpen(open === i ? null : i)}
-                    className="w-full p-6 flex items-center justify-between text-left"
-                    aria-expanded={open === i}
-                  >
+                  <button onClick={() => setOpen(open === i ? null : i)} className="w-full p-6 flex items-center justify-between text-left" aria-expanded={open === i}>
                     <span className="font-serif text-lg">{f.q}</span>
-                    <ChevronDown
-                      className={`w-5 h-5 text-gold flex-shrink-0 transition-transform duration-300 ${
-                        open === i ? "rotate-180" : ""
-                      }`}
-                    />
+                    <ChevronDown className={`w-5 h-5 text-gold flex-shrink-0 transition-transform duration-300 ${open === i ? "rotate-180" : ""}`} />
                   </button>
-                  <motion.div
-                    initial={false}
-                    animate={
-                      open === i ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }
-                    }
-                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    className="overflow-hidden"
-                  >
+                  <motion.div initial={false} animate={open === i ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }} className="overflow-hidden">
                     <p className="px-6 pb-6 text-muted-foreground leading-relaxed">{f.a}</p>
                   </motion.div>
                 </div>
@@ -944,14 +765,10 @@ function Faq() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════
-   CTA
-═══════════════════════════════════════════════════════ */
 function CTA() {
   return (
     <section className="py-32 relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none section-glow-cta" aria-hidden />
-
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,oklch(0.82_0.12_85_/_0.07),transparent_60%)] blur-3xl" />
       </div>
@@ -961,23 +778,12 @@ function CTA() {
             <div className="absolute inset-0 bg-hero opacity-60" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.15),transparent_40%)]" />
             <div className="relative z-10">
-              <motion.div
-                animate={{ rotate: [0, 15, -10, 0], scale: [1, 1.12, 1] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              >
+              <motion.div animate={{ rotate: [0, 15, -10, 0], scale: [1, 1.12, 1] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}>
                 <Sun className="w-10 h-10 text-gold mx-auto" />
               </motion.div>
               <h2 className="mt-6 text-4xl md:text-5xl">Begin your reading.</h2>
-              <p className="mt-5 text-muted-foreground max-w-xl mx-auto">
-                A single conversation can shift the trajectory of a decade. Reserve your private
-                session today.
-              </p>
-              <Link
-                to="/book"
-                className="mt-10 inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-medium shadow-gold hover:scale-[1.02] transition"
-              >
-                Book Your Session <ArrowRight className="w-4 h-4" />
-              </Link>
+              <p className="mt-5 text-muted-foreground max-w-xl mx-auto">A single conversation can shift the trajectory of a decade. Reserve your private session today.</p>
+              <Link to="/book" className="mt-10 inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-medium shadow-gold hover:scale-[1.02] transition">Book Your Session <ArrowRight className="w-4 h-4" /></Link>
             </div>
           </div>
         </Reveal>

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Instagram, Youtube, Linkedin, Mail, MapPin, Phone } from "lucide-react";
+import { Instagram, Mail, MapPin, Phone } from "lucide-react";
 import { siteConfig, footerLinks } from "@/content/site";
 
 export default function Footer() {
@@ -20,8 +20,6 @@ export default function Footer() {
           <div className="flex gap-3 mt-8">
             {[
               { Icon: Instagram, href: siteConfig.social.instagram, label: "Instagram" },
-              { Icon: Youtube, href: siteConfig.social.youtube, label: "YouTube" },
-              { Icon: Linkedin, href: siteConfig.social.linkedin, label: "LinkedIn" },
               { Icon: Mail, href: `mailto:${siteConfig.email}`, label: "Email" },
             ].map(({ Icon, href, label }) => (
               <a key={label} href={href} aria-label={label} className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-muted-foreground hover:text-gold hover:scale-110 hover:shadow-gold transition-all duration-300">
