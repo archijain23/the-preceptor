@@ -123,12 +123,18 @@
       radial-gradient(ellipse 50% 45% at 10%  20%, oklch(0.50 0.08 305 / 0.18), transparent 58%),
       radial-gradient(ellipse 45% 40% at 90%  80%, oklch(0.28 0.08 255 / 0.14), transparent 55%);
 
+    /* ── Button gradient token ────────────────────────────────── */
+    --gradient-btn: linear-gradient(90deg, #ffde59 0%, #ff914d 100%);
+    --gradient-btn-hover: linear-gradient(90deg, #ffe97a 0%, #ffaa6e 100%);
+
     --gradient-gold:
       linear-gradient(135deg, oklch(0.88 0.10 88), oklch(0.72 0.13 70));
     --gradient-card:
       linear-gradient(160deg, oklch(0.19 0.028 270 / 0.82), oklch(0.14 0.024 270 / 0.65));
     --shadow-gold:    0 10px 40px -10px oklch(0.82 0.12 85 / 0.38);
     --shadow-elegant: 0 30px 80px -30px oklch(0 0 0 / 0.65);
+    --shadow-btn:     0 6px 28px -8px rgba(255, 145, 77, 0.55);
+    --shadow-btn-hover: 0 14px 44px -10px rgba(255, 145, 77, 0.70);
     --transition-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
@@ -137,20 +143,6 @@
   * { border-color: var(--color-border); }
 
   body {
-    /*
-     * BUG A FIX: background-color removed from body.
-     *
-     * Previously body had `background-color: var(--background)` which painted
-     * a solid opaque dark layer over the entire viewport. This completely hid
-     * #cosmic-bg (position:fixed; z-index:-2) because that div is a child of
-     * <body> — a child with a negative z-index goes BEHIND its parent's own
-     * background paint. So the body's solid background-color was covering the
-     * cosmic gradient div entirely.
-     *
-     * Fix: remove background-color from body. The page background is now
-     * fully owned by #cosmic-bg. The fallback background-color is set on
-     * #cosmic-bg itself so there's no flash of unstyled content.
-     */
     color: var(--foreground);
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "cv11";
@@ -199,16 +191,12 @@
 
 /* ════════════════════════════════════════════════════════════════
    COSMIC BACKGROUND LAYER
-   Fixed full-bleed div injected via __root.tsx (#cosmic-bg).
-   Sits at z-index:-2, behind everything including body's paint layer.
-   Body must have NO background-color for this to show through.
 ════════════════════════════════════════════════════════════════ */
 #cosmic-bg {
   position: fixed;
   inset: 0;
   z-index: -2;
   pointer-events: none;
-  /* Fallback solid color in case gradient fails */
   background-color: var(--background);
   background-image: var(--gradient-page);
   background-size: cover;
@@ -281,20 +269,6 @@
     radial-gradient(1.6px 1.6px at 76%  74%, oklch(0.82 0.12 85 / 0.80), transparent);
 }
 
-/*
- * BUG B FIX: starfield-glow must ALWAYS be on a separate element from .starfield.
- *
- * An HTML element has exactly ONE ::before and ONE ::after pseudo-element.
- * When both .starfield and .starfield-glow are on the same div, CSS specificity
- * means only ONE ::before definition wins (last-defined in stylesheet = .starfield-glow
- * wins ::before, .starfield-glow wins ::after). The actual crisp star dots from
- * .starfield::before and .starfield::after are completely overridden — zero stars visible.
- *
- * Fix applied in index.tsx: Hero section now has TWO sibling divs:
- *   <div class="absolute inset-0 starfield" aria-hidden />
- *   <div class="absolute inset-0 starfield-glow" aria-hidden />
- * Each div gets its own ::before and ::after. All 4 pseudo-elements render correctly.
- */
 .starfield-glow::before,
 .starfield-glow::after {
   content: "";
@@ -403,13 +377,8 @@
     color: transparent;
   }
 
-  .bg-hero {
-    background: var(--gradient-hero);
-  }
-
-  .bg-cosmic-section {
-    background: transparent;
-  }
+  .bg-hero            { background: var(--gradient-hero); }
+  .bg-cosmic-section  { background: transparent; }
 
   .bg-cosmic-deep {
     background: linear-gradient(
@@ -500,34 +469,39 @@
     );
   }
 
+  /* ── PRIMARY BUTTON — #ffde59 → #ff914d gradient ─────────────────────
+     Applied to .btn-primary, and via [class*="bg-primary"] to catch any
+     Tailwind bg-primary utility used directly on <button>/<Link> elements.
+  ───────────────────────────────────────────────────────────────────── */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full
-           bg-primary text-primary-foreground font-medium tracking-wide;
+           font-medium tracking-wide;
+    background: var(--gradient-btn);
+    color: #1a0e00;
     transition: transform 0.4s var(--transition-smooth),
                 box-shadow 0.4s var(--transition-smooth),
                 filter 0.4s;
-    box-shadow:
-      0 6px 24px -8px oklch(0.82 0.12 85 / 0.50),
-      0 0 0 1px oklch(0.82 0.12 85 / 0.15) inset;
+    box-shadow: var(--shadow-btn);
   }
   .btn-primary:hover {
     transform: translateY(-2px) scale(1.02);
-    box-shadow:
-      0 14px 40px -10px oklch(0.82 0.12 85 / 0.65),
-      0 0 0 1px oklch(0.82 0.12 85 / 0.20) inset;
+    box-shadow: var(--shadow-btn-hover);
     filter: brightness(1.06);
   }
+
+  /* ── SECONDARY BUTTON — gradient border + ghost ──────────────────── */
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full
-           text-foreground font-medium tracking-wide backdrop-blur-sm;
-    border: 1px solid oklch(0.82 0.12 85 / 0.35);
-    transition: all 0.4s var(--transition-smooth);
+           font-medium tracking-wide backdrop-blur-sm;
     background: oklch(1 0 0 / 0.03);
+    border: 1px solid rgba(255, 222, 89, 0.45);
+    color: var(--foreground);
+    transition: all 0.4s var(--transition-smooth);
   }
   .btn-secondary:hover {
     background: oklch(0.22 0.03 270 / 0.65);
-    border-color: oklch(0.82 0.12 85 / 0.65);
-    box-shadow: 0 0 24px -8px oklch(0.82 0.12 85 / 0.25);
+    border-color: rgba(255, 145, 77, 0.70);
+    box-shadow: 0 0 24px -8px rgba(255, 145, 77, 0.30);
     transform: translateY(-2px);
   }
 
@@ -608,6 +582,21 @@
     );
     z-index: 1;
   }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   GLOBAL: any element using Tailwind bg-primary also gets the gradient.
+   This catches inline <Link className="... bg-primary ..."> buttons
+   in Nav.jsx, route files, etc. without touching each file individually.
+════════════════════════════════════════════════════════════════ */
+[class~="bg-primary"] {
+  background: var(--gradient-btn) !important;
+  color: #1a0e00 !important;
+  box-shadow: var(--shadow-btn);
+}
+[class~="bg-primary"]:hover {
+  filter: brightness(1.07);
+  box-shadow: var(--shadow-btn-hover);
 }
 
 /* ════════════════════════════════════════════════════════════════
