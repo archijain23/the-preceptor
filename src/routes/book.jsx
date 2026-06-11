@@ -82,7 +82,6 @@ function getTzOffsetLabel(tz) {
   }
 }
 
-// BUG FIX: IST offset is +5:30 so UTC = IST - 5h30m → subtract 5h and 30m correctly
 function istHourToUserDate(baseDate, istHour) {
   const y = baseDate.getFullYear();
   const m = baseDate.getMonth() + 1;
@@ -100,14 +99,14 @@ function formatInTz(date, tz, opts) {
 
 // ----- Page -----
 export default function BookPage() {
-  // 0 intro, 1 details, 2 timezone, 3 slot, 4 summary, 5 confirmed
+  // 0 intro, 1 timezone, 2 slot, 3 details, 4 summary, 5 confirmed
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(initialForm);
   const [tz, setTz] = useState("UTC");
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
 
-  // BUG FIX: detect user timezone on mount; fall back gracefully
+  // Detect user timezone on mount; fall back gracefully
   useEffect(() => {
     try {
       const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -119,7 +118,8 @@ export default function BookPage() {
 
   const tzLabel = useMemo(() => getTzOffsetLabel(tz), [tz]);
 
-  const progressSteps = ["Your Details", "Timezone", "Choose Time", "Review"];
+  // New order: Timezone → Choose Time → Your Details → Review
+  const progressSteps = ["Timezone", "Choose Time", "Your Details", "Review"];
 
   return (
     <>
@@ -182,28 +182,20 @@ export default function BookPage() {
                 <IntroStep onStart={() => setStep(1)} />
               </StepWrap>
             )}
+            {/* Step 1: Timezone (was step 2) */}
             {step === 1 && (
-              <StepWrap key="details">
-                <DetailsStep
-                  form={form}
-                  setForm={setForm}
-                  onNext={() => setStep(2)}
-                  onBack={() => setStep(0)}
-                />
-              </StepWrap>
-            )}
-            {step === 2 && (
               <StepWrap key="tz">
                 <TimezoneStep
                   tz={tz}
                   setTz={setTz}
                   tzLabel={tzLabel}
-                  onNext={() => setStep(3)}
-                  onBack={() => setStep(1)}
+                  onNext={() => setStep(2)}
+                  onBack={() => setStep(0)}
                 />
               </StepWrap>
             )}
-            {step === 3 && (
+            {/* Step 2: Slot selection (was step 3) */}
+            {step === 2 && (
               <StepWrap key="slot">
                 <SlotStep
                   tz={tz}
@@ -212,11 +204,23 @@ export default function BookPage() {
                   setSelectedDate={setSelectedDate}
                   selectedSlot={selectedSlot}
                   setSelectedSlot={setSelectedSlot}
+                  onNext={() => setStep(3)}
+                  onBack={() => setStep(1)}
+                />
+              </StepWrap>
+            )}
+            {/* Step 3: Details (was step 1) */}
+            {step === 3 && (
+              <StepWrap key="details">
+                <DetailsStep
+                  form={form}
+                  setForm={setForm}
                   onNext={() => setStep(4)}
                   onBack={() => setStep(2)}
                 />
               </StepWrap>
             )}
+            {/* Step 4: Summary/Review */}
             {step === 4 && (
               <StepWrap key="summary">
                 <SummaryStep
@@ -259,7 +263,7 @@ function StepWrap({ children }) {
   );
 }
 
-// ----- Step 1: Intro -----
+// ----- Step 0: Intro -----
 function IntroStep({ onStart }) {
   return (
     <div className="text-center max-w-3xl mx-auto pt-8">
@@ -316,85 +320,12 @@ function IntroStep({ onStart }) {
   );
 }
 
-// ----- Step 2: Details -----
-function DetailsStep({ form, setForm, onNext, onBack }) {
-  // BUG FIX: update function uses plain string key, no TypeScript keyof
-  const update = (k) => (e) => setForm({ ...form, [k]: e.target.value });
-
-  const valid =
-    form.fullName &&
-    form.email &&
-    form.country &&
-    form.dob &&
-    form.tob &&
-    form.pob;
-
-  return (
-    <div className="max-w-3xl mx-auto">
-      <SectionTitle
-        eyebrow="Step 1"
-        title="Share a few details"
-        subtitle="Used solely to prepare your reading. Always private."
-      />
-
-      <div className="mt-10 glass-card rounded-3xl p-8 md:p-10 shadow-elegant">
-        <Group title="Basic Information">
-          <Field label="Full Name" value={form.fullName} onChange={update("fullName")} required />
-          <Field label="Email Address" type="email" value={form.email} onChange={update("email")} required />
-          <Field label="Phone Number" type="tel" value={form.phone} onChange={update("phone")} />
-          <div className="grid md:grid-cols-2 gap-5">
-            <Field label="Country" value={form.country} onChange={update("country")} required />
-            <Field label="City" value={form.city} onChange={update("city")} />
-          </div>
-        </Group>
-
-        <Divider />
-
-        <Group title="Astrology Information">
-          <div className="grid md:grid-cols-2 gap-5">
-            <Field label="Date of Birth" type="date" value={form.dob} onChange={update("dob")} required />
-            <Field label="Exact Time of Birth" type="time" value={form.tob} onChange={update("tob")} required />
-          </div>
-          <Field label="Place of Birth" value={form.pob} onChange={update("pob")} required />
-        </Group>
-
-        <Divider />
-
-        <Group title="Session Details">
-          <div className="grid md:grid-cols-2 gap-5">
-            <SelectField
-              label="Consultation Type"
-              value={form.consultationType}
-              onChange={update("consultationType")}
-              options={consultationTypes}
-            />
-            <SelectField
-              label="Preferred Language"
-              value={form.language}
-              onChange={update("language")}
-              options={languages}
-            />
-          </div>
-          <TextAreaField
-            label="Main Concern / Questions"
-            value={form.concern}
-            onChange={update("concern")}
-            placeholder="Share what you'd love clarity on..."
-          />
-        </Group>
-
-        <NavRow onBack={onBack} onNext={onNext} nextDisabled={!valid} />
-      </div>
-    </div>
-  );
-}
-
-// ----- Step 3: Timezone -----
+// ----- Step 1: Timezone -----
 function TimezoneStep({ tz, setTz, tzLabel, onNext, onBack }) {
   return (
     <div className="max-w-2xl mx-auto">
       <SectionTitle
-        eyebrow="Step 2"
+        eyebrow="Step 1"
         title="Confirm your timezone"
         subtitle="Available session times are automatically shown in your local timezone."
       />
@@ -421,7 +352,6 @@ function TimezoneStep({ tz, setTz, tzLabel, onNext, onBack }) {
             onChange={(e) => setTz(e.target.value)}
             className="mt-2 w-full bg-secondary/50 border border-border rounded-xl px-4 py-3 text-foreground focus:border-gold focus:outline-none transition"
           >
-            {/* BUG FIX: deduplicate — if detected tz already in COMMON_TZ, avoid duplicate option */}
             {[tz, ...COMMON_TZ.filter((t) => t !== tz)].map((t) => (
               <option key={t} value={t}>
                 {t.replace(/_/g, " ")}
@@ -436,7 +366,7 @@ function TimezoneStep({ tz, setTz, tzLabel, onNext, onBack }) {
   );
 }
 
-// ----- Step 4: Slot selection -----
+// ----- Step 2: Slot selection -----
 function SlotStep({
   tz,
   tzLabel,
@@ -465,7 +395,7 @@ function SlotStep({
     return ASTROLOGER_SLOTS_IST.map((h) => istHourToUserDate(selectedDate, h));
   }, [selectedDate]);
 
-  // BUG FIX: clear previously chosen slot when user picks a new date
+  // Clear previously chosen slot when user picks a new date
   const handleDateSelect = (d) => {
     setSelectedDate(d);
     setSelectedSlot(null);
@@ -476,7 +406,7 @@ function SlotStep({
   return (
     <div className="max-w-4xl mx-auto">
       <SectionTitle
-        eyebrow="Step 3"
+        eyebrow="Step 2"
         title="Choose a time"
         subtitle="All session times are displayed in your local timezone."
       />
@@ -581,16 +511,87 @@ function SlotStep({
           onBack={onBack}
           onNext={onNext}
           nextDisabled={!selectedSlot}
-          nextLabel="Review Booking"
+          nextLabel="Your Details"
         />
       </div>
     </div>
   );
 }
 
-// ----- Step 5: Summary -----
+// ----- Step 3: Details -----
+function DetailsStep({ form, setForm, onNext, onBack }) {
+  const update = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  const valid =
+    form.fullName &&
+    form.email &&
+    form.country &&
+    form.dob &&
+    form.tob &&
+    form.pob;
+
+  return (
+    <div className="max-w-3xl mx-auto">
+      <SectionTitle
+        eyebrow="Step 3"
+        title="Share a few details"
+        subtitle="Used solely to prepare your reading. Always private."
+      />
+
+      <div className="mt-10 glass-card rounded-3xl p-8 md:p-10 shadow-elegant">
+        <Group title="Basic Information">
+          <Field label="Full Name" value={form.fullName} onChange={update("fullName")} required />
+          <Field label="Email Address" type="email" value={form.email} onChange={update("email")} required />
+          <Field label="Phone Number" type="tel" value={form.phone} onChange={update("phone")} />
+          <div className="grid md:grid-cols-2 gap-5">
+            <Field label="Country" value={form.country} onChange={update("country")} required />
+            <Field label="City" value={form.city} onChange={update("city")} />
+          </div>
+        </Group>
+
+        <Divider />
+
+        <Group title="Astrology Information">
+          <div className="grid md:grid-cols-2 gap-5">
+            <Field label="Date of Birth" type="date" value={form.dob} onChange={update("dob")} required />
+            <Field label="Exact Time of Birth" type="time" value={form.tob} onChange={update("tob")} required />
+          </div>
+          <Field label="Place of Birth" value={form.pob} onChange={update("pob")} required />
+        </Group>
+
+        <Divider />
+
+        <Group title="Session Details">
+          <div className="grid md:grid-cols-2 gap-5">
+            <SelectField
+              label="Consultation Type"
+              value={form.consultationType}
+              onChange={update("consultationType")}
+              options={consultationTypes}
+            />
+            <SelectField
+              label="Preferred Language"
+              value={form.language}
+              onChange={update("language")}
+              options={languages}
+            />
+          </div>
+          <TextAreaField
+            label="Main Concern / Questions"
+            value={form.concern}
+            onChange={update("concern")}
+            placeholder="Share what you'd love clarity on..."
+          />
+        </Group>
+
+        <NavRow onBack={onBack} onNext={onNext} nextDisabled={!valid} nextLabel="Review Booking" />
+      </div>
+    </div>
+  );
+}
+
+// ----- Step 4: Summary -----
 function SummaryStep({ form, tz, tzLabel, selectedSlot, onConfirm, onBack }) {
-  // BUG FIX: guard against null selectedSlot before formatting
   const dateStr = selectedSlot
     ? formatInTz(selectedSlot, tz, {
         weekday: "long",
@@ -635,7 +636,7 @@ function SummaryStep({ form, tz, tzLabel, selectedSlot, onConfirm, onBack }) {
   );
 }
 
-// ----- Step 6: Confirmed -----
+// ----- Step 5: Confirmed -----
 function ConfirmedStep({ form, tz, tzLabel, selectedSlot }) {
   const dateStr = selectedSlot
     ? formatInTz(selectedSlot, tz, { weekday: "long", month: "long", day: "numeric" })
@@ -644,7 +645,6 @@ function ConfirmedStep({ form, tz, tzLabel, selectedSlot }) {
     ? formatInTz(selectedSlot, tz, { hour: "numeric", minute: "2-digit", hour12: true })
     : "";
 
-  // BUG FIX: safe first name — guard empty fullName
   const firstName = form.fullName.trim().split(" ")[0] || "friend";
 
   return (
