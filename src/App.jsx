@@ -10,6 +10,7 @@ import Contact from "./routes/contact";
 import Services from "./routes/services";
 import Testimonials from "./routes/testimonials";
 import Shop from "./routes/shop";
+import QnA from "./routes/qna";
 import NotFound from "./routes/not-found";
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/qna" element={<QnA />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

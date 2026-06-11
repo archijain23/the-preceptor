@@ -15,15 +15,12 @@ export const siteConfig = {
   },
 };
 
-// BUG FIX: Services was using hash: "#services" (relative anchor) instead of
-// a proper route. From any page other than "/" this appended #services to the
-// current path (e.g. /about#services). Now it uses to: "/services" like every
-// other nav link so React Router handles navigation correctly.
 export const navLinks = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/services", label: "Services" },
   { to: "/testimonials", label: "Testimonials" },
+  { to: "/qna", label: "Q&A" },
   { to: "/shop", label: "Shop" },
   { to: "/contact", label: "Contact" },
 ];
@@ -34,6 +31,7 @@ export const footerLinks = {
     { to: "/about", label: "About" },
     { to: "/services", label: "Services" },
     { to: "/testimonials", label: "Testimonials" },
+    { to: "/qna", label: "Q&A" },
     { to: "/book", label: "Book a Session" },
     { to: "/shop", label: "Shop" },
   ],
