@@ -100,6 +100,20 @@ export const PAGE_SEO = {
     keywords:    "astrology shop, astrology resources online, the preceptor shop",
   },
 
+  privacy: {
+    title:       "Privacy Policy — The Preceptor",
+    description: "How The Preceptor collects, uses, and protects your personal information when you book an astrology consultation or visit thepreceptorglobal.com.",
+    canonical:   `${SITE.domain}/privacy`,
+    keywords:    "the preceptor privacy policy, data protection astrology consultation",
+  },
+
+  terms: {
+    title:       "Terms & Conditions — The Preceptor",
+    description: "Terms of service governing astrology consultations, bookings, payments, and use of The Preceptor website and services.",
+    canonical:   `${SITE.domain}/terms`,
+    keywords:    "the preceptor terms of service, astrology consultation terms, booking policy",
+  },
+
   notFound: {
     title:       "Page Not Found — The Preceptor",
     description: "The page you're looking for doesn't exist. Return to The Preceptor homepage for premium astrology consultations and spiritual guidance.",
