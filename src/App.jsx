@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/site/ErrorBoundary";
 import Nav from "./components/site/Nav";
 import Footer from "./components/site/Footer";
 import TorchCursor from "./components/site/TorchCursor";
+import ScrollToTop from "./components/site/ScrollToTop";
 import { SITE } from "./content/seo";
 
 /**
@@ -18,7 +19,7 @@ import { SITE } from "./content/seo";
  * when the user first navigates to that route, keeping the initial
  * bundle as small as possible.
  */
-import Home from "./routes/index";  // eager — entry page
+import Home from "./routes/index"; // eager — entry page
 
 const About        = lazy(() => import("./routes/about"));
 const Book         = lazy(() => import("./routes/book"));
@@ -34,7 +35,6 @@ const NotFound     = lazy(() => import("./routes/not-found"));
 /**
  * Minimal loading fallback shown by Suspense while a route chunk loads.
  * Matches the site's dark cosmic aesthetic — no jarring flash of white.
- * Typically only visible for 100-300ms on first route visit.
  */
 function CosmicLoader() {
   return (
@@ -74,37 +74,34 @@ function CosmicLoader() {
 
 /**
  * Global JSON-LD Organisation schema — injected once at the app root.
- * PRIVACY: Owner name, phone, and India-origin are intentionally omitted.
  */
 const orgSchema = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
-  "name": "The Preceptor",
-  "alternateName": "The Preceptor Global",
-  "url": SITE.domain,
-  "logo": `${SITE.domain}/favicon.svg`,
-  "image": SITE.ogImage,
-  "description": "Premium Vedic astrology consultations and spiritual guidance for high-intention seekers worldwide. Birth chart readings, career guidance, relationship synastry, tarot and Kundli analysis.",
-  "slogan": "For those who seek clarity.",
-  "email": SITE.email,
-  "priceRange": "$$",
-  "areaServed": "Worldwide",
-  "availableLanguage": [{ "@type": "Language", "name": "English" }],
-  "serviceType": [
+  name: "The Preceptor",
+  alternateName: "The Preceptor Global",
+  url: SITE.domain,
+  logo: `${SITE.domain}/favicon.svg`,
+  image: SITE.ogImage,
+  description:
+    "Premium Vedic astrology consultations and spiritual guidance for high-intention seekers worldwide. Birth chart readings, career guidance, relationship synastry, tarot and Kundli analysis.",
+  slogan: "For those who seek clarity.",
+  email: SITE.email,
+  priceRange: "$$",
+  areaServed: "Worldwide",
+  availableLanguage: [{ "@type": "Language", name: "English" }],
+  serviceType: [
     "Vedic Astrology Reading",
     "Birth Chart Reading",
     "Relationship Synastry",
     "Career Guidance Astrology",
     "Tarot Reading",
     "Kundli Analysis",
-    "Spiritual Consultation"
+    "Spiritual Consultation",
   ],
-  "sameAs": [
-    SITE.social.instagram,
-    SITE.social.reddit
-  ],
-  "currenciesAccepted": "USD, INR, GBP, EUR",
-  "paymentAccepted": "Online payment",
+  sameAs: [SITE.social.instagram, SITE.social.reddit],
+  currenciesAccepted: "USD, INR, GBP, EUR",
+  paymentAccepted: "Online payment",
 };
 
 export default function App() {
@@ -121,6 +118,11 @@ export default function App() {
         <div id="cosmic-grain" aria-hidden="true" />
 
         <TorchCursor />
+
+        {/* ✦ Resets scroll to (0,0) on every route change — must be
+            inside BrowserRouter (via main.jsx) but outside <Routes>. */}
+        <ScrollToTop />
+
         <Nav />
 
         <main className="flex-1 pt-20">
