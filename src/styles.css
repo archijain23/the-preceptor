@@ -121,7 +121,6 @@
       radial-gradient(ellipse 50% 45% at 10%  20%, oklch(0.50 0.08 305 / 0.18), transparent 58%),
       radial-gradient(ellipse 45% 40% at 90%  80%, oklch(0.28 0.08 255 / 0.14), transparent 55%);
 
-    /* ── Button gradient token ────────────────────────────────── */
     --gradient-btn: linear-gradient(90deg, #ffde59 0%, #ff914d 100%);
     --gradient-btn-hover: linear-gradient(90deg, #ffe97a 0%, #ffaa6e 100%);
 
@@ -136,7 +135,15 @@
     --transition-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  html { scroll-behavior: smooth; }
+  /* ── Smooth scroll with fixed-nav offset ──────────────────────────────
+     scroll-behavior: smooth  → anchor links (#section) glide, not jump.
+     scroll-padding-top: 5rem → offsets the 80px (h-20) fixed header so
+     targeted sections are never hidden behind the nav bar.
+  ──────────────────────────────────────────────────────────────────── */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem; /* matches the h-20 (80px) fixed nav height */
+  }
 
   * { border-color: var(--color-border); }
 
@@ -467,10 +474,6 @@
     );
   }
 
-  /* ── PRIMARY BUTTON — #ffde59 → #ff914d gradient ─────────────────────
-     Applied to .btn-primary, and via [class*="bg-primary"] to catch any
-     Tailwind bg-primary utility used directly on <button>/<Link> elements.
-  ───────────────────────────────────────────────────────────────────── */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full
            font-medium tracking-wide;
@@ -487,7 +490,6 @@
     filter: brightness(1.06);
   }
 
-  /* ── SECONDARY BUTTON — gradient border + ghost ──────────────────── */
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full
            font-medium tracking-wide backdrop-blur-sm;
@@ -584,8 +586,6 @@
 
 /* ════════════════════════════════════════════════════════════════
    GLOBAL: any element using Tailwind bg-primary also gets the gradient.
-   This catches inline <Link className="... bg-primary ..."> buttons
-   in Nav.jsx, route files, etc. without touching each file individually.
 ════════════════════════════════════════════════════════════════ */
 [class~="bg-primary"] {
   background: var(--gradient-btn) !important;
@@ -598,33 +598,65 @@
 }
 
 /* ════════════════════════════════════════════════════════════════
-   SELECTION + SCROLLBAR
+   SELECTION
 ════════════════════════════════════════════════════════════════ */
 ::selection {
   background: oklch(0.82 0.12 85 / 0.28);
   color: oklch(0.96 0.01 80);
 }
 
-html { scrollbar-color: oklch(0.82 0.12 85 / 0.35) transparent; }
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: oklch(0.82 0.12 85 / 0.22);
-  border-radius: 999px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.82 0.12 85 / 0.48);
-  background-clip: padding-box;
+/* ════════════════════════════════════════════════════════════════
+   COSMIC SCROLLBAR
+   — Thin, dark-themed, gold-accented.
+   — 6px width: slim and modern, not the old chunky 10px.
+   — Track: fully transparent — matches the dark cosmic bg.
+   — Thumb: rich gold at 55% opacity — clearly visible but not
+     aggressive. Hover brightens to 80% for clear feedback.
+   — Firefox: scrollbar-color uses the same gold token.
+   — border trick (background-clip: padding-box + transparent
+     border): creates a visual gap between thumb and track edge,
+     making it look even lighter and more refined on dark BGs.
+════════════════════════════════════════════════════════════════ */
+html {
+  scrollbar-color: oklch(0.82 0.12 85 / 0.55) transparent;
+  scrollbar-width: thin;
 }
 
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.82 0.12 85 / 0.55);
+  border-radius: 999px;
+  /* 1px transparent border gives a subtle floating effect */
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  transition: background 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.82 0.12 85 / 0.82);
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   FOCUS
+════════════════════════════════════════════════════════════════ */
 :focus-visible {
   outline: 2px solid oklch(0.82 0.12 85 / 0.75);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
 }
 
+/* ════════════════════════════════════════════════════════════════
+   REDUCED MOTION
+════════════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
