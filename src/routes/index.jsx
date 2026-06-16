@@ -16,9 +16,13 @@ import {
   Quote,
 } from "lucide-react";
 import { useRef, useState, useMemo, useEffect } from "react";
-import heroImg from "@/assets/hero-section.jpg";
-import aboutImg from "@/assets/about-section.jpg";
-import qnaImg from "@/assets/qna-section.jpg";
+// vite-imagetools: ?format=webp&quality=80 converts JPG → WebP at build time.
+// hero: ~1.3 MB JPG → ~110-130 KB WebP
+// about: ~1.27 MB JPG → ~100-120 KB WebP
+// qna:   ~1.39 MB JPG → ~110-130 KB WebP
+import heroImg from "@/assets/hero-section.jpg?format=webp&quality=80";
+import aboutImg from "@/assets/about-section.jpg?format=webp&quality=80";
+import qnaImg from "@/assets/qna-section.jpg?format=webp&quality=80";
 import Reveal from "@/components/site/Reveal";
 
 const services = [
@@ -343,7 +347,7 @@ function Hero() {
           animate={{ y: [0, -16, 0] }}
           transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 2.6 }}
         >
-          {/* Hero image: above-fold LCP element — eager load, high fetch priority, no lazy */}
+          {/* Hero: above-fold LCP — eager, high priority, WebP via vite-imagetools */}
           <img
             src={heroImg}
             alt="The Preceptor — celestial guide"
@@ -556,7 +560,7 @@ function About() {
               maskImage: "radial-gradient(ellipse 75% 80% at 50% 50%, black 45%, rgba(0,0,0,0.55) 75%, transparent 100%)",
             }}
           >
-            {/* About image: below-fold — lazy load to defer until near viewport */}
+            {/* About: below-fold — lazy WebP via vite-imagetools */}
             <motion.img
               src={aboutImg}
               alt="The Preceptor — guiding presence"
@@ -749,7 +753,7 @@ function Faq() {
       <div className="max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-2 gap-16 items-start relative z-10">
         <Reveal>
           <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="relative aspect-square rounded-3xl overflow-hidden gold-border shadow-elegant lg:sticky lg:top-32">
-            {/* FAQ image: below-fold — lazy load */}
+            {/* FAQ: below-fold — lazy WebP via vite-imagetools */}
             <img
               src={qnaImg}
               alt="Cosmic question space"

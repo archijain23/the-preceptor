@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
-import aboutImg from "@/assets/about-section.jpg";
+// vite-imagetools: ?format=webp&quality=80 — about-section.jpg ~1.27 MB → ~100-120 KB WebP
+import aboutImg from "@/assets/about-section.jpg?format=webp&quality=80";
 import { Reveal } from "@/components/site/Reveal";
 
 export default function AboutWrapper() {
@@ -33,8 +34,7 @@ function AboutContent() {
         </Reveal>
         <Reveal delay={0.1}>
           <div className="aspect-[4/5] rounded-2xl overflow-hidden gold-border shadow-elegant">
-            {/* About page hero image: visible near top of page — lazy load still appropriate
-                as it is below the text column on mobile and beside it on desktop */}
+            {/* About page image: lazy WebP via vite-imagetools */}
             <img
               src={aboutImg}
               alt="The Preceptor — guiding presence"
