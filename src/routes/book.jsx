@@ -22,24 +22,20 @@ const CAL_NAMESPACE = "astrology-session";
 
 // Cal.com theme palette — mirrors the site's deep-space luxury CSS vars
 const CAL_THEME = {
-  // Surfaces
   "cal-bg":              "#14121e",
   "cal-bg-emphasis":     "#1c192d",
   "cal-bg-subtle":       "#1f1c30",
   "cal-bg-muted":        "#18162a",
   "cal-bg-inverted":     "#f5f0e8",
-  // Text
   "cal-text":            "#f0ede6",
   "cal-text-emphasis":   "#faf8f3",
   "cal-text-subtle":     "#9b97a8",
   "cal-text-muted":      "#6b6778",
   "cal-text-inverted":   "#14121e",
-  // Brand (gold)
   "cal-brand":           "#d4a84b",
   "cal-brand-emphasis":  "#e8c068",
   "cal-brand-subtle":    "#2a2318",
   "cal-brand-text":      "#14121e",
-  // Borders
   "cal-border":          "rgba(255,255,255,0.08)",
   "cal-border-subtle":   "rgba(255,255,255,0.05)",
   "cal-border-booker":   "rgba(255,255,255,0.07)",
@@ -73,18 +69,16 @@ const consultationTypes = [
 const languages = ["English", "Hindi", "Spanish", "French", "Arabic", "Mandarin"];
 
 // ─── Page ───────────────────────────────────────────────────────
+// New flow: 0 = intro → 1 = choose time (Cal embed) → 2 = your details → 3 = confirmed
 export default function BookPage() {
-  // 0 = intro  1 = details  2 = cal-embed  3 = confirmed
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(initialForm);
   const [bookedData, setBookedData] = useState(null);
 
-  // Initialise Cal.com embed API + theme as soon as component mounts
   useEffect(() => {
     (async () => {
       const cal = await getCalApi({ namespace: CAL_NAMESPACE });
 
-      // Forward URL query params to the booking form
       if (window.Cal) {
         window.Cal.config = window.Cal.config || {};
         window.Cal.config.forwardQueryParams = true;
@@ -97,7 +91,6 @@ export default function BookPage() {
         layout: "month_view",
       });
 
-      // Listen for successful booking
       cal("on", {
         action: "bookingSuccessful",
         callback: (e) => {
@@ -108,7 +101,8 @@ export default function BookPage() {
     })();
   }, []);
 
-  const progressSteps = ["Your Details", "Choose a Time", "Confirmed"];
+  // Progress labels match new order
+  const progressSteps = ["Choose a Time", "Your Details", "Confirmed"];
 
   return (
     <>
@@ -116,7 +110,7 @@ export default function BookPage() {
         <title>Book a Session — The Preceptor</title>
         <meta
           name="description"
-          content="Reserve a private astrology consultation with The Preceptor. Starting at 7:30 PM IST, available every day."
+          content="Reserve a private astrology consultation with The Preceptor. Available every day."
         />
         <meta property="og:title" content="Book a Session — The Preceptor" />
         <meta
@@ -172,20 +166,17 @@ export default function BookPage() {
             )}
 
             {step === 1 && (
-              <StepWrap key="details">
-                <DetailsStep
-                  form={form}
-                  setForm={setForm}
-                  onNext={() => setStep(2)}
-                  onBack={() => setStep(0)}
-                />
+              <StepWrap key="cal">
+                <CalStep onBack={() => setStep(0)} onNext={() => setStep(2)} />
               </StepWrap>
             )}
 
             {step === 2 && (
-              <StepWrap key="cal">
-                <CalStep
+              <StepWrap key="details">
+                <DetailsStep
                   form={form}
+                  setForm={setForm}
+                  onNext={() => setStep(3)}
                   onBack={() => setStep(1)}
                 />
               </StepWrap>
@@ -256,41 +247,14 @@ function IntroStep({ onStart }) {
         ))}
       </div>
 
-      {/* Timings preview */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.55 }}
-        className="mt-10 max-w-lg mx-auto glass-card rounded-2xl p-6"
-      >
-        <p className="text-xs uppercase tracking-[0.3em] text-gold mb-4 flex items-center justify-center gap-2">
-          <CalendarDays className="w-3.5 h-3.5" /> Available Every Day · IST
-        </p>
-        <div className="grid grid-cols-5 gap-2">
-          {[
-            "7:30 PM", "8:30 PM", "9:30 PM", "10:30 PM", "11:30 PM",
-          ].map((t) => (
-            <div
-              key={t}
-              className="rounded-xl py-2 px-1 text-center text-xs border border-white/8 bg-white/3 text-muted-foreground"
-            >
-              {t}
-            </div>
-          ))}
-        </div>
-        <p className="mt-3 text-[11px] text-muted-foreground/60">
-          Times shown in IST · Auto-converted to your local timezone at booking
-        </p>
-      </motion.div>
-
       <motion.button
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
+        transition={{ delay: 0.5 }}
         onClick={onStart}
-        className="mt-10 btn-primary"
+        className="mt-12 btn-primary"
       >
-        Start Booking <ArrowRight className="w-4 h-4" />
+        Choose a Time <ArrowRight className="w-4 h-4" />
       </motion.button>
 
       <p className="mt-6 text-xs text-muted-foreground tracking-wide">
@@ -300,7 +264,70 @@ function IntroStep({ onStart }) {
   );
 }
 
-// ─── Step 1: Details form ───────────────────────────────────────
+// ─── Step 1: Cal.com embed (choose time first) ──────────────────
+function CalStep({ onBack, onNext }) {
+  return (
+    <div className="max-w-5xl mx-auto">
+      <SectionTitle
+        eyebrow="Step 1"
+        title="Choose your time"
+        subtitle="Select a date and time that works for you. All times are shown in your local timezone."
+      />
+
+      {/* Info strip */}
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+        {[
+          { icon: Globe2,       text: "Auto timezone conversion" },
+          { icon: Clock,        text: "60 min sessions" },
+          { icon: CalendarDays, text: "All 7 days available" },
+        ].map((item) => (
+          <div key={item.text} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <item.icon className="w-3.5 h-3.5 text-gold" />
+            {item.text}
+          </div>
+        ))}
+      </div>
+
+      {/* Cal.com embed */}
+      <div
+        className="mt-8 rounded-3xl overflow-hidden shadow-elegant"
+        style={{
+          background: "oklch(0.14 0.024 270 / 0.80)",
+          border: "1px solid rgba(255,255,255,0.07)",
+          backdropFilter: "blur(16px)",
+        }}
+      >
+        <Cal
+          namespace={CAL_NAMESPACE}
+          calLink={CAL_LINK}
+          config={{
+            layout: "month_view",
+            useSlotsViewOnSmallScreen: "true",
+          }}
+          style={{ width: "100%", height: "700px", overflow: "scroll" }}
+        />
+      </div>
+
+      {/* Nav */}
+      <div className="mt-6 flex items-center justify-between">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-full gold-border hover:bg-secondary transition text-sm"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
+        <button
+          onClick={onNext}
+          className="btn-primary"
+        >
+          Enter Your Details <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Step 2: Details form ───────────────────────────────────────
 function DetailsStep({ form, setForm, onNext, onBack }) {
   const update = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
@@ -315,7 +342,7 @@ function DetailsStep({ form, setForm, onNext, onBack }) {
   return (
     <div className="max-w-3xl mx-auto">
       <SectionTitle
-        eyebrow="Step 1"
+        eyebrow="Step 2"
         title="Share a few details"
         subtitle="Used solely to prepare your reading. Always private."
       />
@@ -366,78 +393,7 @@ function DetailsStep({ form, setForm, onNext, onBack }) {
           />
         </Group>
 
-        <NavRow onBack={onBack} onNext={onNext} nextDisabled={!valid} nextLabel="Choose a Time" />
-      </div>
-    </div>
-  );
-}
-
-// ─── Step 2: Cal.com embed ──────────────────────────────────────
-function CalStep({ form, onBack }) {
-  return (
-    <div className="max-w-5xl mx-auto">
-      <SectionTitle
-        eyebrow="Step 2"
-        title="Choose your time"
-        subtitle="All times shown in your local timezone. 5 slots available nightly — 7:30 PM to 11:30 PM IST."
-      />
-
-      {/* Info strip */}
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-        {[
-          { icon: Globe2,       text: "Auto timezone conversion" },
-          { icon: Clock,        text: "60 min sessions" },
-          { icon: CalendarDays, text: "All 7 days available" },
-        ].map((item) => (
-          <div key={item.text} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <item.icon className="w-3.5 h-3.5 text-gold" />
-            {item.text}
-          </div>
-        ))}
-      </div>
-
-      {/* Cal.com embed wrapper — themed to match site */}
-      <div
-        className="mt-8 rounded-3xl overflow-hidden shadow-elegant"
-        style={{
-          background: "oklch(0.14 0.024 270 / 0.80)",
-          border: "1px solid rgba(255,255,255,0.07)",
-          backdropFilter: "blur(16px)",
-        }}
-      >
-        <Cal
-          namespace={CAL_NAMESPACE}
-          calLink={CAL_LINK}
-          config={{
-            layout: "month_view",
-            useSlotsViewOnSmallScreen: "true",
-            // Pre-fill user details so they don't retype
-            name:  form.fullName,
-            email: form.email,
-            smsReminderNumber: form.phone || undefined,
-            notes: [
-              form.consultationType && `Consultation: ${form.consultationType}`,
-              form.language         && `Language: ${form.language}`,
-              form.dob              && `DOB: ${form.dob}`,
-              form.tob              && `TOB: ${form.tob}`,
-              form.pob              && `POB: ${form.pob}`,
-              form.concern          && `Concern: ${form.concern}`,
-            ]
-              .filter(Boolean)
-              .join(" | "),
-          }}
-          style={{ width: "100%", height: "700px", overflow: "scroll" }}
-        />
-      </div>
-
-      {/* Back button */}
-      <div className="mt-6 flex">
-        <button
-          onClick={onBack}
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-full gold-border hover:bg-secondary transition text-sm"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Details
-        </button>
+        <NavRow onBack={onBack} onNext={onNext} nextDisabled={!valid} nextLabel="Confirm Booking" />
       </div>
     </div>
   );
@@ -447,7 +403,6 @@ function CalStep({ form, onBack }) {
 function ConfirmedStep({ form, bookedData }) {
   const firstName = form.fullName.trim().split(" ")[0] || "friend";
 
-  // Extract booking info from Cal.com callback data if available
   const startTime = bookedData?.startTime
     ? new Date(bookedData.startTime).toLocaleString("en-US", {
         weekday: "long",
