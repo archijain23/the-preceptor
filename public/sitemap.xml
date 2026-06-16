@@ -7,28 +7,7 @@
     http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
 >
 
-  <!-- ═══════════════════════════════════════════════════════
-       The Preceptor — XML Sitemap
-       Domain : https://thepreceptorglobal.com
-       Updated: 2026-06-16
-
-       Priority guide:
-         1.0  Homepage — most crawled, highest traffic
-         0.85 Services — primary conversion page
-         0.80 About    — brand authority page
-         0.75 Testimonials — trust signal, long-tail traffic
-         0.70 Q&A      — FAQ rich-result eligible
-         0.60 Contact  — low-traffic utility page
-
-       EXCLUDED:
-         /book  — booking pages should not be indexed; cold
-                  Google traffic to a booking step has near-zero
-                  conversion and creates a crawl dead-end.
-         /shop  — placeholder (disallowed in robots.txt too)
-         /404   — error pages must never appear in sitemaps
-  ════════════════════════════════════════════════════════ -->
-
-  <!-- Homepage -->
+  <!-- Homepage — highest priority, crawled weekly -->
   <url>
     <loc>https://thepreceptorglobal.com/</loc>
     <lastmod>2026-06-16</lastmod>
@@ -36,15 +15,23 @@
     <priority>1.0</priority>
   </url>
 
-  <!-- Services — primary conversion page -->
+  <!-- Book — primary conversion page -->
+  <url>
+    <loc>https://thepreceptorglobal.com/book</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+  </url>
+
+  <!-- Services — service discovery, high SEO value -->
   <url>
     <loc>https://thepreceptorglobal.com/services</loc>
     <lastmod>2026-06-16</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.90</priority>
   </url>
 
-  <!-- About -->
+  <!-- About — brand authority & trust -->
   <url>
     <loc>https://thepreceptorglobal.com/about</loc>
     <lastmod>2026-06-16</lastmod>
@@ -52,7 +39,7 @@
     <priority>0.80</priority>
   </url>
 
-  <!-- Testimonials -->
+  <!-- Testimonials — social proof, E-E-A-T signal -->
   <url>
     <loc>https://thepreceptorglobal.com/testimonials</loc>
     <lastmod>2026-06-16</lastmod>
@@ -60,20 +47,26 @@
     <priority>0.75</priority>
   </url>
 
-  <!-- Q&A — FAQ schema eligible, long-tail search traffic -->
+  <!-- Contact —  utility page -->
+  <url>
+    <loc>https://thepreceptorglobal.com/contact</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+
+  <!-- Q&A — FAQ content, long-tail keyword capture -->
   <url>
     <loc>https://thepreceptorglobal.com/qna</loc>
     <lastmod>2026-06-16</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.70</priority>
+    <priority>0.65</priority>
   </url>
 
-  <!-- Contact -->
-  <url>
-    <loc>https://thepreceptorglobal.com/contact</loc>
-    <lastmod>2026-06-16</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.60</priority>
-  </url>
+  <!--
+    /shop intentionally excluded — placeholder page with thin content.
+    Indexing it would create a "thin content" quality signal.
+    Add it back once the shop has real product pages.
+  -->
 
 </urlset>

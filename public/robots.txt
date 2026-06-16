@@ -1,34 +1,23 @@
-# The Preceptor — robots.txt
-# https://thepreceptorglobal.com/robots.txt
-# Updated: 2026-06-16
+# robots.txt — The Preceptor (https://thepreceptorglobal.com)
+# ─────────────────────────────────────────────────────────────
+# Allow all legitimate search engine crawlers.
+# Disallow /shop — placeholder page with thin content.
+# ─────────────────────────────────────────────────────────────
 
-# ── Allow all well-behaved crawlers ───────────────────────────
 User-agent: *
 Allow: /
+Disallow: /shop
+Disallow: /_next/
+Disallow: /api/
 
-# Shop is a coming-soon placeholder — thin content.
-# Excluded until the shop is fully live with real products.
+# Google Image Bot — allow all images
+User-agent: Googlebot-Image
+Allow: /
+
+# Bing
+User-agent: Bingbot
+Allow: /
 Disallow: /shop
 
-# ── Block high-volume commercial scrapers ─────────────────────
-# These bots burn crawl budget without contributing to ranking.
-User-agent: AhrefsBot
-Disallow: /
-
-User-agent: SemrushBot
-Disallow: /
-
-User-agent: MJ12bot
-Disallow: /
-
-User-agent: DotBot
-Disallow: /
-
-User-agent: PetalBot
-Disallow: /
-
-User-agent: BLEXBot
-Disallow: /
-
-# ── Sitemap ───────────────────────────────────────────────────
+# Sitemap location
 Sitemap: https://thepreceptorglobal.com/sitemap.xml
