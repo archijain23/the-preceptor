@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import Cal, { getCalApi } from "@calcom/embed-react";
 import {
   ArrowRight,
   ArrowLeft,
@@ -8,14 +9,44 @@ import {
   Sparkles,
   Globe2,
   Clock,
-  CalendarDays,
   Video,
   Mail,
   ShieldCheck,
+  CalendarDays,
 } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
 
-// ----- Constants -----
+// ─── Cal.com config ────────────────────────────────────────────
+const CAL_LINK = "preceptor/astrology-session";
+const CAL_NAMESPACE = "astrology-session";
+
+// Cal.com theme palette — mirrors the site's deep-space luxury CSS vars
+const CAL_THEME = {
+  // Surfaces
+  "cal-bg":              "#14121e",
+  "cal-bg-emphasis":     "#1c192d",
+  "cal-bg-subtle":       "#1f1c30",
+  "cal-bg-muted":        "#18162a",
+  "cal-bg-inverted":     "#f5f0e8",
+  // Text
+  "cal-text":            "#f0ede6",
+  "cal-text-emphasis":   "#faf8f3",
+  "cal-text-subtle":     "#9b97a8",
+  "cal-text-muted":      "#6b6778",
+  "cal-text-inverted":   "#14121e",
+  // Brand (gold)
+  "cal-brand":           "#d4a84b",
+  "cal-brand-emphasis":  "#e8c068",
+  "cal-brand-subtle":    "#2a2318",
+  "cal-brand-text":      "#14121e",
+  // Borders
+  "cal-border":          "rgba(255,255,255,0.08)",
+  "cal-border-subtle":   "rgba(255,255,255,0.05)",
+  "cal-border-booker":   "rgba(255,255,255,0.07)",
+  "cal-border-default":  "rgba(255,255,255,0.08)",
+};
+
+// ─── Form initial state ─────────────────────────────────────────
 const initialForm = {
   fullName: "",
   email: "",
@@ -41,85 +72,35 @@ const consultationTypes = [
 
 const languages = ["English", "Hindi", "Spanish", "French", "Arabic", "Mandarin"];
 
-const ASTROLOGER_TZ = "Asia/Kolkata";
-const ASTROLOGER_SLOTS_IST = [10, 12.5, 15, 17.5, 20, 21.5];
-const SESSION_DURATION_MIN = 60;
-
-const COMMON_TZ = [
-  "America/New_York",
-  "America/Chicago",
-  "America/Denver",
-  "America/Los_Angeles",
-  "Europe/London",
-  "Europe/Paris",
-  "Europe/Berlin",
-  "Asia/Dubai",
-  "Asia/Kolkata",
-  "Asia/Singapore",
-  "Asia/Tokyo",
-  "Australia/Sydney",
-];
-
-// ----- Helpers -----
-function getTzOffsetLabel(tz) {
-  try {
-    const dtf = new Intl.DateTimeFormat("en-US", {
-      timeZone: tz,
-      timeZoneName: "shortOffset",
-    });
-    const parts = dtf.formatToParts(new Date());
-    const off = parts.find((p) => p.type === "timeZoneName")?.value ?? "";
-    const abbr =
-      new Intl.DateTimeFormat("en-US", {
-        timeZone: tz,
-        timeZoneName: "short",
-      })
-        .formatToParts(new Date())
-        .find((p) => p.type === "timeZoneName")?.value ?? "";
-    return { abbr, off };
-  } catch {
-    return { abbr: "", off: "" };
-  }
-}
-
-function istHourToUserDate(baseDate, istHour) {
-  const y = baseDate.getFullYear();
-  const m = baseDate.getMonth() + 1;
-  const d = baseDate.getDate();
-  const hh = Math.floor(istHour);
-  const mm = Math.round((istHour - hh) * 60);
-  // IST = UTC+5:30 → UTC = IST - 5h30m
-  const utcMs = Date.UTC(y, m - 1, d, hh - 5, mm - 30);
-  return new Date(utcMs);
-}
-
-function formatInTz(date, tz, opts) {
-  return new Intl.DateTimeFormat("en-US", { timeZone: tz, ...opts }).format(date);
-}
-
-// ----- Page -----
+// ─── Page ───────────────────────────────────────────────────────
 export default function BookPage() {
-  // 0 intro, 1 timezone, 2 slot, 3 details, 4 summary, 5 confirmed
+  // 0 = intro  1 = details  2 = cal-embed  3 = confirmed
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(initialForm);
-  const [tz, setTz] = useState("UTC");
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [bookedData, setBookedData] = useState(null);
 
-  // Detect user timezone on mount; fall back gracefully
+  // Initialise Cal.com embed API + theme as soon as component mounts
   useEffect(() => {
-    try {
-      const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      if (detected) setTz(detected);
-    } catch {
-      setTz("UTC");
-    }
+    (async () => {
+      const cal = await getCalApi({ namespace: CAL_NAMESPACE });
+      cal("ui", {
+        theme: "dark",
+        cssVarsPerTheme: { dark: CAL_THEME },
+        hideEventTypeDetails: false,
+        layout: "month_view",
+      });
+      // Listen for successful booking
+      cal("on", {
+        action: "bookingSuccessful",
+        callback: (e) => {
+          setBookedData(e.detail?.data ?? {});
+          setStep(3);
+        },
+      });
+    })();
   }, []);
 
-  const tzLabel = useMemo(() => getTzOffsetLabel(tz), [tz]);
-
-  // New order: Timezone → Choose Time → Your Details → Review
-  const progressSteps = ["Timezone", "Choose Time", "Your Details", "Review"];
+  const progressSteps = ["Your Details", "Choose a Time", "Confirmed"];
 
   return (
     <>
@@ -127,7 +108,7 @@ export default function BookPage() {
         <title>Book a Session — The Preceptor</title>
         <meta
           name="description"
-          content="Reserve a private astrology consultation with The Preceptor. Timezone-aware scheduling, premium experience for international clients."
+          content="Reserve a private astrology consultation with The Preceptor. Starting at 7:30 PM IST, available every day."
         />
         <meta property="og:title" content="Book a Session — The Preceptor" />
         <meta
@@ -140,30 +121,29 @@ export default function BookPage() {
         {/* Ambient glow */}
         <div
           className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full opacity-30 blur-3xl"
-          style={{
-            background: "radial-gradient(circle, var(--gold) 0%, transparent 60%)",
-          }}
+          style={{ background: "radial-gradient(circle, var(--gold) 0%, transparent 60%)" }}
         />
 
         <section className="relative max-w-6xl mx-auto px-6 lg:px-10 py-16 lg:py-24">
-          {/* Progress bar — hidden on intro (0) and confirmed (5) */}
-          {step > 0 && step < 5 && (
+
+          {/* Progress bar — visible on steps 1 and 2 */}
+          {step >= 1 && step <= 2 && (
             <Reveal>
               <div className="max-w-3xl mx-auto mb-12">
                 <div className="flex items-center gap-3">
                   {progressSteps.map((s, i) => {
-                    const idx = i + 1;
-                    const active = step >= idx;
+                    const active = step > i;
+                    const current = step === i + 1;
                     return (
                       <div key={s} className="flex-1">
                         <div
                           className={`h-[3px] rounded-full transition-all duration-500 ${
-                            active ? "bg-gold shadow-gold" : "bg-muted"
+                            active || current ? "bg-gold shadow-gold" : "bg-muted"
                           }`}
                         />
                         <p
                           className={`mt-2 text-[10px] md:text-xs uppercase tracking-[0.25em] ${
-                            active ? "text-gold" : "text-muted-foreground"
+                            active || current ? "text-gold" : "text-muted-foreground"
                           }`}
                         >
                           {s}
@@ -182,65 +162,30 @@ export default function BookPage() {
                 <IntroStep onStart={() => setStep(1)} />
               </StepWrap>
             )}
-            {/* Step 1: Timezone (was step 2) */}
+
             {step === 1 && (
-              <StepWrap key="tz">
-                <TimezoneStep
-                  tz={tz}
-                  setTz={setTz}
-                  tzLabel={tzLabel}
+              <StepWrap key="details">
+                <DetailsStep
+                  form={form}
+                  setForm={setForm}
                   onNext={() => setStep(2)}
                   onBack={() => setStep(0)}
                 />
               </StepWrap>
             )}
-            {/* Step 2: Slot selection (was step 3) */}
+
             {step === 2 && (
-              <StepWrap key="slot">
-                <SlotStep
-                  tz={tz}
-                  tzLabel={tzLabel}
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                  selectedSlot={selectedSlot}
-                  setSelectedSlot={setSelectedSlot}
-                  onNext={() => setStep(3)}
+              <StepWrap key="cal">
+                <CalStep
+                  form={form}
                   onBack={() => setStep(1)}
                 />
               </StepWrap>
             )}
-            {/* Step 3: Details (was step 1) */}
+
             {step === 3 && (
-              <StepWrap key="details">
-                <DetailsStep
-                  form={form}
-                  setForm={setForm}
-                  onNext={() => setStep(4)}
-                  onBack={() => setStep(2)}
-                />
-              </StepWrap>
-            )}
-            {/* Step 4: Summary/Review */}
-            {step === 4 && (
-              <StepWrap key="summary">
-                <SummaryStep
-                  form={form}
-                  tz={tz}
-                  tzLabel={tzLabel}
-                  selectedSlot={selectedSlot}
-                  onConfirm={() => setStep(5)}
-                  onBack={() => setStep(3)}
-                />
-              </StepWrap>
-            )}
-            {step === 5 && (
               <StepWrap key="done">
-                <ConfirmedStep
-                  form={form}
-                  tz={tz}
-                  tzLabel={tzLabel}
-                  selectedSlot={selectedSlot}
-                />
+                <ConfirmedStep form={form} bookedData={bookedData} />
               </StepWrap>
             )}
           </AnimatePresence>
@@ -263,7 +208,7 @@ function StepWrap({ children }) {
   );
 }
 
-// ----- Step 0: Intro -----
+// ─── Step 0: Intro ──────────────────────────────────────────────
 function IntroStep({ onStart }) {
   return (
     <div className="text-center max-w-3xl mx-auto pt-8">
@@ -286,9 +231,9 @@ function IntroStep({ onStart }) {
 
       <div className="mt-12 grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
         {[
-          { icon: Clock, label: "60 minute session" },
-          { icon: Video, label: "Online — private 1:1" },
-          { icon: Globe2, label: "Your local timezone" },
+          { icon: Clock,      label: "60 minute session" },
+          { icon: Video,      label: "Online — private 1:1" },
+          { icon: Globe2,     label: "Your local timezone" },
         ].map((item, i) => (
           <motion.div
             key={item.label}
@@ -303,222 +248,51 @@ function IntroStep({ onStart }) {
         ))}
       </div>
 
+      {/* Timings preview */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.55 }}
+        className="mt-10 max-w-lg mx-auto glass-card rounded-2xl p-6"
+      >
+        <p className="text-xs uppercase tracking-[0.3em] text-gold mb-4 flex items-center justify-center gap-2">
+          <CalendarDays className="w-3.5 h-3.5" /> Available Every Day · IST
+        </p>
+        <div className="grid grid-cols-5 gap-2">
+          {[
+            "7:30 PM", "8:30 PM", "9:30 PM", "10:30 PM", "11:30 PM",
+          ].map((t) => (
+            <div
+              key={t}
+              className="rounded-xl py-2 px-1 text-center text-xs border border-white/8 bg-white/3 text-muted-foreground"
+            >
+              {t}
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-[11px] text-muted-foreground/60">
+          Times shown in IST · Auto-converted to your local timezone at booking
+        </p>
+      </motion.div>
+
       <motion.button
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
         onClick={onStart}
-        className="mt-12 inline-flex items-center gap-2 px-9 py-4 rounded-full bg-primary text-primary-foreground font-medium shadow-gold hover:scale-[1.03] transition"
+        className="mt-10 btn-primary"
       >
         Start Booking <ArrowRight className="w-4 h-4" />
       </motion.button>
 
       <p className="mt-6 text-xs text-muted-foreground tracking-wide">
-        Estimated 3 minutes · Confirmed by email within 12 hours
+        Estimated 3 minutes · Confirmed instantly via Cal.com
       </p>
     </div>
   );
 }
 
-// ----- Step 1: Timezone -----
-function TimezoneStep({ tz, setTz, tzLabel, onNext, onBack }) {
-  return (
-    <div className="max-w-2xl mx-auto">
-      <SectionTitle
-        eyebrow="Step 1"
-        title="Confirm your timezone"
-        subtitle="Available session times are automatically shown in your local timezone."
-      />
-
-      <div className="mt-10 glass-card rounded-3xl p-8 md:p-10 shadow-elegant text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full gold-border mx-auto">
-          <Globe2 className="w-7 h-7 text-gold" />
-        </div>
-
-        <p className="mt-6 text-sm uppercase tracking-[0.3em] text-muted-foreground">
-          Your Timezone
-        </p>
-        <h3 className="mt-2 text-3xl md:text-4xl">{tz.replace(/_/g, " ")}</h3>
-        <p className="mt-2 text-gold tracking-wide">
-          {tzLabel.abbr} {tzLabel.off && `(${tzLabel.off})`}
-        </p>
-
-        <div className="mt-8 text-left">
-          <label className="text-sm text-muted-foreground">
-            Change timezone (optional)
-          </label>
-          <select
-            value={tz}
-            onChange={(e) => setTz(e.target.value)}
-            className="mt-2 w-full bg-secondary/50 border border-border rounded-xl px-4 py-3 text-foreground focus:border-gold focus:outline-none transition"
-          >
-            {[tz, ...COMMON_TZ.filter((t) => t !== tz)].map((t) => (
-              <option key={t} value={t}>
-                {t.replace(/_/g, " ")}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <NavRow onBack={onBack} onNext={onNext} />
-      </div>
-    </div>
-  );
-}
-
-// ----- Step 2: Slot selection -----
-function SlotStep({
-  tz,
-  tzLabel,
-  selectedDate,
-  setSelectedDate,
-  selectedSlot,
-  setSelectedSlot,
-  onNext,
-  onBack,
-}) {
-  // 14-day rolling window starting from tomorrow
-  const days = useMemo(() => {
-    const arr = [];
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    for (let i = 1; i <= 14; i++) {
-      const d = new Date(start);
-      d.setDate(start.getDate() + i);
-      arr.push(d);
-    }
-    return arr;
-  }, []);
-
-  const slots = useMemo(() => {
-    if (!selectedDate) return [];
-    return ASTROLOGER_SLOTS_IST.map((h) => istHourToUserDate(selectedDate, h));
-  }, [selectedDate]);
-
-  // Clear previously chosen slot when user picks a new date
-  const handleDateSelect = (d) => {
-    setSelectedDate(d);
-    setSelectedSlot(null);
-  };
-
-  const isUnavailable = (d) => d.getDay() === 0; // no Sundays
-
-  return (
-    <div className="max-w-4xl mx-auto">
-      <SectionTitle
-        eyebrow="Step 2"
-        title="Choose a time"
-        subtitle="All session times are displayed in your local timezone."
-      />
-
-      <div className="mt-6 inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-gold">
-        <Globe2 className="w-3.5 h-3.5" /> {tzLabel.abbr || tz}{" "}
-        {tzLabel.off && `· ${tzLabel.off}`}
-      </div>
-
-      <div className="mt-8 glass-card rounded-3xl p-6 md:p-10 shadow-elegant">
-        <div className="flex items-center gap-3 mb-6">
-          <CalendarDays className="w-5 h-5 text-gold" />
-          <h3 className="text-xl">Select a date</h3>
-        </div>
-
-        <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3">
-          {days.map((d) => {
-            const disabled = isUnavailable(d);
-            const isSelected = selectedDate?.toDateString() === d.toDateString();
-            return (
-              <button
-                key={d.toISOString()}
-                disabled={disabled}
-                onClick={() => handleDateSelect(d)}
-                className={`group rounded-2xl p-3 text-center border transition-all ${
-                  disabled
-                    ? "opacity-30 cursor-not-allowed border-border"
-                    : isSelected
-                    ? "border-gold bg-gold/10 shadow-gold"
-                    : "border-border hover:border-gold/50 hover:bg-secondary/50"
-                }`}
-              >
-                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                  {d.toLocaleDateString("en-US", { weekday: "short" })}
-                </div>
-                <div className={`mt-1 text-2xl ${isSelected ? "text-gold" : ""}`}>
-                  {d.getDate()}
-                </div>
-                <div className="text-[10px] text-muted-foreground">
-                  {d.toLocaleDateString("en-US", { month: "short" })}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        <AnimatePresence mode="wait">
-          {selectedDate && (
-            <motion.div
-              key={selectedDate.toISOString()}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-              className="mt-10"
-            >
-              <div className="flex items-center gap-3 mb-5">
-                <Clock className="w-5 h-5 text-gold" />
-                <h3 className="text-xl">
-                  Available times —{" "}
-                  <span className="text-muted-foreground">
-                    {selectedDate.toLocaleDateString("en-US", {
-                      weekday: "long",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </span>
-                </h3>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {slots.map((s) => {
-                  const isSel = selectedSlot?.getTime() === s.getTime();
-                  const label = formatInTz(s, tz, {
-                    hour: "numeric",
-                    minute: "2-digit",
-                    hour12: true,
-                  });
-                  return (
-                    <button
-                      key={s.toISOString()}
-                      onClick={() => setSelectedSlot(s)}
-                      className={`rounded-xl px-4 py-4 border transition-all ${
-                        isSel
-                          ? "border-gold bg-gold/10 text-gold shadow-gold"
-                          : "border-border hover:border-gold/50 hover:bg-secondary/50"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="mt-4 text-xs text-muted-foreground">
-                Times converted from astrologer's timezone (
-                {ASTROLOGER_TZ.replace(/_/g, " ")}) to yours automatically.
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <NavRow
-          onBack={onBack}
-          onNext={onNext}
-          nextDisabled={!selectedSlot}
-          nextLabel="Your Details"
-        />
-      </div>
-    </div>
-  );
-}
-
-// ----- Step 3: Details -----
+// ─── Step 1: Details form ───────────────────────────────────────
 function DetailsStep({ form, setForm, onNext, onBack }) {
   const update = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
@@ -533,7 +307,7 @@ function DetailsStep({ form, setForm, onNext, onBack }) {
   return (
     <div className="max-w-3xl mx-auto">
       <SectionTitle
-        eyebrow="Step 3"
+        eyebrow="Step 1"
         title="Share a few details"
         subtitle="Used solely to prepare your reading. Always private."
       />
@@ -584,68 +358,98 @@ function DetailsStep({ form, setForm, onNext, onBack }) {
           />
         </Group>
 
-        <NavRow onBack={onBack} onNext={onNext} nextDisabled={!valid} nextLabel="Review Booking" />
+        <NavRow onBack={onBack} onNext={onNext} nextDisabled={!valid} nextLabel="Choose a Time" />
       </div>
     </div>
   );
 }
 
-// ----- Step 4: Summary -----
-function SummaryStep({ form, tz, tzLabel, selectedSlot, onConfirm, onBack }) {
-  const dateStr = selectedSlot
-    ? formatInTz(selectedSlot, tz, {
+// ─── Step 2: Cal.com embed ──────────────────────────────────────
+function CalStep({ form, onBack }) {
+  return (
+    <div className="max-w-5xl mx-auto">
+      <SectionTitle
+        eyebrow="Step 2"
+        title="Choose your time"
+        subtitle="All times shown in your local timezone. Sessions run 7:30 PM – 12:30 AM IST every day."
+      />
+
+      {/* Info strip */}
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+        {[
+          { icon: Globe2,  text: "Auto timezone conversion" },
+          { icon: Clock,   text: "60 min sessions" },
+          { icon: CalendarDays, text: "All 7 days available" },
+        ].map((item) => (
+          <div key={item.text} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <item.icon className="w-3.5 h-3.5 text-gold" />
+            {item.text}
+          </div>
+        ))}
+      </div>
+
+      {/* Cal.com embed wrapper — themed to match site */}
+      <div
+        className="mt-8 rounded-3xl overflow-hidden shadow-elegant"
+        style={{
+          background: "oklch(0.14 0.024 270 / 0.80)",
+          border: "1px solid rgba(255,255,255,0.07)",
+          backdropFilter: "blur(16px)",
+        }}
+      >
+        <Cal
+          namespace={CAL_NAMESPACE}
+          calLink={CAL_LINK}
+          config={{
+            layout: "month_view",
+            useSlotsViewOnSmallScreen: "true",
+            // Pre-fill user details so they don't retype
+            name: form.fullName,
+            email: form.email,
+            notes: [
+              form.consultationType && `Consultation: ${form.consultationType}`,
+              form.language        && `Language: ${form.language}`,
+              form.dob             && `DOB: ${form.dob}`,
+              form.tob             && `TOB: ${form.tob}`,
+              form.pob             && `POB: ${form.pob}`,
+              form.concern         && `Concern: ${form.concern}`,
+            ]
+              .filter(Boolean)
+              .join(" | "),
+          }}
+          style={{ width: "100%", height: "700px", overflow: "scroll" }}
+        />
+      </div>
+
+      {/* Back button */}
+      <div className="mt-6 flex">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-full gold-border hover:bg-secondary transition text-sm"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to Details
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Step 3: Confirmed ──────────────────────────────────────────
+function ConfirmedStep({ form, bookedData }) {
+  const firstName = form.fullName.trim().split(" ")[0] || "friend";
+
+  // Extract booking info from Cal.com callback data if available
+  const startTime = bookedData?.startTime
+    ? new Date(bookedData.startTime).toLocaleString("en-US", {
         weekday: "long",
         month: "long",
         day: "numeric",
-        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+        timeZoneName: "short",
       })
-    : "";
-  const timeStr = selectedSlot
-    ? formatInTz(selectedSlot, tz, { hour: "numeric", minute: "2-digit", hour12: true })
-    : "";
-
-  return (
-    <div className="max-w-2xl mx-auto">
-      <SectionTitle
-        eyebrow="Step 4"
-        title="Review your session"
-        subtitle="A quiet moment to confirm everything is right."
-      />
-
-      <div className="mt-10 glass-card rounded-3xl p-8 md:p-10 shadow-elegant">
-        <SummaryRow label="Client" value={form.fullName} />
-        <SummaryRow label="Consultation" value={form.consultationType} />
-        <SummaryRow label="Language" value={form.language} />
-        <SummaryRow label="Date" value={dateStr} />
-        <SummaryRow label="Time" value={`${timeStr} · ${tzLabel.abbr || tz}`} />
-        <SummaryRow label="Duration" value={`${SESSION_DURATION_MIN} minutes`} />
-        <SummaryRow label="Format" value="Private online video session" last />
-
-        <div className="mt-8 flex items-start gap-3 p-4 rounded-2xl bg-secondary/40 border border-border">
-          <ShieldCheck className="w-5 h-5 text-gold shrink-0 mt-0.5" />
-          <p className="text-sm text-muted-foreground">
-            Your details are kept private and used only to prepare your reading.
-            A confirmation and meeting link will be sent to{" "}
-            <span className="text-foreground">{form.email}</span>.
-          </p>
-        </div>
-
-        <NavRow onBack={onBack} onNext={onConfirm} nextLabel="Confirm Booking" />
-      </div>
-    </div>
-  );
-}
-
-// ----- Step 5: Confirmed -----
-function ConfirmedStep({ form, tz, tzLabel, selectedSlot }) {
-  const dateStr = selectedSlot
-    ? formatInTz(selectedSlot, tz, { weekday: "long", month: "long", day: "numeric" })
-    : "";
-  const timeStr = selectedSlot
-    ? formatInTz(selectedSlot, tz, { hour: "numeric", minute: "2-digit", hour12: true })
-    : "";
-
-  const firstName = form.fullName.trim().split(" ")[0] || "friend";
+    : null;
 
   return (
     <div className="max-w-2xl mx-auto text-center">
@@ -663,29 +467,37 @@ function ConfirmedStep({ form, tz, tzLabel, selectedSlot }) {
       </motion.div>
 
       <h2 className="mt-8 text-4xl md:text-5xl bg-gradient-gold">
-        Your Session Has Been Reserved
+        Your Session is Confirmed
       </h2>
       <p className="mt-4 text-muted-foreground max-w-md mx-auto">
-        Thank you, {firstName}. Your private consultation has been gently placed
-        on the calendar.
+        Thank you, {firstName}. Your private consultation has been confirmed and
+        you will receive a calendar invite and meeting link by email shortly.
       </p>
 
       <div className="mt-10 glass-card rounded-3xl p-8 shadow-elegant text-left">
-        <SummaryRow label="Date" value={dateStr} />
-        <SummaryRow label="Time" value={`${timeStr} · ${tzLabel.abbr || tz}`} />
+        {startTime && <SummaryRow label="Time" value={startTime} />}
         <SummaryRow label="Consultation" value={form.consultationType} />
-        <SummaryRow label="Sent to" value={form.email} last />
+        <SummaryRow label="Language" value={form.language} />
+        <SummaryRow label="Confirmation sent to" value={form.email} last />
       </div>
 
       <div className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground">
         <Mail className="w-4 h-4 text-gold" />
-        A confirmation email and meeting details have been sent to your inbox.
+        Check your inbox for the Cal.com confirmation email & meeting link.
+      </div>
+
+      <div className="mt-6 flex items-start gap-3 p-4 rounded-2xl bg-secondary/40 border border-border max-w-md mx-auto">
+        <ShieldCheck className="w-5 h-5 text-gold shrink-0 mt-0.5" />
+        <p className="text-sm text-muted-foreground text-left">
+          Your birth data and consultation details have been securely noted for
+          session preparation.
+        </p>
       </div>
     </div>
   );
 }
 
-// ----- Shared UI components -----
+// ─── Shared UI ──────────────────────────────────────────────────
 function SectionTitle({ eyebrow, title, subtitle }) {
   return (
     <div className="text-center max-w-2xl mx-auto">
@@ -715,8 +527,7 @@ function Field({ label, value, onChange, type = "text", required }) {
   return (
     <label className="block group">
       <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground group-focus-within:text-gold transition">
-        {label}
-        {required && " *"}
+        {label}{required && " *"}
       </span>
       <input
         type={type}
@@ -741,9 +552,7 @@ function SelectField({ label, value, onChange, options }) {
         className="mt-2 w-full bg-secondary/40 border border-border rounded-xl px-4 py-3.5 text-foreground focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold/40 transition"
       >
         {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
+          <option key={o} value={o}>{o}</option>
         ))}
       </select>
     </label>
@@ -769,14 +578,8 @@ function TextAreaField({ label, value, onChange, placeholder }) {
 
 function SummaryRow({ label, value, last }) {
   return (
-    <div
-      className={`flex items-center justify-between py-4 ${
-        last ? "" : "border-b border-border/60"
-      }`}
-    >
-      <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
-        {label}
-      </span>
+    <div className={`flex items-center justify-between py-4 ${last ? "" : "border-b border-border/60"}`}>
+      <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">{label}</span>
       <span className="text-sm md:text-base text-right">{value || "—"}</span>
     </div>
   );
@@ -796,7 +599,7 @@ function NavRow({ onBack, onNext, nextDisabled, nextLabel = "Continue" }) {
       <button
         onClick={onNext}
         disabled={nextDisabled}
-        className="ml-auto inline-flex items-center gap-2 px-7 py-3 rounded-full bg-primary text-primary-foreground font-medium shadow-gold hover:scale-[1.02] transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+        className="ml-auto btn-primary disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none"
       >
         {nextLabel} <ArrowRight className="w-4 h-4" />
       </button>
