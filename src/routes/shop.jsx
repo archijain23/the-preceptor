@@ -3,6 +3,17 @@ import { Sparkles, BookOpen, Gem, GraduationCap, Bell } from "lucide-react";
 import { useState } from "react";
 import { Reveal } from "@/components/site/Reveal";
 
+/**
+ * Replace YOUR_FORMSPREE_ID with your actual Formspree form ID.
+ * Steps:
+ *   1. Go to https://formspree.io and sign up (free)
+ *   2. Create a new form → copy the ID from the endpoint URL
+ *      e.g. https://formspree.io/f/xpwzgkqb  →  ID is "xpwzgkqb"
+ *   3. Replace the string below with that ID
+ */
+const FORMSPREE_ID = "YOUR_FORMSPREE_ID";
+const FORMSPREE_URL = `https://formspree.io/f/${FORMSPREE_ID}`;
+
 const previews = [
   {
     icon: BookOpen,
@@ -22,8 +33,36 @@ const previews = [
 ];
 
 export default function ShopPage() {
-  const [email, setEmail] = useState("");
-  const [done, setDone] = useState(false);
+  const [email, setEmail]         = useState("");
+  const [done, setDone]           = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError]         = useState(null);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const res = await fetch(FORMSPREE_URL, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body:    JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        setDone(true);
+        setEmail("");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data?.errors?.[0]?.message ?? "Something went wrong. Please try again.");
+      }
+    } catch {
+      setError("Network error. Please check your connection and try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <div className="bg-hero starfield min-h-screen">
@@ -57,13 +96,7 @@ export default function ShopPage() {
 
         <Reveal delay={0.15}>
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setDone(true);
-
-              // Add API call here
-              console.log("Email:", email);
-            }}
+            onSubmit={handleSubmit}
             className="mt-12 max-w-md mx-auto glass-card rounded-full p-2 flex items-center"
           >
             <Bell className="w-5 h-5 text-gold mx-4" />
@@ -74,16 +107,32 @@ export default function ShopPage() {
               placeholder="Notify me at launch"
               type="email"
               required
-              className="flex-1 bg-transparent focus:outline-none px-2 py-2 text-sm"
+              disabled={done || submitting}
+              className="flex-1 bg-transparent focus:outline-none px-2 py-2 text-sm disabled:opacity-50"
             />
 
             <button
               type="submit"
-              className="px-6 py-3 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:scale-[1.02] transition"
+              disabled={done || submitting}
+              className="px-6 py-3 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:scale-[1.02] transition disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
             >
-              {done ? "On the list ✓" : "Notify Me"}
+              {done ? "On the list ✓" : submitting ? "Adding…" : "Notify Me"}
             </button>
           </form>
+
+          {/* Error message — only shown on failure */}
+          {error && (
+            <p className="mt-3 text-xs text-red-400 text-center max-w-md mx-auto">
+              {error}
+            </p>
+          )}
+
+          {/* Success message — only shown after successful submission */}
+          {done && (
+            <p className="mt-3 text-xs text-gold/70 text-center max-w-md mx-auto tracking-wide">
+              You're on the list. We'll reach out when the shop opens.
+            </p>
+          )}
         </Reveal>
 
         <div className="mt-20 grid md:grid-cols-3 gap-6">
