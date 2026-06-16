@@ -1,0 +1,24 @@
+# The Preceptor — robots.txt
+# https://thepreceptor.com/robots.txt
+
+User-agent: *
+Allow: /
+
+# Shop is a coming-soon placeholder — thin content, exclude from index
+Disallow: /shop
+
+# Block common nuisance bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# Sitemap reference
+Sitemap: https://thepreceptor.com/sitemap.xml

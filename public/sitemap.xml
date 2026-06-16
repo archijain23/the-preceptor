@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="
+    http://www.sitemaps.org/schemas/sitemap/0.9
+    http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+>
+
+  <!-- Homepage — highest priority, changes most frequently -->
+  <url>
+    <loc>https://thepreceptor.com/</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- About page -->
+  <url>
+    <loc>https://thepreceptor.com/about</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Booking page — conversion-critical, high priority -->
+  <url>
+    <loc>https://thepreceptor.com/book</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Shop — placeholder, low priority until live -->
+  <!-- Intentionally omitted: /shop is disallowed in robots.txt
+       and contains thin coming-soon content. Re-add when shop is live. -->
+
+</urlset>
