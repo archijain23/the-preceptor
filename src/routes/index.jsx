@@ -122,10 +122,7 @@ const faqs = [
   },
 ];
 
-// PERF FIX: dx and repeatDelay are seeded here and passed as stable props.
-// Previously Math.random() was called inside the component's animate/transition
-// props, producing a new object reference on every render and preventing
-// Framer Motion from memoising the animation subscription.
+// Deterministic particle props — stable across renders, no Math.random() in animate/transition.
 function Particle({ x, y, size, delay, duration, dx, repeatDelay }) {
   return (
     <motion.span
@@ -158,20 +155,18 @@ function Particle({ x, y, size, delay, duration, dx, repeatDelay }) {
   );
 }
 
-// PERF FIX: removed filter:blur(4px→0px) from word entry animation.
-// Each word animating through a blur created its own GPU compositing layer
-// (7 simultaneous blur layers on page load). Replaced with a y:6→0 slide-in
-// which is a transform-only operation — compositor-safe, zero extra layers.
+// RESTORED: Original blur-dissolve entrance animation for heading words.
+// Each word emerges from blur(4px) into sharp focus — the original cinematic effect.
 function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
   const words1 = line1.split(" ");
   const words2 = line2Gold.split(" ");
 
   const wordVariant = {
-    hidden: { opacity: 0, x: -22, y: 6 },
+    hidden: { opacity: 0, x: -22, filter: "blur(4px)" },
     visible: (i) => ({
       opacity: 1,
       x: 0,
-      y: 0,
+      filter: "blur(0px)",
       transition: {
         delay: delay + i * 0.09,
         duration: 0.75,
@@ -267,13 +262,6 @@ function HeroSection() {
         style={{ y: yBg, opacity: oBg }}
         className="absolute inset-0 z-0 pointer-events-none"
       >
-        {/*
-          fetchPriority="high" — This is the LCP element.
-          Tells the browser's preload scanner to fetch this image at
-          high priority, ahead of other discovered resources.
-          Typically saves 200–600 ms on LCP in Chrome / Edge / Safari 17+.
-          loading="eager" is correct for above-the-fold content.
-        */}
         <img
           src={heroImg}
           alt=""
@@ -302,6 +290,65 @@ function HeroSection() {
           style={{ background: "radial-gradient(circle, var(--gold) 0%, transparent 60%)" }}
         />
       </div>
+
+      {/* ── RESTORED: Drifting ambient blur orbs ───────────── */}
+      {/* Orb 1 — top-left violet, drifts right */}
+      <motion.div
+        aria-hidden
+        initial={{ opacity: 0 }}
+        animate={{ x: [0, 38, 0], opacity: [0.28, 0.5, 0.28] }}
+        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 1.6 }}
+        className="absolute -top-24 -left-24 w-[65%] h-[85%] pointer-events-none blur-3xl"
+        style={{
+          background: "radial-gradient(ellipse at 40% 40%, var(--nebula-violet) 0%, var(--nebula-blue) 40%, transparent 70%)",
+          mixBlendMode: "screen",
+        }}
+      />
+      {/* Orb 2 — bottom-right gold, drifts left */}
+      <motion.div
+        aria-hidden
+        initial={{ opacity: 0 }}
+        animate={{ x: [0, -28, 0], opacity: [0.2, 0.38, 0.2] }}
+        transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 2.2 }}
+        className="absolute bottom-0 right-0 w-[58%] h-[65%] pointer-events-none blur-3xl"
+        style={{
+          background: "radial-gradient(ellipse at 60% 60%, var(--gold) 0%, var(--nebula-blue) 50%, transparent 70%)",
+          mixBlendMode: "screen",
+        }}
+      />
+      {/* Orb 3 — mid-right violet, drifts right */}
+      <motion.div
+        aria-hidden
+        animate={{ x: [0, 55, 0], opacity: [0.18, 0.32, 0.18] }}
+        transition={{ duration: 34, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-[15%] right-[10%] w-[55%] h-[40%] pointer-events-none blur-2xl"
+        style={{
+          background: "radial-gradient(ellipse at 50% 50%, var(--nebula-violet) 0%, transparent 65%)",
+          mixBlendMode: "screen",
+        }}
+      />
+      {/* Orb 4 — bottom-right blue, drifts left */}
+      <motion.div
+        aria-hidden
+        animate={{ x: [0, -45, 0], opacity: [0.12, 0.26, 0.12] }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+        className="absolute bottom-[20%] right-[5%] w-[48%] h-[35%] pointer-events-none blur-2xl"
+        style={{
+          background: "radial-gradient(ellipse at 50% 50%, var(--nebula-blue) 0%, transparent 65%)",
+          mixBlendMode: "screen",
+        }}
+      />
+      {/* Orb 5 — center-bottom gold accent, drifts right */}
+      <motion.div
+        aria-hidden
+        animate={{ x: [0, 30, 0], opacity: [0.1, 0.22, 0.1] }}
+        transition={{ duration: 30, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+        className="absolute bottom-[10%] left-[20%] w-[40%] h-[30%] pointer-events-none blur-2xl"
+        style={{
+          background: "radial-gradient(ellipse at 50% 50%, var(--gold) 0%, transparent 65%)",
+          mixBlendMode: "screen",
+        }}
+      />
 
       {/* ── Floating particles ─────────────────────────────── */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
