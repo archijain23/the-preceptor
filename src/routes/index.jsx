@@ -15,10 +15,6 @@ import {
   Quote,
 } from "lucide-react";
 import { useRef, useState, useMemo, useEffect } from "react";
-// vite-imagetools: ?format=webp&quality=80 converts JPG → WebP at build time.
-// hero: ~1.3 MB JPG → ~110-130 KB WebP
-// about: ~1.27 MB JPG → ~100-120 KB WebP
-// qna:   ~1.39 MB JPG → ~110-130 KB WebP
 import heroImg from "@/assets/hero-section.jpg?format=webp&quality=80";
 import aboutImg from "@/assets/about-section.jpg?format=webp&quality=80";
 import qnaImg from "@/assets/qna-section.jpg?format=webp&quality=80";
@@ -155,8 +151,7 @@ function Particle({ x, y, size, delay, duration, dx, repeatDelay }) {
   );
 }
 
-// RESTORED: Original blur-dissolve entrance animation for heading words.
-// Each word emerges from blur(4px) into sharp focus — the original cinematic effect.
+// Left-aligned staggered heading — blur-dissolve entrance, words flow left.
 function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
   const words1 = line1.split(" ");
   const words2 = line2Gold.split(" ");
@@ -177,10 +172,10 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
 
   return (
     <h1
-      className="mt-8 leading-[1.04]"
+      className="mt-6 leading-[1.04]"
       style={{
         fontFamily: "var(--font-serif)",
-        fontSize: "clamp(2.75rem, 6vw + 0.5rem, 5.75rem)",
+        fontSize: "clamp(2.75rem, 5vw + 0.5rem, 5.75rem)",
         letterSpacing: "-0.025em",
         fontWeight: 400,
       }}
@@ -237,27 +232,26 @@ export default function Home() {
 function HeroSection() {
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const yBg   = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
-  const oBg   = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const oBg = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
-  // Stable particle data — computed once, never on re-render
   const particles = useMemo(() => [
-    { id: 0, x: 15, y: 65, size: "5px",  delay: 0,   duration: 5,   dx: 12,  repeatDelay: 1.5 },
-    { id: 1, x: 25, y: 75, size: "3px",  delay: 1.2, duration: 6.5, dx: -8,  repeatDelay: 2 },
-    { id: 2, x: 70, y: 80, size: "4px",  delay: 0.5, duration: 7,   dx: 15,  repeatDelay: 1 },
-    { id: 3, x: 85, y: 60, size: "6px",  delay: 2,   duration: 5.5, dx: -18, repeatDelay: 2.5 },
-    { id: 4, x: 50, y: 85, size: "3.5px",delay: 0.8, duration: 8,   dx: 10,  repeatDelay: 1.8 },
-    { id: 5, x: 35, y: 70, size: "4px",  delay: 1.5, duration: 6,   dx: -12, repeatDelay: 2.2 },
-    { id: 6, x: 60, y: 72, size: "5px",  delay: 3,   duration: 7.5, dx: 20,  repeatDelay: 1.2 },
+    { id: 0, x: 15, y: 65, size: "5px",   delay: 0,   duration: 5,   dx: 12,  repeatDelay: 1.5 },
+    { id: 1, x: 25, y: 75, size: "3px",   delay: 1.2, duration: 6.5, dx: -8,  repeatDelay: 2 },
+    { id: 2, x: 70, y: 80, size: "4px",   delay: 0.5, duration: 7,   dx: 15,  repeatDelay: 1 },
+    { id: 3, x: 85, y: 60, size: "6px",   delay: 2,   duration: 5.5, dx: -18, repeatDelay: 2.5 },
+    { id: 4, x: 50, y: 85, size: "3.5px", delay: 0.8, duration: 8,   dx: 10,  repeatDelay: 1.8 },
+    { id: 5, x: 35, y: 70, size: "4px",   delay: 1.5, duration: 6,   dx: -12, repeatDelay: 2.2 },
+    { id: 6, x: 60, y: 72, size: "5px",   delay: 3,   duration: 7.5, dx: 20,  repeatDelay: 1.2 },
   ], []);
 
   return (
     <section
       ref={heroRef}
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
+      className="relative min-h-screen flex items-center overflow-hidden"
       aria-label="Hero"
     >
-      {/* ── Parallax background image ──────────────────────── */}
+      {/* ── Full-bleed background image (right-weighted, fades left) ── */}
       <motion.div
         style={{ y: yBg, opacity: oBg }}
         className="absolute inset-0 z-0 pointer-events-none"
@@ -271,141 +265,146 @@ function HeroSection() {
           loading="eager"
           decoding="async"
           fetchPriority="high"
-          className="w-full h-full object-cover"
-          style={{ opacity: 0.35 }}
+          className="w-full h-full object-cover object-center"
+          style={{ opacity: 0.75 }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
+        {/* Left-to-right fade so text column stays readable */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, var(--background) 0%, var(--background) 28%, oklch(from var(--background) l c h / 0.82) 45%, oklch(from var(--background) l c h / 0.35) 65%, transparent 100%)",
+          }}
+        />
+        {/* Bottom fade to next section */}
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
       </motion.div>
 
-      {/* ── Cosmic ambient ─────────────────────────────────── */}
+      {/* ── Cosmic ambient orbs ────────────────────────────────────── */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div
-          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[900px]
-                     rounded-full opacity-20 blur-3xl pointer-events-none"
-          style={{ background: "radial-gradient(circle, var(--nebula-violet) 0%, var(--nebula-blue) 50%, transparent 70%)" }}
+        {/* Top-left violet */}
+        <motion.div
+          aria-hidden
+          initial={{ opacity: 0 }}
+          animate={{ x: [0, 38, 0], opacity: [0.28, 0.5, 0.28] }}
+          transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 1.6 }}
+          className="absolute -top-24 -left-24 w-[55%] h-[80%] pointer-events-none blur-3xl"
+          style={{
+            background: "radial-gradient(ellipse at 40% 40%, var(--nebula-violet) 0%, var(--nebula-blue) 40%, transparent 70%)",
+            mixBlendMode: "screen",
+          }}
         />
-        <div
-          className="absolute bottom-0 right-0 w-[500px] h-[500px]
-                     rounded-full opacity-15 blur-3xl pointer-events-none"
-          style={{ background: "radial-gradient(circle, var(--gold) 0%, transparent 60%)" }}
+        {/* Bottom-right gold */}
+        <motion.div
+          aria-hidden
+          initial={{ opacity: 0 }}
+          animate={{ x: [0, -28, 0], opacity: [0.2, 0.38, 0.2] }}
+          transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 2.2 }}
+          className="absolute bottom-0 right-0 w-[50%] h-[60%] pointer-events-none blur-3xl"
+          style={{
+            background: "radial-gradient(ellipse at 60% 60%, var(--gold) 0%, var(--nebula-blue) 50%, transparent 70%)",
+            mixBlendMode: "screen",
+          }}
+        />
+        {/* Mid-right violet */}
+        <motion.div
+          aria-hidden
+          animate={{ x: [0, 55, 0], opacity: [0.18, 0.32, 0.18] }}
+          transition={{ duration: 34, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[15%] right-[10%] w-[45%] h-[40%] pointer-events-none blur-2xl"
+          style={{
+            background: "radial-gradient(ellipse at 50% 50%, var(--nebula-violet) 0%, transparent 65%)",
+            mixBlendMode: "screen",
+          }}
+        />
+        {/* Bottom-right blue */}
+        <motion.div
+          aria-hidden
+          animate={{ x: [0, -45, 0], opacity: [0.12, 0.26, 0.12] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+          className="absolute bottom-[20%] right-[5%] w-[40%] h-[35%] pointer-events-none blur-2xl"
+          style={{
+            background: "radial-gradient(ellipse at 50% 50%, var(--nebula-blue) 0%, transparent 65%)",
+            mixBlendMode: "screen",
+          }}
+        />
+        {/* Center-bottom gold accent */}
+        <motion.div
+          aria-hidden
+          animate={{ x: [0, 30, 0], opacity: [0.1, 0.22, 0.1] }}
+          transition={{ duration: 30, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+          className="absolute bottom-[10%] left-[20%] w-[35%] h-[30%] pointer-events-none blur-2xl"
+          style={{
+            background: "radial-gradient(ellipse at 50% 50%, var(--gold) 0%, transparent 65%)",
+            mixBlendMode: "screen",
+          }}
         />
       </div>
 
-      {/* ── RESTORED: Drifting ambient blur orbs ───────────── */}
-      {/* Orb 1 — top-left violet, drifts right */}
-      <motion.div
-        aria-hidden
-        initial={{ opacity: 0 }}
-        animate={{ x: [0, 38, 0], opacity: [0.28, 0.5, 0.28] }}
-        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 1.6 }}
-        className="absolute -top-24 -left-24 w-[65%] h-[85%] pointer-events-none blur-3xl"
-        style={{
-          background: "radial-gradient(ellipse at 40% 40%, var(--nebula-violet) 0%, var(--nebula-blue) 40%, transparent 70%)",
-          mixBlendMode: "screen",
-        }}
-      />
-      {/* Orb 2 — bottom-right gold, drifts left */}
-      <motion.div
-        aria-hidden
-        initial={{ opacity: 0 }}
-        animate={{ x: [0, -28, 0], opacity: [0.2, 0.38, 0.2] }}
-        transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 2.2 }}
-        className="absolute bottom-0 right-0 w-[58%] h-[65%] pointer-events-none blur-3xl"
-        style={{
-          background: "radial-gradient(ellipse at 60% 60%, var(--gold) 0%, var(--nebula-blue) 50%, transparent 70%)",
-          mixBlendMode: "screen",
-        }}
-      />
-      {/* Orb 3 — mid-right violet, drifts right */}
-      <motion.div
-        aria-hidden
-        animate={{ x: [0, 55, 0], opacity: [0.18, 0.32, 0.18] }}
-        transition={{ duration: 34, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[15%] right-[10%] w-[55%] h-[40%] pointer-events-none blur-2xl"
-        style={{
-          background: "radial-gradient(ellipse at 50% 50%, var(--nebula-violet) 0%, transparent 65%)",
-          mixBlendMode: "screen",
-        }}
-      />
-      {/* Orb 4 — bottom-right blue, drifts left */}
-      <motion.div
-        aria-hidden
-        animate={{ x: [0, -45, 0], opacity: [0.12, 0.26, 0.12] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 4 }}
-        className="absolute bottom-[20%] right-[5%] w-[48%] h-[35%] pointer-events-none blur-2xl"
-        style={{
-          background: "radial-gradient(ellipse at 50% 50%, var(--nebula-blue) 0%, transparent 65%)",
-          mixBlendMode: "screen",
-        }}
-      />
-      {/* Orb 5 — center-bottom gold accent, drifts right */}
-      <motion.div
-        aria-hidden
-        animate={{ x: [0, 30, 0], opacity: [0.1, 0.22, 0.1] }}
-        transition={{ duration: 30, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-        className="absolute bottom-[10%] left-[20%] w-[40%] h-[30%] pointer-events-none blur-2xl"
-        style={{
-          background: "radial-gradient(ellipse at 50% 50%, var(--gold) 0%, transparent 65%)",
-          mixBlendMode: "screen",
-        }}
-      />
-
-      {/* ── Floating particles ─────────────────────────────── */}
+      {/* ── Floating particles ─────────────────────────────────────── */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         {particles.map((p) => (
           <Particle key={p.id} {...p} />
         ))}
       </div>
 
-      {/* ── Hero content ───────────────────────────────────── */}
-      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full text-xs uppercase
-                     tracking-[0.3em] border gold-border bg-secondary/30 backdrop-blur-sm"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-gold" />
-          <span>Vedic · Western · Spiritual</span>
-        </motion.div>
+      {/* ── Hero content — LEFT ALIGNED ────────────────────────────── */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-10 py-32 lg:py-0 lg:min-h-screen flex items-center">
+        <div className="max-w-2xl">
 
-        <StaggeredHeading
-          line1="Navigate Life With"
-          line2Gold="Celestial Clarity"
-          delay={0.1}
-        />
-
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.85, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-7 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
-        >
-          Private astrology consultations for founders, healers, and
-          high-intention seekers. Trusted by 2,500+ clients across 18+ countries.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.05, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-10 flex flex-wrap items-center justify-center gap-4"
-        >
-          <Link to="/book" className="btn-primary">
-            Book a Consultation <ArrowRight className="w-4 h-4" />
-          </Link>
-          <Link
-            to="/about"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm
-                       font-medium gold-border hover:bg-secondary/40 transition-all"
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full text-xs uppercase
+                       tracking-[0.3em] border gold-border bg-secondary/30 backdrop-blur-sm"
           >
-            Learn More
-          </Link>
-        </motion.div>
+            <Sparkles className="w-3.5 h-3.5 text-gold" />
+            <span>Premium Astrology</span>
+          </motion.div>
+
+          {/* Heading */}
+          <StaggeredHeading
+            line1="Modern guidance,"
+            line2Gold="written in the stars."
+            delay={0.1}
+          />
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.85, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-7 text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed"
+          >
+            Cinematic, deeply personal astrology consultations for high-intention
+            seekers — designed for clarity in love, career, and life's defining chapters.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.05, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-10 flex flex-wrap items-center gap-4"
+          >
+            <Link to="/book" className="btn-primary">
+              Book a Session <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              to="/services"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm
+                         font-medium gold-border hover:bg-secondary/40 transition-all"
+            >
+              Explore Services
+            </Link>
+          </motion.div>
+
+        </div>
       </div>
 
-      {/* ── Scroll indicator ───────────────────────────────── */}
+      {/* ── Scroll indicator ───────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -602,7 +601,6 @@ function TestimonialsSection() {
             </motion.div>
           </AnimatePresence>
 
-          {/* Prev / Next */}
           <div className="mt-8 flex items-center justify-center gap-4">
             <button
               onClick={prev}
@@ -617,7 +615,6 @@ function TestimonialsSection() {
               </svg>
             </button>
 
-            {/* Dots */}
             <div className="flex items-center gap-2">
               {testimonials.map((_, i) => (
                 <button
