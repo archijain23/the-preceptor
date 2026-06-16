@@ -2,16 +2,69 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Preceptor — Premium Astrology Consultations</title>
-    <meta name="description" content="Private astrology consultations with The Preceptor. Birth chart readings, career guidance, relationship insights and more — available worldwide." />
 
-    <!-- ═══════════════════════════════════════════════════════════
-         FONT LOADING — preconnect first, then stylesheet
-         Moved from CSS @import (render-blocking) to <link> tags
-         so the browser discovers fonts in parallel with everything else.
-    ════════════════════════════════════════════════════════════ -->
+    <!-- ── Favicon ─────────────────────────────────────────────────── -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- ── Primary Meta ─────────────────────────────────────────── -->
+    <title>The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online</title>
+    <meta
+      name="description"
+      content="Book a private Vedic astrology consultation online. Birth chart readings, career guidance, relationship insights &amp; spiritual clarity — trusted by 2,500+ clients across 18+ countries."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://thepreceptorglobal.com/" />
+
+    <!-- ── Theme color (PWA + browser chrome) ─────────────────────── -->
+    <meta name="theme-color" content="#0a0a0f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- ── Open Graph — static pre-hydration fallback ─────────────────
+         Social crawlers (FB, LinkedIn, WhatsApp, Slack, Discord)
+         do NOT run JavaScript. These tags are read from raw HTML.
+         react-helmet-async per-page <SEO> tags override these at
+         runtime for real users visiting any specific page.
+    ──────────────────────────────────────────────────────── -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:url"         content="https://thepreceptorglobal.com/" />
+    <meta property="og:site_name"   content="The Preceptor" />
+    <meta property="og:locale"      content="en_US" />
+    <meta
+      property="og:title"
+      content="The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online"
+    />
+    <meta
+      property="og:description"
+      content="Book a private Vedic astrology consultation online. Birth chart readings, career guidance, relationship insights &amp; spiritual clarity — trusted by 2,500+ clients across 18+ countries."
+    />
+    <meta property="og:image"        content="https://thepreceptorglobal.com/og-image.jpg" />
+    <meta property="og:image:width"  content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt"    content="The Preceptor — For those who seek clarity." />
+    <meta property="og:image:type"   content="image/jpeg" />
+
+    <!-- ── Twitter / X Card — static pre-hydration fallback ─────────── -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:site"        content="@thepreceptorglobal" />
+    <meta
+      name="twitter:title"
+      content="The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online"
+    />
+    <meta
+      name="twitter:description"
+      content="Book a private Vedic astrology consultation online. Birth chart readings, career guidance, relationship insights &amp; spiritual clarity — trusted by 2,500+ clients across 18+ countries."
+    />
+    <meta name="twitter:image"       content="https://thepreceptorglobal.com/og-image.jpg" />
+    <meta name="twitter:image:alt"   content="The Preceptor — For those who seek clarity." />
+
+    <!-- ── Google Fonts — preconnect first, then stylesheet ─────────────
+         Preconnect hints let the browser open the TCP/TLS connection
+         to Google Fonts in parallel with parsing this HTML, so fonts
+         are ready sooner. @import inside CSS is render-blocking and
+         delays font discovery until after CSS is fully parsed.
+    ──────────────────────────────────────────────────────── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
