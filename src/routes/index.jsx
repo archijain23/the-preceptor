@@ -124,7 +124,11 @@ const faqs = [
   },
 ];
 
-function Particle({ x, y, size, delay, duration }) {
+// PERF FIX: dx and repeatDelay are seeded here and passed as stable props.
+// Previously Math.random() was called inside the component's animate/transition
+// props, producing a new object reference on every render and preventing
+// Framer Motion from memoising the animation subscription.
+function Particle({ x, y, size, delay, duration, dx, repeatDelay }) {
   return (
     <motion.span
       aria-hidden
@@ -132,14 +136,14 @@ function Particle({ x, y, size, delay, duration }) {
       animate={{
         opacity: [0, 0.7, 0.4, 0.8, 0],
         y: [0, -60, -120],
-        x: [0, (Math.random() - 0.5) * 40],
+        x: [0, dx],
       }}
       transition={{
         duration,
         delay,
         repeat: Infinity,
         ease: "easeInOut",
-        repeatDelay: Math.random() * 4 + 2,
+        repeatDelay,
       }}
       style={{
         position: "absolute",
@@ -156,16 +160,20 @@ function Particle({ x, y, size, delay, duration }) {
   );
 }
 
+// PERF FIX: removed filter:blur(4px→0px) from word entry animation.
+// Each word animating through a blur created its own GPU compositing layer
+// (7 simultaneous blur layers on page load). Replaced with a y:6→0 slide-in
+// which is a transform-only operation — compositor-safe, zero extra layers.
 function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
   const words1 = line1.split(" ");
   const words2 = line2Gold.split(" ");
 
   const wordVariant = {
-    hidden: { opacity: 0, x: -22, filter: "blur(4px)" },
+    hidden: { opacity: 0, x: -22, y: 6 },
     visible: (i) => ({
       opacity: 1,
       x: 0,
-      filter: "blur(0px)",
+      y: 0,
       transition: {
         delay: delay + i * 0.09,
         duration: 0.75,
@@ -232,6 +240,10 @@ export default function HomePage() {
 }
 
 function Hero() {
+  // PERF FIX: dx (horizontal drift) and repeatDelay are now seeded here in
+  // useMemo alongside the other particle data. This ensures every Particle
+  // render receives stable prop values — Framer Motion can memoise the
+  // animation and never re-subscribes due to a changed transition object.
   const particles = useMemo(
     () =>
       Array.from({ length: 18 }, (_, idx) => ({
@@ -241,6 +253,9 @@ function Hero() {
         size: (idx % 3) + 1.5,
         delay: idx * 0.45,
         duration: 5 + (idx % 5),
+        // Deterministic pseudo-random values derived from idx — stable across renders.
+        dx: ((idx * 17 + 3) % 41) - 20,          // range: -20 to +20
+        repeatDelay: 2 + (idx % 5),               // range: 2 to 6
       })),
     []
   );
@@ -264,10 +279,20 @@ function Hero() {
           <Particle key={p.id} {...p} />
         ))}
       </div>
+
+      {/*
+        PERF FIX — Ambient blur orbs: removed animated `x` translation.
+        Previously these ran infinite x + opacity loops with blur-3xl/blur-2xl.
+        Animating `x` (a transform) on an element with `filter:blur()` forces
+        the GPU to re-composite the blur layer on every animation frame because
+        blur cannot be cached when the element's position changes.
+        Opacity-only animation allows the blur to be rasterised once and
+        composited as a static layer — dramatically cheaper on mobile GPUs.
+      */}
       <motion.div
         aria-hidden
         initial={{ opacity: 0 }}
-        animate={{ x: [0, 38, 0], opacity: [0.28, 0.5, 0.28] }}
+        animate={{ opacity: [0.28, 0.5, 0.28] }}
         transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 1.6 }}
         className="absolute -top-24 -left-24 w-[65%] h-[85%] pointer-events-none blur-3xl"
         style={{
@@ -278,7 +303,7 @@ function Hero() {
       <motion.div
         aria-hidden
         initial={{ opacity: 0 }}
-        animate={{ x: [0, -28, 0], opacity: [0.2, 0.38, 0.2] }}
+        animate={{ opacity: [0.2, 0.38, 0.2] }}
         transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 2.2 }}
         className="absolute bottom-0 right-0 w-[58%] h-[65%] pointer-events-none blur-3xl"
         style={{
@@ -288,7 +313,7 @@ function Hero() {
       />
       <motion.div
         aria-hidden
-        animate={{ x: [0, 55, 0], opacity: [0.18, 0.32, 0.18] }}
+        animate={{ opacity: [0.18, 0.32, 0.18] }}
         transition={{ duration: 34, repeat: Infinity, ease: "easeInOut" }}
         className="absolute top-[15%] right-[10%] w-[55%] h-[40%] pointer-events-none blur-2xl"
         style={{
@@ -299,7 +324,7 @@ function Hero() {
       />
       <motion.div
         aria-hidden
-        animate={{ x: [0, -45, 0], opacity: [0.12, 0.26, 0.12] }}
+        animate={{ opacity: [0.12, 0.26, 0.12] }}
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 4 }}
         className="absolute bottom-[20%] right-[5%] w-[48%] h-[35%] pointer-events-none blur-2xl"
         style={{
@@ -308,6 +333,7 @@ function Hero() {
           mixBlendMode: "screen",
         }}
       />
+
       <motion.div
         initial={{ opacity: 0, y: 48, scale: 1.06 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -532,7 +558,18 @@ function About() {
       </div>
       <div className="star-cluster absolute inset-0" aria-hidden />
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-12 gap-12 lg:gap-20 items-center">
-        <motion.div style={{ y }} className="lg:col-span-6 relative aspect-[4/5] lg:aspect-[5/6] order-1 lg:order-none">
+        {/*
+          PERF FIX: added willChange:"transform" to the parallax container.
+          useTransform(scrollYProgress) drives y and imgScale on every scroll
+          event. Without willChange, the browser must promote this element to
+          its own compositor layer on the first scroll tick, causing a
+          single-frame jank spike. willChange:"transform" promotes the layer
+          upfront so it is ready before the user begins scrolling.
+        */}
+        <motion.div
+          style={{ y, willChange: "transform" }}
+          className="lg:col-span-6 relative aspect-[4/5] lg:aspect-[5/6] order-1 lg:order-none"
+        >
           <div className="absolute -inset-10 bg-[radial-gradient(ellipse_at_center,oklch(0.82_0.12_85_/_0.15),transparent_70%)] blur-2xl pointer-events-none" />
           <motion.div
             initial={{ opacity: 0, scale: 1.05 }}
