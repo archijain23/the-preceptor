@@ -1,7 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
-import Cal, { getCalApi } from "@calcom/embed-react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   ArrowLeft,
@@ -18,56 +17,13 @@ import {
 } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
 
-const CAL_LINK = "preceptor/astrology-session";
 const CAL_NAMESPACE = "astrology-session";
+const CAL_LINK     = "preceptor/astrology-session";
 
-const CAL_THEME = {
-  "cal-bg":             "#14121e",
-  "cal-bg-emphasis":    "#1c192d",
-  "cal-bg-subtle":      "#1f1c30",
-  "cal-bg-muted":       "#18162a",
-  "cal-bg-inverted":    "#f5f0e8",
-  "cal-text":           "#f0ede6",
-  "cal-text-emphasis":  "#faf8f3",
-  "cal-text-subtle":    "#9b97a8",
-  "cal-text-muted":     "#6b6778",
-  "cal-text-inverted":  "#14121e",
-  "cal-brand":          "#d4a84b",
-  "cal-brand-emphasis": "#e8c068",
-  "cal-brand-subtle":   "#2a2318",
-  "cal-brand-text":     "#14121e",
-  "cal-border":         "rgba(255,255,255,0.08)",
-  "cal-border-subtle":  "rgba(255,255,255,0.05)",
-  "cal-border-booker":  "rgba(255,255,255,0.07)",
-  "cal-border-default": "rgba(255,255,255,0.08)",
-};
-
-// Flow: 0 = intro  →  1 = Cal embed (choose time + fill details)  →  2 = confirmed
+// Flow: 0 = intro  →  1 = Cal embed (slot + details)  →  2 = confirmed
 export default function BookPage() {
-  const [step, setStep] = useState(0);
+  const [step, setStep]           = useState(0);
   const [bookedData, setBookedData] = useState(null);
-  const calInitialised = useRef(false);
-
-  useEffect(() => {
-    if (calInitialised.current) return;
-    calInitialised.current = true;
-    (async () => {
-      const cal = await getCalApi({ namespace: CAL_NAMESPACE });
-      cal("ui", {
-        theme: "dark",
-        cssVarsPerTheme: { dark: CAL_THEME },
-        hideEventTypeDetails: false,
-        layout: "month_view",
-      });
-      cal("on", {
-        action: "bookingSuccessful",
-        callback: (e) => {
-          setBookedData(e.detail?.data ?? {});
-          setStep(2);
-        },
-      });
-    })();
-  }, []);
 
   return (
     <>
@@ -81,7 +37,8 @@ export default function BookPage() {
       <div className="bg-hero starfield min-h-screen relative overflow-hidden">
         {/* Ambient glow */}
         <div
-          className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full opacity-30 blur-3xl"
+          className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2
+                     w-[800px] h-[800px] rounded-full opacity-30 blur-3xl"
           style={{ background: "radial-gradient(circle, var(--gold) 0%, transparent 60%)" }}
         />
 
@@ -96,7 +53,10 @@ export default function BookPage() {
 
             {step === 1 && (
               <StepWrap key="cal">
-                <CalStep onBack={() => setStep(0)} />
+                <CalStep
+                  onBack={() => setStep(0)}
+                  onBooked={(data) => { setBookedData(data); setStep(2); }}
+                />
               </StepWrap>
             )}
 
@@ -126,32 +86,26 @@ function StepWrap({ children }) {
   );
 }
 
-// ───────────────────────────────────────────────────────────────────
+// ─── Intro ──────────────────────────────────────────────────────────────────
 function IntroStep({ onStart }) {
   return (
     <div className="text-center max-w-3xl mx-auto pt-8">
       <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
         className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-gold"
       >
         <Sparkles className="w-3.5 h-3.5" /> Private Consultation
       </motion.span>
 
       <motion.h1
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
         className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold"
       >
         Begin Your Spiritual Consultation
       </motion.h1>
 
       <motion.p
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
         className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto"
       >
         A calm, private space to explore your chart with clarity and care.
@@ -167,8 +121,7 @@ function IntroStep({ onStart }) {
         ].map((item, i) => (
           <motion.div
             key={item.label}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.45 + i * 0.08 }}
             className="glass-card rounded-2xl p-5"
           >
@@ -180,9 +133,7 @@ function IntroStep({ onStart }) {
 
       {/* How it works */}
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
         className="mt-10 max-w-lg mx-auto glass-card rounded-2xl p-6 text-left"
       >
         <p className="text-xs uppercase tracking-[0.3em] text-gold mb-5 text-center">How it works</p>
@@ -202,9 +153,7 @@ function IntroStep({ onStart }) {
       </motion.div>
 
       <motion.button
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.72 }}
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.72 }}
         onClick={onStart}
         className="mt-10 btn-primary"
       >
@@ -212,9 +161,7 @@ function IntroStep({ onStart }) {
       </motion.button>
 
       <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
         className="mt-5 text-xs text-muted-foreground tracking-wide"
       >
         Takes about 3 minutes · Confirmed instantly
@@ -223,10 +170,104 @@ function IntroStep({ onStart }) {
   );
 }
 
-// ───────────────────────────────────────────────────────────────────
-// Cal embed — Cal.com handles both slot selection AND details form internally.
-// This is the single booking interface. bookingSuccessful fires on completion.
-function CalStep({ onBack }) {
+// ─── Cal embed step ───────────────────────────────────────────────────────
+// Uses the official vanilla Cal.com embed script (no npm package).
+// Injects the script once, inits the inline embed into #my-cal-inline-astrology-session,
+// and listens for bookingSuccessful to advance to the confirmed screen.
+function CalStep({ onBack, onBooked }) {
+  const embedRef  = useRef(null);
+  const scriptRef = useRef(null);
+
+  useEffect(() => {
+    // Avoid double-init if component re-mounts
+    if (window.__calInitDone) {
+      attachBookingListener(onBooked);
+      return;
+    }
+
+    // Inject Cal.com embed script
+    const script = document.createElement("script");
+    script.type = "text/javascript";
+    script.async = true;
+    script.innerHTML = `
+      (function (C, A, L) {
+        let p = function (a, ar) { a.q.push(ar); };
+        let d = C.document;
+        C.Cal = C.Cal || function () {
+          let cal = C.Cal; let ar = arguments;
+          if (!cal.loaded) {
+            cal.ns = {}; cal.q = cal.q || [];
+            d.head.appendChild(d.createElement("script")).src = A;
+            cal.loaded = true;
+          }
+          if (ar[0] === L) {
+            const api = function () { p(api, arguments); };
+            const namespace = ar[1];
+            api.q = api.q || [];
+            if (typeof namespace === "string") {
+              cal.ns[namespace] = cal.ns[namespace] || api;
+              p(cal.ns[namespace], ar);
+              p(cal, ["initNamespace", namespace]);
+            } else p(cal, ar);
+            return;
+          }
+          p(cal, ar);
+        };
+      })(window, "https://app.cal.com/embed/embed.js", "init");
+
+      Cal("init", "${CAL_NAMESPACE}", { origin: "https://app.cal.com" });
+      Cal.config = Cal.config || {};
+      Cal.config.forwardQueryParams = true;
+
+      Cal.ns["${CAL_NAMESPACE}"]("inline", {
+        elementOrSelector: "#my-cal-inline-astrology-session",
+        config: { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
+        calLink: "${CAL_LINK}",
+      });
+
+      Cal.ns["${CAL_NAMESPACE}"]("ui", {
+        hideEventTypeDetails: false,
+        layout: "month_view",
+        theme: "dark",
+        cssVarsPerTheme: {
+          dark: {
+            "cal-bg":             "#14121e",
+            "cal-bg-emphasis":    "#1c192d",
+            "cal-bg-subtle":      "#1f1c30",
+            "cal-bg-muted":       "#18162a",
+            "cal-bg-inverted":    "#f5f0e8",
+            "cal-text":           "#f0ede6",
+            "cal-text-emphasis":  "#faf8f3",
+            "cal-text-subtle":    "#9b97a8",
+            "cal-text-muted":     "#6b6778",
+            "cal-text-inverted":  "#14121e",
+            "cal-brand":          "#d4a84b",
+            "cal-brand-emphasis": "#e8c068",
+            "cal-brand-subtle":   "#2a2318",
+            "cal-brand-text":     "#14121e",
+            "cal-border":         "rgba(255,255,255,0.08)",
+            "cal-border-subtle":  "rgba(255,255,255,0.05)",
+            "cal-border-booker":  "rgba(255,255,255,0.07)",
+            "cal-border-default": "rgba(255,255,255,0.08)",
+          }
+        }
+      });
+    `;
+    document.body.appendChild(script);
+    scriptRef.current = script;
+    window.__calInitDone = true;
+
+    // Poll until Cal namespace is ready, then attach the booking listener
+    const poll = setInterval(() => {
+      if (window.Cal?.ns?.[CAL_NAMESPACE]) {
+        clearInterval(poll);
+        attachBookingListener(onBooked);
+      }
+    }, 100);
+
+    return () => clearInterval(poll);
+  }, [onBooked]);
+
   return (
     <div className="max-w-5xl mx-auto">
       {/* Header */}
@@ -253,22 +294,18 @@ function CalStep({ onBack }) {
         ))}
       </div>
 
-      {/* Cal.com embed */}
+      {/* Cal.com inline embed target */}
       <div
         className="mt-8 rounded-3xl overflow-hidden shadow-elegant"
         style={{
-          background: "oklch(0.14 0.024 270 / 0.80)",
-          border: "1px solid rgba(255,255,255,0.07)",
+          background:     "oklch(0.14 0.024 270 / 0.80)",
+          border:         "1px solid rgba(255,255,255,0.07)",
           backdropFilter: "blur(16px)",
         }}
       >
-        <Cal
-          namespace={CAL_NAMESPACE}
-          calLink={CAL_LINK}
-          config={{
-            layout: "month_view",
-            useSlotsViewOnSmallScreen: "true",
-          }}
+        <div
+          id="my-cal-inline-astrology-session"
+          ref={embedRef}
           style={{ width: "100%", height: "720px", overflow: "scroll" }}
         />
       </div>
@@ -285,21 +322,32 @@ function CalStep({ onBack }) {
   );
 }
 
-// ───────────────────────────────────────────────────────────────────
-// Confirmed — auto-triggered by Cal.com's bookingSuccessful event
+// Attach the bookingSuccessful listener to Cal namespace
+function attachBookingListener(onBooked) {
+  try {
+    window.Cal.ns[CAL_NAMESPACE]("on", {
+      action:   "bookingSuccessful",
+      callback: (e) => onBooked(e.detail?.data ?? {}),
+    });
+  } catch (err) {
+    console.warn("[Cal] Could not attach bookingSuccessful listener:", err);
+  }
+}
+
+// ─── Confirmed screen ────────────────────────────────────────────────────
 function ConfirmedStep({ bookedData }) {
-  const name  = bookedData?.attendees?.[0]?.name  || "";
-  const email = bookedData?.attendees?.[0]?.email || "";
+  const name      = bookedData?.attendees?.[0]?.name  || "";
+  const email     = bookedData?.attendees?.[0]?.email || "";
   const firstName = name.trim().split(" ")[0] || "friend";
 
   const startTime = bookedData?.startTime
     ? new Date(bookedData.startTime).toLocaleString("en-US", {
-        weekday: "long",
-        month:   "long",
-        day:     "numeric",
-        hour:    "numeric",
-        minute:  "2-digit",
-        hour12:  true,
+        weekday:      "long",
+        month:        "long",
+        day:          "numeric",
+        hour:         "numeric",
+        minute:       "2-digit",
+        hour12:       true,
         timeZoneName: "short",
       })
     : null;
@@ -312,26 +360,21 @@ function ConfirmedStep({ bookedData }) {
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         className="relative inline-flex items-center justify-center w-24 h-24 rounded-full"
         style={{
-          background:
-            "radial-gradient(circle, color-mix(in oklab, var(--gold) 40%, transparent), transparent 70%)",
+          background: "radial-gradient(circle, color-mix(in oklab, var(--gold) 40%, transparent), transparent 70%)",
         }}
       >
         <CheckCircle2 className="w-14 h-14 text-gold" />
       </motion.div>
 
       <motion.h2
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
         className="mt-8 text-4xl md:text-5xl bg-gradient-gold"
       >
         Your Session is Confirmed
       </motion.h2>
 
       <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.35 }}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
         className="mt-4 text-muted-foreground max-w-md mx-auto"
       >
         {firstName !== "friend" ? `Thank you, ${firstName}.` : "Thank you."} Your private
@@ -339,16 +382,13 @@ function ConfirmedStep({ bookedData }) {
         their way to your inbox.
       </motion.p>
 
-      {/* Summary card */}
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.45 }}
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
         className="mt-10 glass-card rounded-3xl p-8 shadow-elegant text-left"
       >
         {startTime && <SummaryRow label="Date & Time" value={startTime} />}
         {name      && <SummaryRow label="Name"        value={name} />}
-        {email     && <SummaryRow label="Confirmation sent to" value={email} last={!startTime && !name} />}
+        {email     && <SummaryRow label="Confirmation sent to" value={email} last />}
         {!startTime && !name && !email && (
           <p className="text-sm text-muted-foreground text-center py-4">
             Check your email for booking details.
@@ -357,9 +397,7 @@ function ConfirmedStep({ bookedData }) {
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.55 }}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
         className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground"
       >
         <Mail className="w-4 h-4 text-gold" />
@@ -367,9 +405,7 @@ function ConfirmedStep({ bookedData }) {
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.65 }}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}
         className="mt-5 flex items-start gap-3 p-4 rounded-2xl bg-secondary/40 border border-border max-w-md mx-auto"
       >
         <ShieldCheck className="w-5 h-5 text-gold shrink-0 mt-0.5" />
@@ -383,14 +419,10 @@ function ConfirmedStep({ bookedData }) {
 
 function SummaryRow({ label, value, last }) {
   return (
-    <div
-      className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 py-4 ${
-        last ? "" : "border-b border-border/60"
-      }`}
-    >
-      <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground shrink-0">
-        {label}
-      </span>
+    <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 py-4 ${
+      last ? "" : "border-b border-border/60"
+    }`}>
+      <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground shrink-0">{label}</span>
       <span className="text-sm md:text-base sm:text-right">{value}</span>
     </div>
   );
