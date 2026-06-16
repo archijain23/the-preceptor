@@ -4,6 +4,16 @@ import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { navLinks, siteConfig } from "@/content/site";
 
+/**
+ * Legal links shown at the bottom of the mobile nav overlay.
+ * These pages don't belong in the primary nav hierarchy but must
+ * be reachable on mobile — footer is off-screen when the menu opens.
+ */
+const mobileFooterLinks = [
+  { to: "/privacy", label: "Privacy Policy" },
+  { to: "/terms",   label: "Terms & Conditions" },
+];
+
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -47,11 +57,7 @@ export default function Nav() {
             <span className="font-serif text-xl tracking-wide">{siteConfig.name}</span>
           </Link>
 
-          {/* BUG FIX: removed hash branch — all navLinks now use `to` so we
-              always render NavLink (React Router). The old `l.hash` path was
-              rendering a plain <a href="#services"> which is a relative anchor
-              and resolves against the current URL path. */}
-          <nav className="hidden lg:flex items-center gap-10">
+          <nav className="hidden lg:flex items-center gap-10" aria-label="Primary navigation">
             {navLinks.map((l) => (
               <NavLink
                 key={l.to}
@@ -79,6 +85,8 @@ export default function Nav() {
             className="lg:hidden text-foreground relative w-10 h-10 flex items-center justify-center"
             onClick={() => setOpen(!open)}
             aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
           >
             <motion.span
               animate={{ rotate: open ? 90 : 0, opacity: open ? 0 : 1 }}
@@ -99,6 +107,10 @@ export default function Nav() {
       <AnimatePresence>
         {open && (
           <motion.div
+            id="mobile-nav"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile navigation"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -106,7 +118,12 @@ export default function Nav() {
             className="lg:hidden fixed inset-0 z-40 bg-background/95 backdrop-blur-2xl"
           >
             <div className="absolute inset-0 bg-hero opacity-60 pointer-events-none" />
-            <nav className="relative h-full flex flex-col items-center justify-center gap-8 px-8">
+
+            {/* Primary nav links — centred, full-screen */}
+            <nav
+              className="relative h-full flex flex-col items-center justify-center gap-8 px-8"
+              aria-label="Mobile primary navigation"
+            >
               {navLinks.map((l, i) => (
                 <motion.div
                   key={l.to}
@@ -127,6 +144,8 @@ export default function Nav() {
                   </Link>
                 </motion.div>
               ))}
+
+              {/* Book CTA */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -135,10 +154,30 @@ export default function Nav() {
               >
                 <Link
                   to="/book"
+                  onClick={() => setOpen(false)}
                   className="inline-flex items-center px-8 py-4 rounded-full bg-primary text-primary-foreground font-medium shadow-gold"
                 >
                   Book a Session
                 </Link>
+              </motion.div>
+
+              {/* Legal links — bottom strip, subtle */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.65, duration: 0.5 }}
+                className="absolute bottom-10 left-0 right-0 flex items-center justify-center gap-6 px-8"
+              >
+                {mobileFooterLinks.map((l) => (
+                  <Link
+                    key={l.to}
+                    to={l.to}
+                    onClick={() => setOpen(false)}
+                    className="text-xs text-muted-foreground hover:text-gold transition-colors tracking-wide"
+                  >
+                    {l.label}
+                  </Link>
+                ))}
               </motion.div>
             </nav>
           </motion.div>
