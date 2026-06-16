@@ -1,4 +1,5 @@
-import { motion, useMemo } from "framer-motion";
+import { motion } from "framer-motion";
+import { useMemo } from "react";
 import { ArrowRight, Star, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImg from "@/assets/hero-section.jpg";

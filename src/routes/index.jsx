@@ -20,6 +20,7 @@ import heroImg from "@/assets/hero-section.jpg?format=webp&quality=80";
 import aboutImg from "@/assets/about-section.jpg?format=webp&quality=80";
 import qnaImg from "@/assets/qna-section.jpg?format=webp&quality=80";
 import Reveal from "@/components/site/Reveal";
+import { HeroSection } from "@/components/home/HeroSection.jsx";
 
 const services = [
   {
@@ -202,7 +203,7 @@ export default function Home() {
 }
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
-function HeroSection() {
+function HeroSections() {
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
