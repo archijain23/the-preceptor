@@ -1,4 +1,6 @@
-import { Helmet } from "react-helmet-async";
+import SEO from "@/components/site/SEO";
+import { PAGE_SEO } from "@/content/seo";
+import { SITE } from "@/content/seo";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -20,19 +22,27 @@ import Reveal from "@/components/site/Reveal";
 const CAL_NAMESPACE = "astrology-session";
 const CAL_LINK     = "preceptor/astrology-session";
 
-// Flow: 0 = intro  →  1 = Cal embed (slot + details)  →  2 = confirmed
+/**
+ * Module-level flag — survives React re-mounts within the same page session.
+ * Reset to false in useEffect cleanup so navigating away + back
+ * triggers a clean re-init into the new DOM container.
+ *
+ * WHY NOT window.__calInitDone:
+ *   The global flag persists even after the component unmounts.
+ *   When the user navigates away and back, the embed container is a
+ *   brand-new empty DOM node — but the global flag says "already done",
+ *   so Cal never injects into it → blank white box.
+ */
+let calScriptInjected = false;
+
+// Flow: 0 = intro  →  1 = Cal embed  →  2 = confirmed
 export default function BookPage() {
-  const [step, setStep]           = useState(0);
+  const [step, setStep]             = useState(0);
   const [bookedData, setBookedData] = useState(null);
 
   return (
     <>
-      <Helmet>
-        <title>Book a Session — The Preceptor</title>
-        <meta name="description" content="Reserve a private astrology consultation with The Preceptor." />
-        <meta property="og:title" content="Book a Session — The Preceptor" />
-        <meta property="og:description" content="Premium astrology consultation — birth chart, career, relationships, and more." />
-      </Helmet>
+      <SEO {...PAGE_SEO.book} />
 
       <div className="bg-hero starfield min-h-screen relative overflow-hidden">
         {/* Ambient glow */}
@@ -44,13 +54,11 @@ export default function BookPage() {
 
         <section className="relative max-w-6xl mx-auto px-6 lg:px-10 py-16 lg:py-24">
           <AnimatePresence mode="wait">
-
             {step === 0 && (
               <StepWrap key="intro">
                 <IntroStep onStart={() => setStep(1)} />
               </StepWrap>
             )}
-
             {step === 1 && (
               <StepWrap key="cal">
                 <CalStep
@@ -59,13 +67,11 @@ export default function BookPage() {
                 />
               </StepWrap>
             )}
-
             {step === 2 && (
               <StepWrap key="confirmed">
                 <ConfirmedStep bookedData={bookedData} />
               </StepWrap>
             )}
-
           </AnimatePresence>
         </section>
       </div>
@@ -86,7 +92,7 @@ function StepWrap({ children }) {
   );
 }
 
-// ─── Intro ──────────────────────────────────────────────────────────────────
+// ─── Intro ───────────────────────────────────────────────────────────────────
 function IntroStep({ onStart }) {
   return (
     <div className="text-center max-w-3xl mx-auto pt-8">
@@ -170,24 +176,76 @@ function IntroStep({ onStart }) {
   );
 }
 
-// ─── Cal embed step ───────────────────────────────────────────────────────
-// Uses the official vanilla Cal.com embed script (no npm package).
-// Injects the script once, inits the inline embed into #my-cal-inline-astrology-session,
-// and listens for bookingSuccessful to advance to the confirmed screen.
+// ─── Cal embed step ───────────────────────────────────────────────────────────
+/**
+ * INIT STRATEGY:
+ *
+ * 1. calScriptInjected (module-level) tracks whether the Cal loader
+ *    script has been appended to document.body in this page session.
+ *
+ * 2. On mount:
+ *    a. If script already injected AND container already has children
+ *       (Cal rendered inside it) → just re-attach the booking listener.
+ *    b. If script already injected but container is empty
+ *       (re-mount after navigation) → re-run inline() to re-render Cal
+ *       into the fresh DOM node.
+ *    c. If script not injected → full cold init.
+ *
+ * 3. On unmount (cleanup): remove the injected script, reset
+ *    calScriptInjected = false so the next mount does a clean init.
+ */
 function CalStep({ onBack, onBooked }) {
   const embedRef  = useRef(null);
   const scriptRef = useRef(null);
 
   useEffect(() => {
-    // Avoid double-init if component re-mounts
-    if (window.__calInitDone) {
-      attachBookingListener(onBooked);
-      return;
+    let pollTimer = null;
+
+    function initCalEmbed() {
+      // Re-render Cal into the (now empty) container
+      try {
+        window.Cal.ns[CAL_NAMESPACE]("inline", {
+          elementOrSelector: `#my-cal-inline-${CAL_NAMESPACE}`,
+          config: { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
+          calLink: CAL_LINK,
+        });
+        attachBookingListener(onBooked);
+      } catch (err) {
+        console.warn("[Cal] Re-init failed:", err);
+      }
     }
 
-    // Inject Cal.com embed script
+    function waitForCalThenInit() {
+      pollTimer = setInterval(() => {
+        if (window.Cal?.ns?.[CAL_NAMESPACE]) {
+          clearInterval(pollTimer);
+          initCalEmbed();
+        }
+      }, 100);
+    }
+
+    const container = embedRef.current;
+
+    if (calScriptInjected) {
+      // Script already in DOM from a previous mount
+      if (container && container.children.length > 0) {
+        // Cal already rendered into this container — just re-attach listener
+        attachBookingListener(onBooked);
+      } else {
+        // Container is a fresh empty node (navigated away + back)
+        // Cal namespace exists; re-run inline() directly
+        if (window.Cal?.ns?.[CAL_NAMESPACE]) {
+          initCalEmbed();
+        } else {
+          waitForCalThenInit();
+        }
+      }
+      return () => { if (pollTimer) clearInterval(pollTimer); };
+    }
+
+    // ── Cold init: first time CalStep mounts ──────────────────────────────
     const script = document.createElement("script");
-    script.type = "text/javascript";
+    script.type  = "text/javascript";
     script.async = true;
     script.innerHTML = `
       (function (C, A, L) {
@@ -220,7 +278,7 @@ function CalStep({ onBack, onBooked }) {
       Cal.config.forwardQueryParams = true;
 
       Cal.ns["${CAL_NAMESPACE}"]("inline", {
-        elementOrSelector: "#my-cal-inline-astrology-session",
+        elementOrSelector: "#my-cal-inline-${CAL_NAMESPACE}",
         config: { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
         calLink: "${CAL_LINK}",
       });
@@ -253,19 +311,21 @@ function CalStep({ onBack, onBooked }) {
         }
       });
     `;
+
     document.body.appendChild(script);
-    scriptRef.current = script;
-    window.__calInitDone = true;
+    scriptRef.current  = script;
+    calScriptInjected  = true;
 
-    // Poll until Cal namespace is ready, then attach the booking listener
-    const poll = setInterval(() => {
-      if (window.Cal?.ns?.[CAL_NAMESPACE]) {
-        clearInterval(poll);
-        attachBookingListener(onBooked);
+    waitForCalThenInit();
+
+    // Cleanup: remove script, reset flag so next mount does a clean init
+    return () => {
+      if (pollTimer) clearInterval(pollTimer);
+      if (scriptRef.current && document.body.contains(scriptRef.current)) {
+        document.body.removeChild(scriptRef.current);
       }
-    }, 100);
-
-    return () => clearInterval(poll);
+      calScriptInjected = false;
+    };
   }, [onBooked]);
 
   return (
@@ -294,7 +354,8 @@ function CalStep({ onBack, onBooked }) {
         ))}
       </div>
 
-      {/* Cal.com inline embed target */}
+      {/* Cal.com inline embed container
+          height: fluid clamp — no fixed 720px that traps mobile scroll */}
       <div
         className="mt-8 rounded-3xl overflow-hidden shadow-elegant"
         style={{
@@ -304,9 +365,13 @@ function CalStep({ onBack, onBooked }) {
         }}
       >
         <div
-          id="my-cal-inline-astrology-session"
+          id={`my-cal-inline-${CAL_NAMESPACE}`}
           ref={embedRef}
-          style={{ width: "100%", height: "720px", overflow: "scroll" }}
+          style={{
+            width:     "100%",
+            minHeight: "clamp(520px, 80vh, 760px)",
+            overflow:  "auto",
+          }}
         />
       </div>
 
@@ -322,7 +387,7 @@ function CalStep({ onBack, onBooked }) {
   );
 }
 
-// Attach the bookingSuccessful listener to Cal namespace
+/** Attach bookingSuccessful listener to Cal namespace */
 function attachBookingListener(onBooked) {
   try {
     window.Cal.ns[CAL_NAMESPACE]("on", {
@@ -334,7 +399,7 @@ function attachBookingListener(onBooked) {
   }
 }
 
-// ─── Confirmed screen ────────────────────────────────────────────────────
+// ─── Confirmed screen ─────────────────────────────────────────────────────────
 function ConfirmedStep({ bookedData }) {
   const name      = bookedData?.attendees?.[0]?.name  || "";
   const email     = bookedData?.attendees?.[0]?.email || "";
