@@ -6,7 +6,7 @@ import { FAQS } from "@/utils/constants";
 import qnaImg from "@/assets/qna-section.jpg";
 
 export function FaqSection() {
-  const [open, setOpen] = useState<number | null>(0);
+  const [open, setOpen] = useState(0);
 
   return (
     <section className="py-32 relative overflow-hidden">
