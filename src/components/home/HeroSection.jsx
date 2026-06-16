@@ -101,14 +101,13 @@ export function HeroSection() {
       size: (idx % 3) + 1.5,
       delay: idx * 0.45,
       duration: 5 + (idx % 5),
-      // stable deterministic drift — no Math.random() in render
       drift: ((idx * 17 + 7) % 41) - 20,
     })),
     [],
   );
 
   return (
-    <section className="relative overflow-hidden min-h-[100svh] flex items-center shooting-star">
+    <section className="relative overflow-hidden min-h-[100svh] flex items-center">
 
       {/* Nebula gradient */}
       <div
