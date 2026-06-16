@@ -33,7 +33,17 @@ function AboutContent() {
         </Reveal>
         <Reveal delay={0.1}>
           <div className="aspect-[4/5] rounded-2xl overflow-hidden gold-border shadow-elegant">
-            <img src={aboutImg} alt="The Precetor" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            {/* About page hero image: visible near top of page — lazy load still appropriate
+                as it is below the text column on mobile and beside it on desktop */}
+            <img
+              src={aboutImg}
+              alt="The Preceptor — guiding presence"
+              width={1000}
+              height={1250}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
           </div>
         </Reveal>
       </section>

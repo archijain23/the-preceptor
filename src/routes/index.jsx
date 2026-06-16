@@ -343,10 +343,14 @@ function Hero() {
           animate={{ y: [0, -16, 0] }}
           transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 2.6 }}
         >
+          {/* Hero image: above-fold LCP element — eager load, high fetch priority, no lazy */}
           <img
             src={heroImg}
             alt="The Preceptor — celestial guide"
+            width={1400}
+            height={1867}
             fetchPriority="high"
+            loading="eager"
             decoding="async"
             className="absolute inset-0 w-full h-full object-cover object-center lg:scale-[1.18] mix-blend-luminosity"
             style={{ opacity: 0.88 }}
@@ -552,7 +556,17 @@ function About() {
               maskImage: "radial-gradient(ellipse 75% 80% at 50% 50%, black 45%, rgba(0,0,0,0.55) 75%, transparent 100%)",
             }}
           >
-            <motion.img src={aboutImg} alt="The Preceptor — guiding presence" loading="lazy" decoding="async" style={{ scale: imgScale }} className="w-full h-full object-cover mix-blend-luminosity opacity-90" />
+            {/* About image: below-fold — lazy load to defer until near viewport */}
+            <motion.img
+              src={aboutImg}
+              alt="The Preceptor — guiding presence"
+              width={1000}
+              height={1250}
+              loading="lazy"
+              decoding="async"
+              style={{ scale: imgScale }}
+              className="w-full h-full object-cover mix-blend-luminosity opacity-90"
+            />
             <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-transparent to-background/70" />
             <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-transparent" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_40%,oklch(0.82_0.12_85_/_0.14),transparent_60%)]" />
@@ -735,7 +749,16 @@ function Faq() {
       <div className="max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-2 gap-16 items-start relative z-10">
         <Reveal>
           <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="relative aspect-square rounded-3xl overflow-hidden gold-border shadow-elegant lg:sticky lg:top-32">
-            <img src={qnaImg} alt="Cosmic question space" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            {/* FAQ image: below-fold — lazy load */}
+            <img
+              src={qnaImg}
+              alt="Cosmic question space"
+              width={800}
+              height={800}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
           </motion.div>
         </Reveal>
