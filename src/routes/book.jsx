@@ -83,12 +83,20 @@ export default function BookPage() {
   useEffect(() => {
     (async () => {
       const cal = await getCalApi({ namespace: CAL_NAMESPACE });
+
+      // Forward URL query params to the booking form
+      if (window.Cal) {
+        window.Cal.config = window.Cal.config || {};
+        window.Cal.config.forwardQueryParams = true;
+      }
+
       cal("ui", {
         theme: "dark",
         cssVarsPerTheme: { dark: CAL_THEME },
         hideEventTypeDetails: false,
         layout: "month_view",
       });
+
       // Listen for successful booking
       cal("on", {
         action: "bookingSuccessful",
@@ -231,9 +239,9 @@ function IntroStep({ onStart }) {
 
       <div className="mt-12 grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
         {[
-          { icon: Clock,      label: "60 minute session" },
-          { icon: Video,      label: "Online — private 1:1" },
-          { icon: Globe2,     label: "Your local timezone" },
+          { icon: Clock,  label: "60 minute session" },
+          { icon: Video,  label: "Online — private 1:1" },
+          { icon: Globe2, label: "Your local timezone" },
         ].map((item, i) => (
           <motion.div
             key={item.label}
@@ -371,14 +379,14 @@ function CalStep({ form, onBack }) {
       <SectionTitle
         eyebrow="Step 2"
         title="Choose your time"
-        subtitle="All times shown in your local timezone. Sessions run 7:30 PM – 12:30 AM IST every day."
+        subtitle="All times shown in your local timezone. 5 slots available nightly — 7:30 PM to 11:30 PM IST."
       />
 
       {/* Info strip */}
       <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
         {[
-          { icon: Globe2,  text: "Auto timezone conversion" },
-          { icon: Clock,   text: "60 min sessions" },
+          { icon: Globe2,       text: "Auto timezone conversion" },
+          { icon: Clock,        text: "60 min sessions" },
           { icon: CalendarDays, text: "All 7 days available" },
         ].map((item) => (
           <div key={item.text} className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -404,15 +412,16 @@ function CalStep({ form, onBack }) {
             layout: "month_view",
             useSlotsViewOnSmallScreen: "true",
             // Pre-fill user details so they don't retype
-            name: form.fullName,
+            name:  form.fullName,
             email: form.email,
+            smsReminderNumber: form.phone || undefined,
             notes: [
               form.consultationType && `Consultation: ${form.consultationType}`,
-              form.language        && `Language: ${form.language}`,
-              form.dob             && `DOB: ${form.dob}`,
-              form.tob             && `TOB: ${form.tob}`,
-              form.pob             && `POB: ${form.pob}`,
-              form.concern         && `Concern: ${form.concern}`,
+              form.language         && `Language: ${form.language}`,
+              form.dob              && `DOB: ${form.dob}`,
+              form.tob              && `TOB: ${form.tob}`,
+              form.pob              && `POB: ${form.pob}`,
+              form.concern          && `Concern: ${form.concern}`,
             ]
               .filter(Boolean)
               .join(" | "),
@@ -483,7 +492,7 @@ function ConfirmedStep({ form, bookedData }) {
 
       <div className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground">
         <Mail className="w-4 h-4 text-gold" />
-        Check your inbox for the Cal.com confirmation email & meeting link.
+        Check your inbox for the Cal.com confirmation email &amp; meeting link.
       </div>
 
       <div className="mt-6 flex items-start gap-3 p-4 rounded-2xl bg-secondary/40 border border-border max-w-md mx-auto">
