@@ -5,7 +5,7 @@ import { ASTROLOGER } from "@/utils/constants";
 import aboutImg from "@/assets/about-section.jpg";
 
 export function AboutSection() {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["8%", "-8%"]);
   const imgScale = useTransform(scrollYProgress, [0, 1], [1.08, 1.18]);
@@ -33,7 +33,7 @@ export function AboutSection() {
               WebkitMaskImage: "radial-gradient(ellipse 75% 80% at 50% 50%, black 45%, rgba(0,0,0,0.55) 75%, transparent 100%)",
               maskImage: "radial-gradient(ellipse 75% 80% at 50% 50%, black 45%, rgba(0,0,0,0.55) 75%, transparent 100%)",
             }}>
-            <motion.img src={aboutImg} alt="The Precetor — guiding presence"
+            <motion.img src={aboutImg} alt="The Preceptor — guiding presence"
               loading="lazy" decoding="async" width={600} height={750}
               style={{ scale: imgScale }}
               className="w-full h-full object-cover mix-blend-luminosity opacity-90" />
