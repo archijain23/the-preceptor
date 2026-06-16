@@ -1,27 +1,78 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { motion } from "framer-motion";
 import ErrorBoundary from "./components/site/ErrorBoundary";
 import Nav from "./components/site/Nav";
 import Footer from "./components/site/Footer";
 import TorchCursor from "./components/site/TorchCursor";
-import Home from "./routes/index";
-import About from "./routes/about";
-import Book from "./routes/book";
-import Contact from "./routes/contact";
-import Services from "./routes/services";
-import Testimonials from "./routes/testimonials";
-import Shop from "./routes/shop";
-import QnA from "./routes/qna";
-import NotFound from "./routes/not-found";
 import { SITE } from "./content/seo";
 
 /**
- * Global JSON-LD Organisation schema — injected once at the app root.
- * Google uses this to understand the business entity behind the site.
+ * Route-level code splitting via React.lazy().
  *
+ * Home is imported eagerly — it is the entry page and must never
+ * show a loading flash on first visit.
+ *
+ * All other routes are lazy — their JS chunks are downloaded only
+ * when the user first navigates to that route, keeping the initial
+ * bundle as small as possible.
+ */
+import Home from "./routes/index";  // eager — entry page
+
+const About        = lazy(() => import("./routes/about"));
+const Book         = lazy(() => import("./routes/book"));
+const Contact      = lazy(() => import("./routes/contact"));
+const Services     = lazy(() => import("./routes/services"));
+const Testimonials = lazy(() => import("./routes/testimonials"));
+const Shop         = lazy(() => import("./routes/shop"));
+const QnA          = lazy(() => import("./routes/qna"));
+const NotFound     = lazy(() => import("./routes/not-found"));
+
+/**
+ * Minimal loading fallback shown by Suspense while a route chunk loads.
+ * Matches the site's dark cosmic aesthetic — no jarring flash of white.
+ * Typically only visible for 100-300ms on first route visit.
+ */
+function CosmicLoader() {
+  return (
+    <div
+      style={{
+        minHeight: "60vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "1rem",
+        color: "var(--color-gold, #c9a84c)",
+      }}
+      aria-label="Loading page"
+    >
+      <motion.span
+        animate={{ opacity: [0.3, 1, 0.3], scale: [0.9, 1.1, 0.9] }}
+        transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+        style={{ fontSize: "2rem" }}
+        aria-hidden="true"
+      >
+        ✦
+      </motion.span>
+      <span
+        style={{
+          fontSize: "0.75rem",
+          letterSpacing: "0.25em",
+          textTransform: "uppercase",
+          color: "var(--color-muted-foreground, #6b6778)",
+        }}
+      >
+        Loading
+      </span>
+    </div>
+  );
+}
+
+/**
+ * Global JSON-LD Organisation schema — injected once at the app root.
  * PRIVACY: Owner name, phone, and India-origin are intentionally omitted.
- * The brand is presented as a global English-language service.
  */
 const orgSchema = {
   "@context": "https://schema.org",
@@ -56,48 +107,36 @@ const orgSchema = {
 
 export default function App() {
   return (
-    /**
-     * ErrorBoundary wraps the ENTIRE app tree.
-     * Any unhandled render error in any component will be caught here
-     * and show the premium fallback screen instead of a blank page.
-     *
-     * It sits OUTSIDE BrowserRouter intentionally — if the router itself
-     * errors, the fallback <a href="/"> still works as a plain anchor.
-     */
     <ErrorBoundary>
       <div className="min-h-screen flex flex-col">
-        {/* ── Global JSON-LD Organisation Schema ─────────────────
-            Injected once here so it appears on every page.
-            Page-level <SEO> components handle per-route meta tags.
-        ──────────────────────────────────────────────────────── */}
         <Helmet>
           <script type="application/ld+json">
             {JSON.stringify(orgSchema)}
           </script>
         </Helmet>
 
-        {/* Cosmic background layers */}
-        <div id="cosmic-bg" aria-hidden="true" />
+        <div id="cosmic-bg"    aria-hidden="true" />
         <div id="cosmic-grain" aria-hidden="true" />
 
-        {/* Golden torch cursor — fixed overlay, pointer-events-none */}
         <TorchCursor />
-
         <Nav />
+
         <main className="flex-1 pt-20">
-          <Routes>
-            <Route path="/"             element={<Home />} />
-            <Route path="/about"        element={<About />} />
-            <Route path="/book"         element={<Book />} />
-            <Route path="/contact"      element={<Contact />} />
-            <Route path="/services"     element={<Services />} />
-            <Route path="/testimonials" element={<Testimonials />} />
-            <Route path="/shop"         element={<Shop />} />
-            <Route path="/qna"          element={<QnA />} />
-            {/* Catch-all — must be last */}
-            <Route path="*"             element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<CosmicLoader />}>
+            <Routes>
+              <Route path="/"             element={<Home />} />
+              <Route path="/about"        element={<About />} />
+              <Route path="/book"         element={<Book />} />
+              <Route path="/contact"      element={<Contact />} />
+              <Route path="/services"     element={<Services />} />
+              <Route path="/testimonials" element={<Testimonials />} />
+              <Route path="/shop"         element={<Shop />} />
+              <Route path="/qna"          element={<QnA />} />
+              <Route path="*"             element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </main>
+
         <Footer />
       </div>
     </ErrorBoundary>
