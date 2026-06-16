@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import SEO from "@/components/site/SEO";
+import { PAGE_SEO } from "@/content/seo";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
@@ -218,22 +219,7 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
 export default function HomePage() {
   return (
     <>
-      <Helmet>
-        <title>The Preceptor — Premium Astrology Consultations</title>
-        <meta
-          name="description"
-          content="Cinematic astrology consultations and spiritual guidance for high-intention clients in the US and across the world."
-        />
-        <meta
-          property="og:title"
-          content="The Preceptor — Premium Astrology Consultations"
-        />
-        <meta
-          property="og:description"
-          content="Modern luxury astrology, birth chart readings, and spiritual consultations."
-        />
-      </Helmet>
-
+      <SEO {...PAGE_SEO.home} />
       <Hero />
       <About />
       <Services />
@@ -347,7 +333,6 @@ function Hero() {
           animate={{ y: [0, -16, 0] }}
           transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 2.6 }}
         >
-          {/* Hero: above-fold LCP — eager, high priority, WebP via vite-imagetools */}
           <img
             src={heroImg}
             alt="The Preceptor — celestial guide"
@@ -560,7 +545,6 @@ function About() {
               maskImage: "radial-gradient(ellipse 75% 80% at 50% 50%, black 45%, rgba(0,0,0,0.55) 75%, transparent 100%)",
             }}
           >
-            {/* About: below-fold — lazy WebP via vite-imagetools */}
             <motion.img
               src={aboutImg}
               alt="The Preceptor — guiding presence"
@@ -753,7 +737,6 @@ function Faq() {
       <div className="max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-2 gap-16 items-start relative z-10">
         <Reveal>
           <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="relative aspect-square rounded-3xl overflow-hidden gold-border shadow-elegant lg:sticky lg:top-32">
-            {/* FAQ: below-fold — lazy WebP via vite-imagetools */}
             <img
               src={qnaImg}
               alt="Cosmic question space"
