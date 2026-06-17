@@ -7,9 +7,6 @@ import {
 } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { OfferTimer } from "@/components/site/OfferTimer";
-import { useSanityData } from "@/sanity/useSanityData";
-import { useSanityCtx } from "@/sanity/SanityProvider";
-import { SERVICES_QUERY } from "@/sanity/queries";
 import { SERVICES, SITE } from "@/utils/constants";
 
 const ICON_MAP = {
@@ -33,12 +30,6 @@ const INCLUDES = [
 ];
 
 export default function ServicesPage() {
-  // ── Live data from Sanity, falls back to constants.js ──────────────────────
-  const { data: services } = useSanityData(SERVICES_QUERY, SERVICES);
-  const { siteSettings, offerConfig } = useSanityCtx();
-
-  const email = siteSettings?.email || SITE.email;
-
   return (
     <>
       <Helmet>
@@ -84,24 +75,19 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* All service cards */}
+        {/* All 10 service cards */}
         <section className="py-20 bg-cosmic-deep relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none section-glow-services" aria-hidden />
           <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
-            {/* Countdown timer — reads from Sanity offerConfig */}
+
+            {/* ── Countdown timer ───────────────────────────── */}
             <Reveal className="mb-4">
               <OfferTimer />
             </Reveal>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {services.map((s, i) => {
+              {SERVICES.map((s, i) => {
                 const Icon = ICON_MAP[s.icon] || Star;
-                // Sanity uses `desc`; fallback constants also use `desc`
-                const description = s.desc || s.description;
-                const price = s.price || offerConfig?.currentPrice || "$180";
-                const originalPrice = s.originalPrice || offerConfig?.originalPrice;
-                const duration = s.duration || offerConfig?.sessionDuration || "60 min";
-
                 return (
                   <Reveal key={s.slug} delay={i * 0.06}>
                     <motion.div
@@ -111,32 +97,40 @@ export default function ServicesPage() {
                     >
                       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.06),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                       <div className="relative z-10 flex flex-col gap-3 h-full">
+                        {/* Icon */}
                         <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center">
                           <Icon className="w-5 h-5" />
                         </div>
+
+                        {/* Badge */}
                         {s.badge && (
                           <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold">
                             {s.badge}
                           </span>
                         )}
+
+                        {/* Title + desc */}
                         <div className="flex-1">
                           <h2 className="text-2xl font-serif leading-snug">{s.title}</h2>
-                          <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{description}</p>
+                          <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
                         </div>
+
+                        {/* Duration + price */}
                         <div className="flex items-center justify-between pt-4 border-t border-gold/10">
                           <span className="flex items-center gap-1 text-xs text-gold">
                             <Clock className="w-3 h-3" />
-                            {duration}
+                            {s.duration}
                           </span>
                           <div className="flex items-baseline gap-2">
-                            {originalPrice && (
+                            {s.originalPrice && (
                               <span className="text-sm text-muted-foreground line-through">
-                                {originalPrice}
+                                {s.originalPrice}
                               </span>
                             )}
-                            <span className="font-serif text-xl text-gold">{price}</span>
+                            <span className="font-serif text-xl text-gold">{s.price}</span>
                           </div>
                         </div>
+
                         <Link
                           to="/book"
                           className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-gold hover:text-foreground transition group/link"
@@ -185,8 +179,8 @@ export default function ServicesPage() {
                 <Link to="/book" className="btn-primary">
                   Reserve a Session <ArrowRight className="w-4 h-4" />
                 </Link>
-                {email && (
-                  <a href={`mailto:${email}`} className="btn-secondary">
+                {SITE?.email && (
+                  <a href={`mailto:${SITE.email}`} className="btn-secondary">
                     Have a question?
                   </a>
                 )}
