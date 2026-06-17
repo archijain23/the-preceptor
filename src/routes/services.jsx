@@ -2,23 +2,15 @@ import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  ArrowRight,
-  Star,
-  Briefcase,
-  Heart,
-  Moon,
-  Sparkles,
-  BookOpen,
-  Compass,
-  CheckCircle,
+  ArrowRight, Star, Briefcase, Heart, Moon, Sparkles,
+  BookOpen, Compass, CheckCircle, Clock,
 } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
+import { OfferTimer } from "@/components/site/OfferTimer";
 import { SERVICES, SITE } from "@/utils/constants";
 
 const ICON_MAP = {
-  Star,
-  BookOpen,
-  Heart,
+  Star, BookOpen, Heart,
   HeartHandshake: Heart,
   Rings: Moon,
   Briefcase,
@@ -26,8 +18,7 @@ const ICON_MAP = {
   Hourglass: Moon,
   Orbit: Sparkles,
   Compass,
-  Moon,
-  Sparkles,
+  Moon, Sparkles,
 };
 
 const INCLUDES = [
@@ -43,15 +34,9 @@ export default function ServicesPage() {
     <>
       <Helmet>
         <title>Astrology Services — The Preceptor</title>
-        <meta
-          name="description"
-          content="Explore birth chart readings, relationship consultations, marriage consultation, career astrology, Mahadasha guidance, Sade Sati, and more. Premium sessions for discerning seekers."
-        />
+        <meta name="description" content="Explore birth chart readings, relationship consultations, marriage consultation, career astrology, Mahadasha guidance, Sade Sati, and more. Premium 60-minute sessions for discerning seekers." />
         <meta property="og:title" content="Astrology Services — The Preceptor" />
-        <meta
-          property="og:description"
-          content="Premium astrology consultation services — individually crafted for clarity in love, career, and life's defining chapters."
-        />
+        <meta property="og:description" content="Premium astrology consultation services — individually crafted for clarity in love, career, and life's defining chapters." />
       </Helmet>
 
       <main className="min-h-screen">
@@ -73,11 +58,7 @@ export default function ServicesPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
               className="mt-5"
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(2.5rem, 5vw, 4.5rem)",
-                fontWeight: 400,
-              }}
+              style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)", fontWeight: 400 }}
             >
               Sessions designed for
               <span className="block bg-gradient-gold"> the discerning seeker.</span>
@@ -98,6 +79,12 @@ export default function ServicesPage() {
         <section className="py-20 bg-cosmic-deep relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none section-glow-services" aria-hidden />
           <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
+
+            {/* ── Countdown timer ───────────────────────────── */}
+            <Reveal className="mb-4">
+              <OfferTimer />
+            </Reveal>
+
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {SERVICES.map((s, i) => {
                 const Icon = ICON_MAP[s.icon] || Star;
@@ -106,30 +93,44 @@ export default function ServicesPage() {
                     <motion.div
                       whileHover={{ y: -6 }}
                       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                      className="glass-card rounded-2xl p-8 flex flex-col gap-4 group hover:border-primary/40 relative overflow-hidden"
+                      className="glass-card rounded-2xl p-8 flex flex-col gap-3 group hover:border-primary/40 relative overflow-hidden"
                     >
                       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.06),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                       <div className="relative z-10 flex flex-col gap-3 h-full">
+                        {/* Icon */}
                         <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center">
                           <Icon className="w-5 h-5" />
                         </div>
+
+                        {/* Badge */}
                         {s.badge && (
                           <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold">
                             {s.badge}
                           </span>
                         )}
+
+                        {/* Title + desc */}
                         <div className="flex-1">
                           <h2 className="text-2xl font-serif leading-snug">{s.title}</h2>
-                          <p className="mt-3 text-muted-foreground text-sm leading-relaxed">
-                            {s.desc}
-                          </p>
+                          <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
                         </div>
+
+                        {/* Duration + price */}
                         <div className="flex items-center justify-between pt-4 border-t border-gold/10">
-                          <span className="text-xs px-2 py-0.5 rounded-full border border-gold/20 text-gold">
+                          <span className="flex items-center gap-1 text-xs text-gold">
+                            <Clock className="w-3 h-3" />
                             {s.duration}
                           </span>
-                          <span className="font-serif text-base text-gold">{s.price}</span>
+                          <div className="flex items-baseline gap-2">
+                            {s.originalPrice && (
+                              <span className="text-sm text-muted-foreground line-through">
+                                {s.originalPrice}
+                              </span>
+                            )}
+                            <span className="font-serif text-xl text-gold">{s.price}</span>
+                          </div>
                         </div>
+
                         <Link
                           to="/book"
                           className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-gold hover:text-foreground transition group/link"
@@ -166,14 +167,13 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* CTA strip */}
+        {/* CTA */}
         <section className="py-24">
           <div className="max-w-3xl mx-auto px-6 text-center">
             <Reveal>
               <h2 className="text-3xl md:text-4xl">Ready to book?</h2>
               <p className="mt-4 text-muted-foreground">
-                Choose your session type and reserve your private time. Slots fill
-                up — early scheduling is recommended.
+                Choose your session and reserve your private time. Slots fill up — early scheduling is recommended.
               </p>
               <div className="mt-8 flex flex-wrap gap-4 justify-center">
                 <Link to="/book" className="btn-primary">

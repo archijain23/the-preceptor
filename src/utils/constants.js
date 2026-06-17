@@ -20,14 +20,25 @@ export const SITE = {
   },
 };
 
+/**
+ * OFFER CONFIG
+ * Set OFFER_END_DATE to the exact UTC timestamp when the $180 offer expires.
+ * After that date the timer disappears and originalPrice is still shown struck-through
+ * (so the card still looks correct until you remove originalPrice from each service).
+ *
+ * Format: ISO 8601 — "YYYY-MM-DDTHH:MM:SSZ"
+ */
+export const OFFER_END_DATE = "2026-07-17T23:59:59Z"; // 30-day offer window
+
 export const SERVICES = [
   {
     slug: "general-birth-chart",
     title: "General Birth Chart Reading",
     badge: "Quick Session",
     desc: "A focused overview of your natal chart — your core personality, life themes, key strengths, and the fundamental blueprint the cosmos wrote for you at birth.",
-    duration: "45 min",
-    price: "On Request",
+    duration: "60 min",
+    price: "$180",
+    originalPrice: "$200",
     icon: "Star",
   },
   {
@@ -35,8 +46,9 @@ export const SERVICES = [
     title: "Detailed Birth Chart Reading",
     badge: "In-Depth",
     desc: "A cinematic, comprehensive decode of your entire natal sky — purpose, gifts, shadow, life arc, and the deeper story encoded in every house and planet.",
-    duration: "90 min",
-    price: "On Request",
+    duration: "60 min",
+    price: "$180",
+    originalPrice: "$200",
     icon: "BookOpen",
   },
   {
@@ -44,8 +56,9 @@ export const SERVICES = [
     title: "Relationship Guidance",
     badge: "Quick Session",
     desc: "Targeted guidance on your current relationship dynamic — understanding patterns, timing, and what the chart reveals about love in your life right now.",
-    duration: "45 min",
-    price: "On Request",
+    duration: "60 min",
+    price: "$180",
+    originalPrice: "$200",
     icon: "Heart",
   },
   {
@@ -53,8 +66,9 @@ export const SERVICES = [
     title: "Partner Compatibility",
     badge: "Mid-Level · In-Depth",
     desc: "A synastry and composite chart reading for two individuals — revealing the strengths, challenges, karmic threads, and long-term potential of the relationship.",
-    duration: "90 min",
-    price: "On Request",
+    duration: "60 min",
+    price: "$180",
+    originalPrice: "$200",
     icon: "HeartHandshake",
   },
   {
@@ -62,8 +76,9 @@ export const SERVICES = [
     title: "Marriage Consultation",
     badge: "In-Depth",
     desc: "An exhaustive study of two charts across every dimension of compatibility — emotional, physical, karmic, and practical. The most thorough relationship reading offered.",
-    duration: "120 min",
-    price: "On Request",
+    duration: "60 min",
+    price: "$180",
+    originalPrice: "$200",
     icon: "Rings",
   },
   {
@@ -71,8 +86,9 @@ export const SERVICES = [
     title: "Career Consultation",
     badge: "Mid-Level · In-Depth",
     desc: "Strategic career direction aligned with your dharma and chart placements. The in-depth session identifies multiple aligned career paths with a personalised roadmap for each.",
-    duration: "60–90 min",
-    price: "On Request",
+    duration: "60 min",
+    price: "$180",
+    originalPrice: "$200",
     icon: "Briefcase",
   },
   {
@@ -80,8 +96,9 @@ export const SERVICES = [
     title: "Saturn's Seven and a Half Guidance",
     badge: "Vedic · Sade Sati",
     desc: "Specialised guidance for the Sade Sati — when Saturn transits the 12th, natal, or 2nd sign from your Moon. Understand the purpose, navigate the pressure, and emerge stronger.",
-    duration: "75 min",
-    price: "On Request",
+    duration: "60 min",
+    price: "$180",
+    originalPrice: "$200",
     icon: "Saturn",
   },
   {
@@ -90,7 +107,8 @@ export const SERVICES = [
     badge: "Predictive",
     desc: "A forward-looking reading of who you are becoming — what life looks and feels like as you step beyond your 20s or enter the post-marriage chapter of your journey.",
     duration: "60 min",
-    price: "On Request",
+    price: "$180",
+    originalPrice: "$200",
     icon: "Hourglass",
   },
   {
@@ -99,7 +117,8 @@ export const SERVICES = [
     badge: "Planetary Period",
     desc: "Deep guidance on your current planetary time period — what the ruling planet demands of you, what it promises, and how to move with its energy rather than against it.",
     duration: "60 min",
-    price: "On Request",
+    price: "$180",
+    originalPrice: "$200",
     icon: "Orbit",
   },
   {
@@ -107,8 +126,9 @@ export const SERVICES = [
     title: "Current Situation Guidance",
     badge: "Quick · Mid-Level",
     desc: "For moments when you need clarity now. A focused, real-time reading of your current transits and circumstances — practical, grounded, and immediately applicable.",
-    duration: "30–60 min",
-    price: "On Request",
+    duration: "60 min",
+    price: "$180",
+    originalPrice: "$200",
     icon: "Compass",
   },
 ];
@@ -167,7 +187,7 @@ export const FAQS = [
   },
   {
     q: "How long is a session?",
-    a: "Sessions range from 30 minutes (quick guidance) to 120 minutes (marriage consultation). Duration is shown on each service.",
+    a: "Every session is 60 minutes — focused, private, and deeply personal.",
   },
   {
     q: "Can international clients book sessions?",

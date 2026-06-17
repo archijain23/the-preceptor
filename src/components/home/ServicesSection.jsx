@@ -2,27 +2,22 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Star, Briefcase, Heart, Moon, Sparkles, BookOpen,
-  Compass, ArrowRight,
+  Compass, ArrowRight, Clock,
 } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
+import { OfferTimer } from "@/components/site/OfferTimer";
 import { HOME_SERVICES } from "@/utils/constants";
 
-// Icon map — covers all 10 service icons
-// Lucide doesn't have Saturn/Rings/Orbit/Hourglass/HeartHandshake in older builds;
-// we gracefully fall back to thematic alternatives that ARE in lucide-react v0.469
 const ICON_MAP = {
-  Star,        // General Birth Chart
-  BookOpen,    // Detailed Birth Chart
-  Heart,       // Relationship Guidance
-  HeartHandshake: Heart,  // Partner Compatibility — fallback to Heart
-  Rings: Moon,            // Marriage — fallback to Moon
-  Briefcase,   // Career
-  Saturn: Sparkles,       // Sade Sati — fallback to Sparkles
-  Hourglass: Moon,        // Later Life — fallback to Moon
-  Orbit: Sparkles,        // Mahadasha — fallback to Sparkles
-  Compass,     // Current Situation
-  Moon,
-  Sparkles,
+  Star, BookOpen, Heart,
+  HeartHandshake: Heart,
+  Rings: Moon,
+  Briefcase,
+  Saturn: Sparkles,
+  Hourglass: Moon,
+  Orbit: Sparkles,
+  Compass,
+  Moon, Sparkles,
 };
 
 export function ServicesSection() {
@@ -36,6 +31,7 @@ export function ServicesSection() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
+        {/* Section header */}
         <Reveal className="text-center max-w-2xl mx-auto">
           <span className="text-xs uppercase tracking-[0.3em] text-gold">Services</span>
           <h2 className="mt-4 text-4xl md:text-5xl">Consultations crafted with intention.</h2>
@@ -44,8 +40,13 @@ export function ServicesSection() {
           </p>
         </Reveal>
 
+        {/* ── Countdown timer ───────────────────────────────── */}
+        <Reveal className="mt-10">
+          <OfferTimer />
+        </Reveal>
+
         {/* 4-card grid */}
-        <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
           {HOME_SERVICES.map((s, i) => {
             const Icon = ICON_MAP[s.icon] || Star;
             return (
@@ -56,19 +57,37 @@ export function ServicesSection() {
                   className="glass-card rounded-2xl p-8 h-full group cursor-pointer hover:border-primary/40 relative overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.07),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative z-10">
+                  <div className="relative z-10 flex flex-col h-full gap-3">
+                    {/* Icon */}
                     <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center group-hover:bg-primary/20 transition">
                       <Icon className="w-5 h-5" />
                     </div>
+
+                    {/* Badge */}
                     {s.badge && (
-                      <span className="mt-4 inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold">
+                      <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold">
                         {s.badge}
                       </span>
                     )}
-                    <h3 className="mt-3 text-xl leading-snug">{s.title}</h3>
-                    <p className="mt-3 text-muted-foreground text-sm leading-relaxed line-clamp-3">{s.desc}</p>
-                    <div className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="px-2 py-0.5 rounded-full border border-gold/20 text-gold">{s.duration}</span>
+
+                    {/* Title + desc */}
+                    <h3 className="text-xl leading-snug">{s.title}</h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 flex-1">{s.desc}</p>
+
+                    {/* Duration + price */}
+                    <div className="mt-2 flex items-center justify-between border-t border-gold/10 pt-3">
+                      <span className="flex items-center gap-1 text-xs text-gold">
+                        <Clock className="w-3 h-3" />
+                        {s.duration}
+                      </span>
+                      <div className="flex items-baseline gap-2">
+                        {s.originalPrice && (
+                          <span className="text-xs text-muted-foreground line-through">
+                            {s.originalPrice}
+                          </span>
+                        )}
+                        <span className="font-semibold text-gold text-lg">{s.price}</span>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -77,7 +96,7 @@ export function ServicesSection() {
           })}
         </div>
 
-        {/* View More button */}
+        {/* View More CTA */}
         <Reveal className="mt-12 text-center">
           <Link
             to="/services"
