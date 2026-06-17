@@ -1,223 +1,158 @@
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Star, Quote, PlayCircle } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
+import { useSanityData } from "@/sanity/useSanityData";
+import { TESTIMONIALS_QUERY } from "@/sanity/queries";
+import { TESTIMONIALS } from "@/utils/constants";
 
-const reviews = [
-  {
-    name: "Amelia R.",
-    country: "New York, USA",
-    text: "The most precise reading I've ever had. It felt like sitting with a wise friend who could see decades ahead.",
-    rating: 5,
-  },
-  {
-    name: "Daniel K.",
-    country: "London, UK",
-    text: "Calm, confident, and breathtakingly accurate. The Preceptor gave me a map I didn't know I needed.",
-    rating: 5,
-  },
-  {
-    name: "Priya S.",
-    country: "Toronto, CA",
-    text: "A truly luxurious experience. Insightful, grounded and deeply transformative. I have referred half of my friends.",
-    rating: 5,
-  },
-  {
-    name: "Marcus T.",
-    country: "Los Angeles, USA",
-    text: "I've worked with multiple astrologers. None compare. The clarity I received reshaped my next career move.",
-    rating: 5,
-  },
-  {
-    name: "Lina M.",
-    country: "Berlin, DE",
-    text: "Every word landed. The session was poetic, precise and quietly powerful.",
-    rating: 5,
-  },
-  {
-    name: "Sara H.",
-    country: "Dubai, UAE",
-    text: "Worth every dollar. Felt like a true reset for my year ahead.",
-    rating: 5,
-  },
-  {
-    name: "Jordan W.",
-    country: "Sydney, AU",
-    text: "I came in skeptical and left with goosebumps. Genuinely life-changing.",
-    rating: 5,
-  },
-  {
-    name: "Elena C.",
-    country: "Madrid, ES",
-    text: "The Preceptor has a rare gift for translating cosmic patterns into actionable wisdom.",
-    rating: 5,
-  },
-];
-
-const CAROUSEL_COUNT = 5;
-const SLIDE_INTERVAL = 6000;
+function StarRating({ rating = 5 }) {
+  return (
+    <div className="flex gap-0.5" aria-label={`${rating} out of 5 stars`}>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star
+          key={i}
+          className={`w-3.5 h-3.5 ${
+            i < rating ? "text-gold fill-gold" : "text-muted-foreground"
+          }`}
+        />
+      ))}
+    </div>
+  );
+}
 
 export default function TestimonialsPage() {
-  const [activeIndex, setActiveIndex] = useState(0);
+  // ── Live from Sanity, falls back to constants.js ───────────────────────────
+  const { data: reviews } = useSanityData(TESTIMONIALS_QUERY, TESTIMONIALS);
 
-  const carouselReviews = reviews.slice(0, CAROUSEL_COUNT);
-  const moreReviews = reviews.slice(CAROUSEL_COUNT);
-  const activeReview = carouselReviews[activeIndex];
+  const [active, setActive] = useState(0);
+  const total = reviews?.length || 0;
 
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setActiveIndex((current) => (current + 1) % carouselReviews.length);
-    }, SLIDE_INTERVAL);
-    return () => window.clearInterval(timer);
-  }, [carouselReviews.length]);
+  const prev = () => setActive((a) => (a - 1 + total) % total);
+  const next = () => setActive((a) => (a + 1) % total);
 
-  const goPrevious = () =>
-    setActiveIndex((current) => (current + carouselReviews.length - 1) % carouselReviews.length);
+  // Guard: empty state
+  if (!total) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">No testimonials yet.</p>
+      </main>
+    );
+  }
 
-  const goNext = () =>
-    setActiveIndex((current) => (current + 1) % carouselReviews.length);
+  const current = reviews[active];
 
   return (
     <>
       <Helmet>
-        <title>Testimonials — The Preceptor</title>
-        <meta
-          name="description"
-          content="Real stories from clients across the United States and the world after their consultations with The Preceptor."
-        />
-        <meta property="og:title" content="Client Stories — The Preceptor" />
-        <meta property="og:description" content="Trusted by 8,400+ clients across 47 countries." />
+        <title>Client Testimonials — The Preceptor</title>
+        <meta name="description" content="Real words from real clients. Discover why seekers from across the world return to The Preceptor for guidance." />
       </Helmet>
 
-      <div className="bg-hero starfield min-h-screen">
-        <section className="max-w-7xl mx-auto px-6 lg:px-10 py-20 lg:py-28">
+      <main className="min-h-screen">
+        {/* Hero */}
+        <section className="relative py-36 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,oklch(0.28_0.10_255_/_0.45),transparent_65%)]" />
+          <div className="absolute inset-0 starfield" aria-hidden />
+          <div className="relative max-w-4xl mx-auto px-6 lg:px-10 text-center z-10">
+            <motion.span
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="text-xs uppercase tracking-[0.3em] text-gold"
+            >
+              — Client Words
+            </motion.span>
+            <motion.h1
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-5"
+              style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)", fontWeight: 400 }}
+            >
+              What seekers say
+              <span className="block bg-gradient-gold"> after the session.</span>
+            </motion.h1>
+          </div>
+        </section>
 
-          {/* Hero heading */}
-          <Reveal className="text-center max-w-3xl mx-auto">
-            <span className="text-xs uppercase tracking-[0.3em] text-gold">Testimonials</span>
-            <h1 className="mt-4 text-5xl md:text-6xl">Stories from the seekers.</h1>
-            <p className="mt-5 text-muted-foreground">Trust earned, one consultation at a time.</p>
-          </Reveal>
+        {/* Carousel */}
+        <section className="py-24 bg-cosmic-deep relative overflow-hidden">
+          <div className="max-w-3xl mx-auto px-6 lg:px-10 relative z-10">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -24 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="glass-card rounded-3xl p-10 md:p-14 text-center"
+              >
+                <Quote className="w-8 h-8 text-gold/30 mx-auto mb-6" />
+                <p className="text-xl md:text-2xl font-serif leading-relaxed text-foreground">
+                  &ldquo;{current.text}&rdquo;
+                </p>
+                <div className="mt-8 flex flex-col items-center gap-2">
+                  <StarRating rating={current.rating} />
+                  <p className="text-sm font-medium text-foreground">{current.name}</p>
+                  {current.country && (
+                    <p className="text-xs text-muted-foreground">{current.country}</p>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
 
-          {/* Featured carousel */}
-          <div className="mt-20">
+            {/* Navigation */}
+            <div className="mt-8 flex items-center justify-center gap-6">
+              <button
+                onClick={prev}
+                aria-label="Previous testimonial"
+                className="glass-card w-10 h-10 rounded-full flex items-center justify-center hover:border-gold/40 transition"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <span className="text-xs text-muted-foreground tabular-nums">
+                {active + 1} / {total}
+              </span>
+              <button
+                onClick={next}
+                aria-label="Next testimonial"
+                className="glass-card w-10 h-10 rounded-full flex items-center justify-center hover:border-gold/40 transition"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* All reviews grid */}
+        <section className="py-24">
+          <div className="max-w-6xl mx-auto px-6 lg:px-10">
             <Reveal>
-              <span className="text-xs uppercase tracking-[0.3em] text-gold">Featured Stories</span>
-              <h2 className="mt-4 text-4xl md:text-5xl">Standout reviews.</h2>
+              <h2 className="text-2xl font-serif text-center mb-12">All reviews</h2>
             </Reveal>
-
-            <Reveal delay={0.1}>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeIndex}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  className="mt-10 glass-card rounded-3xl p-10 relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.08),transparent_40%)]" />
-                  <div className="relative z-10">
-                    <Quote className="w-10 h-10 text-gold/30 mx-auto" />
-                    <p className="mt-6 font-serif text-2xl md:text-3xl leading-relaxed">
-                      "{activeReview.text}"
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {reviews.map((r, i) => (
+                <Reveal key={i} delay={i * 0.05}>
+                  <div className="glass-card rounded-2xl p-6 flex flex-col gap-3">
+                    <StarRating rating={r.rating} />
+                    <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                      &ldquo;{r.text}&rdquo;
                     </p>
-                    <div className="mt-8 flex justify-center gap-1">
-                      {[...Array(activeReview.rating)].map((_, k) => (
-                        <Star key={k} className="w-4 h-4 fill-gold text-gold" />
-                      ))}
-                    </div>
-                    <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <p className="font-serif text-lg text-gold">{activeReview.name}</p>
-                        <p className="text-xs text-muted-foreground">{activeReview.country}</p>
-                      </div>
-                      <div className="flex items-center justify-center gap-3">
-                        <button
-                          onClick={goPrevious}
-                          aria-label="Previous review"
-                          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gold/30 text-gold transition hover:bg-gold/10"
-                        >
-                          <ArrowLeft className="w-4 h-4" />
-                        </button>
-                        <div className="flex items-center gap-2">
-                          {carouselReviews.map((_, index) => (
-                            <button
-                              key={index}
-                              onClick={() => setActiveIndex(index)}
-                              aria-label={`View review ${index + 1}`}
-                              className={`h-2 rounded-full transition-all ${
-                                index === activeIndex ? "w-8 bg-gold" : "w-2 bg-muted"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <button
-                          onClick={goNext}
-                          aria-label="Next review"
-                          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gold/30 text-gold transition hover:bg-gold/10"
-                        >
-                          <ArrowRight className="w-4 h-4" />
-                        </button>
-                      </div>
+                    <div>
+                      <p className="text-sm font-medium">{r.name}</p>
+                      {r.country && (
+                        <p className="text-xs text-muted-foreground">{r.country}</p>
+                      )}
                     </div>
                   </div>
-                </motion.div>
-              </AnimatePresence>
-            </Reveal>
-          </div>
-
-          {/* More reviews grid */}
-          {moreReviews.length > 0 && (
-            <div className="mt-16">
-              <Reveal className="text-center max-w-3xl mx-auto">
-                <span className="text-xs uppercase tracking-[0.3em] text-gold">More stories</span>
-                <h2 className="mt-4 text-4xl md:text-5xl">More voices from clients.</h2>
-              </Reveal>
-              <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {moreReviews.map((r, i) => (
-                  <Reveal key={r.name} delay={i * 0.05}>
-                    <div className="glass-card rounded-2xl p-8 h-full hover:border-primary/40 hover:-translate-y-1 transition">
-                      <Quote className="w-7 h-7 text-gold/40" />
-                      <p className="mt-4 leading-relaxed text-foreground/90">"{r.text}"</p>
-                      <div className="mt-6 flex items-center justify-between gap-4">
-                        <div>
-                          <p className="font-serif text-lg text-gold">{r.name}</p>
-                          <p className="text-xs text-muted-foreground">{r.country}</p>
-                        </div>
-                        <div className="flex gap-0.5">
-                          {[...Array(5)].map((_, k) => (
-                            <Star key={k} className="w-3 h-3 fill-gold text-gold" />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </Reveal>
-                ))}
-              </div>
+                </Reveal>
+              ))}
             </div>
-          )}
-
-          {/* Video testimonials */}
-          <Reveal>
-            <div className="mt-24 text-center">
-              <span className="text-xs uppercase tracking-[0.3em] text-gold">Video Stories</span>
-              <h2 className="mt-4 text-4xl md:text-5xl">Hear it in their words.</h2>
-            </div>
-          </Reveal>
-          <div className="mt-12 grid md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((n) => (
-              <Reveal key={n} delay={n * 0.05}>
-                <div className="aspect-video glass-card rounded-2xl flex items-center justify-center hover:shadow-gold transition cursor-pointer group">
-                  <PlayCircle className="w-14 h-14 text-gold group-hover:scale-110 transition" />
-                </div>
-              </Reveal>
-            ))}
           </div>
-
         </section>
-      </div>
+      </main>
     </>
   );
 }
