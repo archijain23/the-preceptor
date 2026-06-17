@@ -1,7 +1,6 @@
 import SEO from "@/components/site/SEO";
 import { PAGE_SEO, SITE } from "@/content/seo";
 import { Mail, MapPin, Send } from "lucide-react";
-// vite-imagetools: ?format=webp&quality=80 — about-section.jpg ~1.27 MB → ~100-120 KB WebP
 import aboutImg from "@/assets/about-section.jpg?format=webp&quality=80";
 import { Reveal } from "@/components/site/Reveal";
 
@@ -15,7 +14,6 @@ export default function AboutWrapper() {
 }
 
 function AboutContent() {
-  /** Functional mailto fallback — fires until a real backend is wired up */
   function handleContactSubmit(e) {
     e.preventDefault();
     const fd   = new FormData(e.currentTarget);
@@ -28,42 +26,68 @@ function AboutContent() {
 
   return (
     <div className="bg-hero starfield">
-      {/* ── Story ──────────────────────────────────────────── */}
-      <section className="max-w-7xl mx-auto px-6 lg:px-10 py-20 lg:py-28 grid lg:grid-cols-2 gap-16 items-center">
+
+      {/* ── Hero — full-bleed image bg with title overlay ───── */}
+      <section className="relative w-full min-h-[70vh] flex items-center justify-center overflow-hidden">
+
+        {/* Background image — translucent */}
+        <img
+          src={aboutImg}
+          alt=""
+          aria-hidden="true"
+          width={1800}
+          height={1200}
+          loading="eager"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{ opacity: 0.28 }}
+        />
+
+        {/* Dark gradient overlay so text stays legible */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(10,8,18,0.55) 0%, rgba(10,8,18,0.35) 50%, rgba(10,8,18,0.82) 100%)",
+          }}
+        />
+
+        {/* Title */}
         <Reveal>
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">Our Story</span>
-          <h1 className="mt-4 text-5xl md:text-6xl">A practice rooted in clarity.</h1>
-          <p className="mt-6 text-muted-foreground leading-relaxed">
+          <div className="relative z-10 text-center px-6 py-24">
+            <span className="block text-xs uppercase tracking-[0.4em] text-gold mb-6">
+              Our Story
+            </span>
+            <h1
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light leading-[1.05] bg-gradient-gold"
+            >
+              About The
+              <br />
+              <span className="tracking-[0.15em] font-semibold">PRECEPTOR</span>
+            </h1>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* ── Story paragraphs — below the image ─────────────── */}
+      <section className="max-w-3xl mx-auto px-6 lg:px-10 py-20">
+        <Reveal>
+          <p className="text-lg text-muted-foreground leading-relaxed">
             The Preceptor began as a small private practice for friends seeking real
             answers. Over 7 years, it has grown into a global consultation studio
             serving founders, artists, healers, and high-intention seekers across
             18+ countries.
           </p>
-          <p className="mt-4 text-muted-foreground leading-relaxed">
+          <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
             Our approach blends classical Vedic astrology, Western tropical analysis,
             and intuitive symbolic work — translated into clean, modern language you
             can act on.
           </p>
         </Reveal>
-
-        <Reveal delay={0.1}>
-          <div className="aspect-[4/5] rounded-2xl overflow-hidden gold-border shadow-elegant">
-            {/* About page image: lazy WebP via vite-imagetools */}
-            <img
-              src={aboutImg}
-              alt="The Preceptor — guiding presence"
-              width={1000}
-              height={1250}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </Reveal>
       </section>
 
-      {/* ── Philosophy cards ───────────────────────────────── */}
-      <section className="max-w-7xl mx-auto px-6 lg:px-10 py-20">
+      {/* ── Philosophy cards ─────────────────────────────────── */}
+      <section className="max-w-7xl mx-auto px-6 lg:px-10 pb-20">
         <div className="grid md:grid-cols-3 gap-6">
           {[
             { t: "Mission",    d: "To make profound spiritual insight feel modern, accessible, and quietly luxurious." },
@@ -80,7 +104,7 @@ function AboutContent() {
         </div>
       </section>
 
-      {/* ── Contact ────────────────────────────────────────── */}
+      {/* ── Contact ──────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-6 lg:px-10 py-20 grid lg:grid-cols-2 gap-12">
         <Reveal>
           <span className="text-xs uppercase tracking-[0.3em] text-gold">Contact</span>
@@ -91,10 +115,7 @@ function AboutContent() {
           <div className="mt-10 space-y-5">
             <div className="flex items-center gap-4">
               <Mail className="w-5 h-5 text-gold" />
-              <a
-                href={`mailto:${SITE.email}`}
-                className="hover:text-gold transition-colors"
-              >
+              <a href={`mailto:${SITE.email}`} className="hover:text-gold transition-colors">
                 {SITE.email}
               </a>
             </div>
@@ -143,6 +164,7 @@ function AboutContent() {
           </form>
         </Reveal>
       </section>
+
     </div>
   );
 }
