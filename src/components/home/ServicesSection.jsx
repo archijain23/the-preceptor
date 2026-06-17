@@ -1,9 +1,29 @@
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Star, Briefcase, Heart, Moon, Sparkles, BookOpen, ArrowRight } from "lucide-react";
+import {
+  Star, Briefcase, Heart, Moon, Sparkles, BookOpen,
+  Compass, ArrowRight,
+} from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
-import { SERVICES } from "@/utils/constants";
+import { HOME_SERVICES } from "@/utils/constants";
 
-const ICON_MAP = { Star, Briefcase, Heart, Moon, Sparkles, BookOpen };
+// Icon map — covers all 10 service icons
+// Lucide doesn't have Saturn/Rings/Orbit/Hourglass/HeartHandshake in older builds;
+// we gracefully fall back to thematic alternatives that ARE in lucide-react v0.469
+const ICON_MAP = {
+  Star,        // General Birth Chart
+  BookOpen,    // Detailed Birth Chart
+  Heart,       // Relationship Guidance
+  HeartHandshake: Heart,  // Partner Compatibility — fallback to Heart
+  Rings: Moon,            // Marriage — fallback to Moon
+  Briefcase,   // Career
+  Saturn: Sparkles,       // Sade Sati — fallback to Sparkles
+  Hourglass: Moon,        // Later Life — fallback to Moon
+  Orbit: Sparkles,        // Mahadasha — fallback to Sparkles
+  Compass,     // Current Situation
+  Moon,
+  Sparkles,
+};
 
 export function ServicesSection() {
   return (
@@ -24,11 +44,12 @@ export function ServicesSection() {
           </p>
         </Reveal>
 
-        <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {SERVICES.map((s, i) => {
+        {/* 4-card grid */}
+        <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+          {HOME_SERVICES.map((s, i) => {
             const Icon = ICON_MAP[s.icon] || Star;
             return (
-              <Reveal key={s.slug} delay={i * 0.05}>
+              <Reveal key={s.slug} delay={i * 0.07}>
                 <motion.div
                   whileHover={{ y: -6 }}
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -39,14 +60,15 @@ export function ServicesSection() {
                     <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center group-hover:bg-primary/20 transition">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <h3 className="mt-6 text-2xl">{s.title}</h3>
-                    <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
+                    {s.badge && (
+                      <span className="mt-4 inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold">
+                        {s.badge}
+                      </span>
+                    )}
+                    <h3 className="mt-3 text-xl leading-snug">{s.title}</h3>
+                    <p className="mt-3 text-muted-foreground text-sm leading-relaxed line-clamp-3">{s.desc}</p>
                     <div className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
                       <span className="px-2 py-0.5 rounded-full border border-gold/20 text-gold">{s.duration}</span>
-                      <span className="font-serif text-gold text-sm">{s.price}</span>
-                    </div>
-                    <div className="mt-4 flex items-center gap-2 text-gold text-sm opacity-0 group-hover:opacity-100 transition">
-                      Learn more <ArrowRight className="w-3 h-3" />
                     </div>
                   </div>
                 </motion.div>
@@ -54,6 +76,17 @@ export function ServicesSection() {
             );
           })}
         </div>
+
+        {/* View More button */}
+        <Reveal className="mt-12 text-center">
+          <Link
+            to="/services"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full border border-gold/40 text-gold hover:bg-gold/10 transition font-medium text-sm tracking-wide group"
+          >
+            View All 10 Services
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </Reveal>
       </div>
     </section>
   );

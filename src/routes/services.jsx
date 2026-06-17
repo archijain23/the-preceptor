@@ -9,13 +9,26 @@ import {
   Moon,
   Sparkles,
   BookOpen,
+  Compass,
   CheckCircle,
 } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { SERVICES, SITE } from "@/utils/constants";
 
-// BUG FIX: plain JS object — no `as const` TypeScript assertion
-const ICON_MAP = { Star, Briefcase, Heart, Moon, Sparkles, BookOpen };
+const ICON_MAP = {
+  Star,
+  BookOpen,
+  Heart,
+  HeartHandshake: Heart,
+  Rings: Moon,
+  Briefcase,
+  Saturn: Sparkles,
+  Hourglass: Moon,
+  Orbit: Sparkles,
+  Compass,
+  Moon,
+  Sparkles,
+};
 
 const INCLUDES = [
   "Private 1-on-1 video session",
@@ -32,12 +45,12 @@ export default function ServicesPage() {
         <title>Astrology Services — The Preceptor</title>
         <meta
           name="description"
-          content="Explore birth chart readings, relationship consultations, career astrology, Kundli analysis, Tarot, and spiritual guidance. Premium sessions for discerning seekers."
+          content="Explore birth chart readings, relationship consultations, marriage consultation, career astrology, Mahadasha guidance, Sade Sati, and more. Premium sessions for discerning seekers."
         />
         <meta property="og:title" content="Astrology Services — The Preceptor" />
         <meta
           property="og:description"
-          content="Premium astrology consultation services — individually crafted for clarity in love, career, and life’s defining chapters."
+          content="Premium astrology consultation services — individually crafted for clarity in love, career, and life's defining chapters."
         />
       </Helmet>
 
@@ -81,33 +94,32 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* Service cards */}
+        {/* All 10 service cards */}
         <section className="py-20 bg-cosmic-deep relative overflow-hidden">
-          <div
-            className="absolute inset-0 pointer-events-none section-glow-services"
-            aria-hidden
-          />
+          <div className="absolute inset-0 pointer-events-none section-glow-services" aria-hidden />
           <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {SERVICES.map((s, i) => {
-                // BUG FIX: plain JS lookup — no `as keyof typeof` cast
-                const Icon = ICON_MAP[s.icon];
-                // BUG FIX: guard against missing icon so render never crashes
-                if (!Icon) return null;
+                const Icon = ICON_MAP[s.icon] || Star;
                 return (
                   <Reveal key={s.slug} delay={i * 0.06}>
                     <motion.div
                       whileHover={{ y: -6 }}
                       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                      className="glass-card rounded-2xl p-8 flex flex-col gap-6 group hover:border-primary/40 relative overflow-hidden"
+                      className="glass-card rounded-2xl p-8 flex flex-col gap-4 group hover:border-primary/40 relative overflow-hidden"
                     >
                       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.06),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      <div className="relative z-10 flex flex-col gap-4 h-full">
+                      <div className="relative z-10 flex flex-col gap-3 h-full">
                         <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center">
                           <Icon className="w-5 h-5" />
                         </div>
+                        {s.badge && (
+                          <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold">
+                            {s.badge}
+                          </span>
+                        )}
                         <div className="flex-1">
-                          <h2 className="text-2xl font-serif">{s.title}</h2>
+                          <h2 className="text-2xl font-serif leading-snug">{s.title}</h2>
                           <p className="mt-3 text-muted-foreground text-sm leading-relaxed">
                             {s.desc}
                           </p>
@@ -116,11 +128,11 @@ export default function ServicesPage() {
                           <span className="text-xs px-2 py-0.5 rounded-full border border-gold/20 text-gold">
                             {s.duration}
                           </span>
-                          <span className="font-serif text-xl text-gold">{s.price}</span>
+                          <span className="font-serif text-base text-gold">{s.price}</span>
                         </div>
                         <Link
                           to="/book"
-                          className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-gold hover:text-foreground transition group/link"
+                          className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-gold hover:text-foreground transition group/link"
                         >
                           Book this session
                           <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
@@ -138,10 +150,8 @@ export default function ServicesPage() {
         <section className="py-24 relative overflow-hidden">
           <div className="max-w-4xl mx-auto px-6 lg:px-10 text-center">
             <Reveal>
-              <span className="text-xs uppercase tracking-[0.3em] text-gold">
-                Every Session
-              </span>
-              <h2 className="mt-4 text-3xl md:text-4xl">What’s always included.</h2>
+              <span className="text-xs uppercase tracking-[0.3em] text-gold">Every Session</span>
+              <h2 className="mt-4 text-3xl md:text-4xl">What's always included.</h2>
             </Reveal>
             <Reveal delay={0.08}>
               <ul className="mt-10 grid sm:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
@@ -169,7 +179,6 @@ export default function ServicesPage() {
                 <Link to="/book" className="btn-primary">
                   Reserve a Session <ArrowRight className="w-4 h-4" />
                 </Link>
-                {/* BUG FIX: guard SITE.email existence before building mailto href */}
                 {SITE?.email && (
                   <a href={`mailto:${SITE.email}`} className="btn-secondary">
                     Have a question?

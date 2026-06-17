@@ -1,76 +1,120 @@
 /**
- * constants.ts — single source of truth for all site content.
- * Replace these values with your real information before going live.
+ * constants.js — single source of truth for all site content.
  */
 
 export const SITE = {
-  name: "The Precetor",
+  name: "The Preceptor",
   tagline: "Premium Astrology Consultations",
   description:
     "Cinematic astrology consultations and spiritual guidance for high-intention clients in the US and across the world.",
-  url: "https://theprecetor.com",
-  email: "hello@theprecetor.com",
+  url: "https://thepreceptor.com",
+  email: "hello@thepreceptor.com",
   phone: "+1 (555) 000-0000",
   whatsapp: "https://wa.me/15550000000",
-  calLink: "https://cal.com/theprecetor", // replace with your Cal.com link
+  calLink: "https://cal.com/preceptor",
   social: {
-    instagram: "https://instagram.com/theprecetor",
-    twitter: "https://twitter.com/theprecetor",
-    youtube: "https://youtube.com/@theprecetor",
-    facebook: "https://facebook.com/theprecetor",
+    instagram: "https://instagram.com/thepreceptor",
+    twitter: "https://twitter.com/thepreceptor",
+    youtube: "https://youtube.com/@thepreceptor",
+    facebook: "https://facebook.com/thepreceptor",
   },
 };
 
 export const SERVICES = [
   {
-    slug: "birth-chart",
-    title: "Birth Chart Reading",
-    desc: "A cinematic decode of your natal sky — purpose, gifts, and life arc.",
-    duration: "60 min",
-    price: "$180",
+    slug: "general-birth-chart",
+    title: "General Birth Chart Reading",
+    badge: "Quick Session",
+    desc: "A focused overview of your natal chart — your core personality, life themes, key strengths, and the fundamental blueprint the cosmos wrote for you at birth.",
+    duration: "45 min",
+    price: "On Request",
     icon: "Star",
   },
   {
-    slug: "career-guidance",
-    title: "Career Guidance",
-    desc: "Strategic timing and direction aligned with your dharma and ambition.",
-    duration: "60 min",
-    price: "$180",
-    icon: "Briefcase",
+    slug: "detailed-birth-chart",
+    title: "Detailed Birth Chart Reading",
+    badge: "In-Depth",
+    desc: "A cinematic, comprehensive decode of your entire natal sky — purpose, gifts, shadow, life arc, and the deeper story encoded in every house and planet.",
+    duration: "90 min",
+    price: "On Request",
+    icon: "BookOpen",
   },
   {
-    slug: "relationship",
-    title: "Relationship Consultation",
-    desc: "Synastry and compatibility guidance for love, family, and partnership.",
-    duration: "60 min",
-    price: "$180",
+    slug: "relationship-guidance",
+    title: "Relationship Guidance",
+    badge: "Quick Session",
+    desc: "Targeted guidance on your current relationship dynamic — understanding patterns, timing, and what the chart reveals about love in your life right now.",
+    duration: "45 min",
+    price: "On Request",
     icon: "Heart",
   },
   {
-    slug: "tarot",
-    title: "Tarot Reading",
-    desc: "Intuitive symbolic readings for clarity at decisive crossroads.",
-    duration: "45 min",
-    price: "$120",
-    icon: "Moon",
-  },
-  {
-    slug: "spiritual",
-    title: "Spiritual Consultation",
-    desc: "Personal practices, rituals, and remedies for inner alignment.",
-    duration: "60 min",
-    price: "$180",
-    icon: "Sparkles",
-  },
-  {
-    slug: "kundli",
-    title: "Kundli Analysis",
-    desc: "Deep Vedic chart analysis with predictive timelines and dashas.",
+    slug: "partner-compatibility",
+    title: "Partner Compatibility",
+    badge: "Mid-Level · In-Depth",
+    desc: "A synastry and composite chart reading for two individuals — revealing the strengths, challenges, karmic threads, and long-term potential of the relationship.",
     duration: "90 min",
-    price: "$240",
-    icon: "BookOpen",
+    price: "On Request",
+    icon: "HeartHandshake",
+  },
+  {
+    slug: "marriage-consultation",
+    title: "Marriage Consultation",
+    badge: "In-Depth",
+    desc: "An exhaustive study of two charts across every dimension of compatibility — emotional, physical, karmic, and practical. The most thorough relationship reading offered.",
+    duration: "120 min",
+    price: "On Request",
+    icon: "Rings",
+  },
+  {
+    slug: "career-consultation",
+    title: "Career Consultation",
+    badge: "Mid-Level · In-Depth",
+    desc: "Strategic career direction aligned with your dharma and chart placements. The in-depth session identifies multiple aligned career paths with a personalised roadmap for each.",
+    duration: "60–90 min",
+    price: "On Request",
+    icon: "Briefcase",
+  },
+  {
+    slug: "saturn-seven-half",
+    title: "Saturn's Seven and a Half Guidance",
+    badge: "Vedic · Sade Sati",
+    desc: "Specialised guidance for the Sade Sati — when Saturn transits the 12th, natal, or 2nd sign from your Moon. Understand the purpose, navigate the pressure, and emerge stronger.",
+    duration: "75 min",
+    price: "On Request",
+    icon: "Saturn",
+  },
+  {
+    slug: "later-life-reading",
+    title: "Later Life Reading",
+    badge: "Predictive",
+    desc: "A forward-looking reading of who you are becoming — what life looks and feels like as you step beyond your 20s or enter the post-marriage chapter of your journey.",
+    duration: "60 min",
+    price: "On Request",
+    icon: "Hourglass",
+  },
+  {
+    slug: "mahadasha-guidance",
+    title: "Mahadasha Guidance",
+    badge: "Planetary Period",
+    desc: "Deep guidance on your current planetary time period — what the ruling planet demands of you, what it promises, and how to move with its energy rather than against it.",
+    duration: "60 min",
+    price: "On Request",
+    icon: "Orbit",
+  },
+  {
+    slug: "current-situation",
+    title: "Current Situation Guidance",
+    badge: "Quick · Mid-Level",
+    desc: "For moments when you need clarity now. A focused, real-time reading of your current transits and circumstances — practical, grounded, and immediately applicable.",
+    duration: "30–60 min",
+    price: "On Request",
+    icon: "Compass",
   },
 ];
+
+/** First 4 services shown on the home page */
+export const HOME_SERVICES = SERVICES.slice(0, 4);
 
 export const TESTIMONIALS = [
   {
@@ -82,7 +126,7 @@ export const TESTIMONIALS = [
   {
     name: "Daniel K.",
     country: "London, UK",
-    text: "Calm, confident, and breathtakingly accurate. The Precetor gave me a map I didn't know I needed.",
+    text: "Calm, confident, and breathtakingly accurate. The Preceptor gave me a map I didn't know I needed.",
     rating: 5,
   },
   {
@@ -123,7 +167,7 @@ export const FAQS = [
   },
   {
     q: "How long is a session?",
-    a: "Standard consultations run 60 minutes. Deep-dive readings extend to 90 minutes with a written summary.",
+    a: "Sessions range from 30 minutes (quick guidance) to 120 minutes (marriage consultation). Duration is shown on each service.",
   },
   {
     q: "Can international clients book sessions?",
@@ -140,9 +184,9 @@ export const FAQS = [
 ];
 
 export const ASTROLOGER = {
-  name: "The Precetor",
+  name: "The Preceptor",
   yearsExperience: 12,
-  bio: "For over twelve years, The Precetor has guided executives, artists, and seekers through life's most pivotal chapters — translating classical Vedic and Western astrology into language that is grounded, modern, and quietly powerful.",
+  bio: "For over twelve years, The Preceptor has guided executives, artists, and seekers through life's most pivotal chapters — translating classical Vedic and Western astrology into language that is grounded, modern, and quietly powerful.",
   philosophy:
     "Our philosophy is simple: the stars do not predict your fate — they reveal your design. We help you read it.",
 };
