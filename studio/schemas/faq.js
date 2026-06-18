@@ -24,13 +24,14 @@ export const faqSchema = defineType({
       type: 'string',
       options: {
         list: [
-          { title: 'Booking', value: 'booking' },
-          { title: 'Sessions', value: 'sessions' },
-          { title: 'Payments', value: 'payments' },
-          { title: 'General', value: 'general' },
+          { title: 'Sessions',        value: 'sessions' },
+          { title: 'Astrology',       value: 'astrology' },
+          { title: 'Logistics',       value: 'logistics' },
+          { title: 'Types of Readings', value: 'readings' },
         ],
       },
-      initialValue: 'general',
+      initialValue: 'sessions',
+      validation: (R) => R.required(),
     }),
     defineField({
       name: 'order',

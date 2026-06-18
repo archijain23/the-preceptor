@@ -3,6 +3,7 @@ import { PAGE_SEO, SITE } from "@/content/seo";
 import { Mail, MapPin, Send } from "lucide-react";
 import aboutImg from "@/assets/about-section.jpg?format=webp&quality=80";
 import { Reveal } from "@/components/site/Reveal";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 export default function AboutWrapper() {
   return (
@@ -14,13 +15,17 @@ export default function AboutWrapper() {
 }
 
 function AboutContent() {
+  const { settings } = useSiteSettings();
+
+  const email = settings?.email ?? SITE.email;
+
   function handleContactSubmit(e) {
     e.preventDefault();
     const fd   = new FormData(e.currentTarget);
     const name = fd.get("name")    || "";
     const subj = fd.get("subject") || "Enquiry";
     const body = fd.get("message") || "";
-    const mailto = `mailto:${SITE.email}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(`Hi,\n\nName: ${name}\n\n${body}`)}`;
+    const mailto = `mailto:${email}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(`Hi,\n\nName: ${name}\n\n${body}`)}`;
     window.location.href = mailto;
   }
 
@@ -30,7 +35,6 @@ function AboutContent() {
       {/* ── Hero ── full-bleed image bg with title overlay */}
       <section className="relative w-full min-h-[70vh] flex items-center justify-center overflow-hidden">
 
-        {/* Background image — more visible */}
         <img
           src={aboutImg}
           alt=""
@@ -43,7 +47,6 @@ function AboutContent() {
           style={{ opacity: 0.50 }}
         />
 
-        {/* Lighter gradient overlay — only darkens edges/bottom for text contrast */}
         <div
           className="absolute inset-0"
           style={{
@@ -52,7 +55,6 @@ function AboutContent() {
           }}
         />
 
-        {/* Title */}
         <Reveal>
           <div className="relative z-10 text-center px-6 py-24">
             <span className="block text-xs uppercase tracking-[0.4em] text-gold mb-6">
@@ -67,24 +69,21 @@ function AboutContent() {
         </Reveal>
       </section>
 
-      {/* ── Story paragraphs — below the image */}
+      {/* ── Story paragraphs ── */}
       <section className="max-w-3xl mx-auto px-6 lg:px-10 py-20">
         <Reveal>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            The Preceptor began as a small private practice for friends seeking real
-            answers. Over 7 years, it has grown into a global consultation studio
-            serving founders, artists, healers, and high-intention seekers across
-            18+ countries.
+            {settings?.aboutParagraph1 ??
+              "The Preceptor began as a small private practice for friends seeking real answers. Over 7 years, it has grown into a global consultation studio serving founders, artists, healers, and high-intention seekers across 18+ countries."}
           </p>
           <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-            Our approach blends classical Vedic astrology, Western tropical analysis,
-            and intuitive symbolic work — translated into clean, modern language you
-            can act on.
+            {settings?.aboutParagraph2 ??
+              "Our approach blends classical Vedic astrology, Western tropical analysis, and intuitive symbolic work — translated into clean, modern language you can act on."}
           </p>
         </Reveal>
       </section>
 
-      {/* ── Philosophy cards */}
+      {/* ── Philosophy cards ── */}
       <section className="max-w-7xl mx-auto px-6 lg:px-10 pb-20">
         <div className="grid md:grid-cols-3 gap-6">
           {[
@@ -102,7 +101,7 @@ function AboutContent() {
         </div>
       </section>
 
-      {/* ── Contact */}
+      {/* ── Contact ── */}
       <section className="max-w-7xl mx-auto px-6 lg:px-10 py-20 grid lg:grid-cols-2 gap-12">
         <Reveal>
           <span className="text-xs uppercase tracking-[0.3em] text-gold">Contact</span>
@@ -113,8 +112,8 @@ function AboutContent() {
           <div className="mt-10 space-y-5">
             <div className="flex items-center gap-4">
               <Mail className="w-5 h-5 text-gold" />
-              <a href={`mailto:${SITE.email}`} className="hover:text-gold transition-colors">
-                {SITE.email}
+              <a href={`mailto:${email}`} className="hover:text-gold transition-colors">
+                {email}
               </a>
             </div>
             <div className="flex items-center gap-4">

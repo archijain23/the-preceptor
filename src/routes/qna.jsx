@@ -4,9 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus, Sparkles, MessageCircleQuestion, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Reveal from "@/components/site/Reveal";
+import { useSanity } from "@/lib/useSanity";
+import { useSiteSettings } from "@/lib/useSiteSettings";
+import { FAQ_QUERY } from "@/lib/sanityQueries";
 
-// ── Q&A Data ──────────────────────────────────────────────────────────────────
-const CATEGORIES = [
+// ── Static fallback data ──────────────────────────────────────────────────────
+const STATIC_CATEGORIES = [
   {
     id: "sessions",
     label: "Sessions",
@@ -97,10 +100,47 @@ const CATEGORIES = [
   },
 ];
 
+// Category display metadata
+const CATEGORY_META = [
+  { id: "sessions",  label: "Sessions" },
+  { id: "astrology", label: "Astrology" },
+  { id: "logistics", label: "Logistics" },
+  { id: "readings",  label: "Types of Readings" },
+];
+
+/**
+ * Group a flat array of Sanity FAQ docs into the CATEGORIES shape.
+ * Docs without a recognised category fall into 'sessions' by default.
+ */
+function groupByCategory(faqs) {
+  const map = {};
+  CATEGORY_META.forEach(({ id }) => { map[id] = []; });
+
+  faqs.forEach((faq) => {
+    const cat = faq.category ?? "sessions";
+    if (!map[cat]) map[cat] = [];
+    map[cat].push({ q: faq.question, a: faq.answer });
+  });
+
+  // Only return categories that have at least one question
+  return CATEGORY_META
+    .filter(({ id }) => map[id].length > 0)
+    .map(({ id, label }) => ({ id, label, questions: map[id] }));
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function QnAPage() {
-  const [activeCategory, setActiveCategory] = useState("sessions");
-  const [openIndex, setOpenIndex] = useState(null);
+  const { data: cmsFaqs } = useSanity(FAQ_QUERY, null);
+  const { settings }      = useSiteSettings();
+
+  // Build categories from CMS when available; fall back to static
+  const CATEGORIES =
+    cmsFaqs && cmsFaqs.length > 0
+      ? groupByCategory(cmsFaqs)
+      : STATIC_CATEGORIES;
+
+  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]?.id ?? "sessions");
+  const [openIndex, setOpenIndex]           = useState(null);
 
   const activeQuestions =
     CATEGORIES.find((c) => c.id === activeCategory)?.questions ?? [];
@@ -148,7 +188,7 @@ export default function QnAPage() {
               <Sparkles className="w-3.5 h-3.5" /> Questions &amp; Answers
             </motion.span>
             <h1 className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold">
-              Everything you want to know.
+              {settings?.faqSectionHeading ?? "Everything you want to know."}
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
               From how sessions work to the deeper philosophy behind the practice
@@ -156,7 +196,6 @@ export default function QnAPage() {
             </p>
           </Reveal>
 
-          {/* Floating icon */}
           <Reveal delay={0.15}>
             <div className="mt-12 inline-flex items-center justify-center w-20 h-20 rounded-full gold-border shadow-gold">
               <MessageCircleQuestion className="w-9 h-9 text-gold" />
@@ -262,7 +301,6 @@ export default function QnAPage() {
         <section className="max-w-3xl mx-auto px-6 lg:px-10 pb-28">
           <Reveal>
             <div className="glass-card rounded-3xl p-10 md:p-14 text-center border border-gold/20 shadow-elegant relative overflow-hidden">
-              {/* subtle glow */}
               <div
                 className="pointer-events-none absolute inset-0 opacity-10"
                 style={{
