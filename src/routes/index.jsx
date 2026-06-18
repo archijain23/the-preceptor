@@ -27,8 +27,8 @@ export default function Home() {
     <>
       <SEO {...PAGE_SEO.home} />
       <HeroSection />
-      <ServicesSection />
       <AboutSection />
+      <ServicesSection />
       <AchievementsSection />
       <TestimonialsSection />
       <QnASection />
