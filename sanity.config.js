@@ -11,7 +11,7 @@ export default defineConfig({
   name: 'the-preceptor',
   title: 'The Preceptor',
 
-  projectId: 'y9w7fo0ix',
+  projectId: '9w7fo0ix',
   dataset: 'production',
 
   plugins: [
