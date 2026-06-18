@@ -4,22 +4,43 @@ import { ArrowLeft, ArrowRight, Star, Quote } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Reveal } from "@/components/site/Reveal";
 import { TESTIMONIALS } from "@/utils/constants";
+import { useSanity } from "@/lib/useSanity";
+import { TESTIMONIALS_QUERY } from "@/lib/sanityQueries";
 
 const SLIDE_INTERVAL = 6000;
 
+// Normalise a Sanity testimonial doc → same shape as local constant
+function normalise(t) {
+  return {
+    name:    t.name,
+    country: t.location ?? t.country ?? "",
+    text:    t.review   ?? t.text    ?? "",
+    rating:  t.rating   ?? 5,
+  };
+}
+
 export function TestimonialsSection() {
+  const { data: cmsTestimonials } = useSanity(TESTIMONIALS_QUERY, null);
+  const testimonials = cmsTestimonials
+    ? cmsTestimonials.map(normalise)
+    : TESTIMONIALS;
+
   const [i, setI] = useState(0);
-  const t = TESTIMONIALS[i];
+
+  // Reset index if testimonials list changes (e.g. CMS loads after fallback)
+  useEffect(() => { setI(0); }, [testimonials.length]);
+
+  const t = testimonials[i] ?? testimonials[0];
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setI((c) => (c + 1) % TESTIMONIALS.length);
+      setI((c) => (c + 1) % testimonials.length);
     }, SLIDE_INTERVAL);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [testimonials.length]);
 
-  const goPrev = () => setI((c) => (c + TESTIMONIALS.length - 1) % TESTIMONIALS.length);
-  const goNext = () => setI((c) => (c + 1) % TESTIMONIALS.length);
+  const goPrev = () => setI((c) => (c + testimonials.length - 1) % testimonials.length);
+  const goNext = () => setI((c) => (c + 1) % testimonials.length);
 
   return (
     <section className="py-32 relative overflow-hidden">
@@ -60,7 +81,7 @@ export function TestimonialsSection() {
                       <ArrowLeft className="w-4 h-4" />
                     </button>
                     <div className="flex items-center gap-2">
-                      {TESTIMONIALS.map((_, idx) => (
+                      {testimonials.map((_, idx) => (
                         <button key={idx} onClick={() => setI(idx)} aria-label={`View review ${idx + 1}`}
                           className={`h-2 rounded-full transition-all ${idx === i ? "w-8 bg-gold" : "w-2 bg-muted"}`}
                         />
