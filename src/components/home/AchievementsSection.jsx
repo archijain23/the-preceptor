@@ -1,9 +1,21 @@
 import { motion } from "framer-motion";
 import { Award } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
-import { ACHIEVEMENTS } from "@/utils/constants";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 export function AchievementsSection() {
+  const { settings } = useSiteSettings();
+
+  const sectionLabel   = settings?.achievementsSectionLabel   ?? "Recognition";
+  const sectionHeading = settings?.achievementsSectionHeading ?? "A practice built on trust.";
+
+  const achievements = [
+    settings?.stat1 ?? { value: "12+",   label: "Years of Practice" },
+    settings?.stat2 ?? { value: "8,400", label: "Sessions Delivered" },
+    settings?.stat3 ?? { value: "47",    label: "Countries Served" },
+    settings?.stat4 ?? { value: "4.98",  label: "Average Rating" },
+  ];
+
   return (
     <section className="py-32 bg-cosmic-deep relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none section-glow-achievements" aria-hidden />
@@ -15,11 +27,11 @@ export function AchievementsSection() {
 
       <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
         <Reveal className="text-center max-w-2xl mx-auto">
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">Recognition</span>
-          <h2 className="mt-4 text-4xl md:text-5xl">A practice built on trust.</h2>
+          <span className="text-xs uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
+          <h2 className="mt-4 text-4xl md:text-5xl">{sectionHeading}</h2>
         </Reveal>
         <div className="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {ACHIEVEMENTS.map((a, i) => (
+          {achievements.map((a, i) => (
             <Reveal key={a.label} delay={i * 0.08}>
               <motion.div
                 whileHover={{ y: -4 }}

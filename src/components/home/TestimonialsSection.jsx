@@ -5,11 +5,11 @@ import { Link } from "react-router-dom";
 import { Reveal } from "@/components/site/Reveal";
 import { TESTIMONIALS } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 import { TESTIMONIALS_QUERY } from "@/lib/sanityQueries";
 
 const SLIDE_INTERVAL = 6000;
 
-// Normalise a Sanity testimonial doc → same shape as local constant
 function normalise(t) {
   return {
     name:    t.name,
@@ -21,15 +21,17 @@ function normalise(t) {
 
 export function TestimonialsSection() {
   const { data: cmsTestimonials } = useSanity(TESTIMONIALS_QUERY, null);
+  const { settings } = useSiteSettings();
+
+  const sectionLabel   = settings?.testimonialsSectionLabel   ?? "Testimonials";
+  const sectionHeading = settings?.testimonialsSectionHeading ?? "Voices from across the world.";
+
   const testimonials = cmsTestimonials
     ? cmsTestimonials.map(normalise)
     : TESTIMONIALS;
 
   const [i, setI] = useState(0);
-
-  // Reset index if testimonials list changes (e.g. CMS loads after fallback)
   useEffect(() => { setI(0); }, [testimonials.length]);
-
   const t = testimonials[i] ?? testimonials[0];
 
   useEffect(() => {
@@ -51,8 +53,8 @@ export function TestimonialsSection() {
 
       <div className="max-w-5xl mx-auto px-6 lg:px-10 text-center relative z-10">
         <Reveal>
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">Testimonials</span>
-          <h2 className="mt-4 text-4xl md:text-5xl">Voices from across the world.</h2>
+          <span className="text-xs uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
+          <h2 className="mt-4 text-4xl md:text-5xl">{sectionHeading}</h2>
         </Reveal>
 
         <Reveal delay={0.1}>

@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { ArrowRight, Star, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImg from "@/assets/hero-section.jpg";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 // ── Ambient drifting gold particle ──────────────────────────────────────────
 function Particle({ x, y, size, delay, duration, drift }) {
@@ -93,6 +94,19 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
 }
 
 export function HeroSection() {
+  const { settings } = useSiteSettings();
+
+  // CMS values with hardcoded fallbacks
+  const badgeText    = settings?.heroBadgeText    ?? "Premium Astrology";
+  const heading1     = settings?.heroHeading1     ?? "Modern guidance,";
+  const heading2Gold = settings?.heroHeading2Gold ?? "written in the stars.";
+  const bodyCopy     = settings?.heroBodyCopy     ?? "Cinematic, deeply personal astrology consultations for high-intention seekers — designed for clarity in love, career, and life's defining chapters.";
+  const cta1Label    = settings?.heroCta1Label    ?? "Book a Session";
+  const cta2Label    = settings?.heroCta2Label    ?? "Explore Services";
+  const clientCount  = settings?.stat2?.value     ?? "8,400+";
+  const clientLabel  = settings?.stat2?.label     ?? "clients";
+  const countryCount = settings?.stat3?.value     ?? "47";
+
   const particles = useMemo(
     () => Array.from({ length: 18 }, (_, idx) => ({
       id: idx,
@@ -219,10 +233,10 @@ export function HeroSection() {
             >
               <Sparkles className="w-3 h-3" />
             </motion.span>
-            Premium Astrology
+            {badgeText}
           </motion.span>
 
-          <StaggeredHeading line1="Modern guidance," line2Gold="written in the stars." delay={0.45} />
+          <StaggeredHeading line1={heading1} line2Gold={heading2Gold} delay={0.45} />
 
           {/* Body copy */}
           <motion.p
@@ -232,8 +246,7 @@ export function HeroSection() {
             className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl max-w-xl leading-relaxed"
             style={{ color: "oklch(0.7 0.02 80)" }}
           >
-            Cinematic, deeply personal astrology consultations for high-intention seekers — designed
-            for clarity in love, career, and life’s defining chapters.
+            {bodyCopy}
           </motion.p>
 
           {/* CTAs */}
@@ -249,7 +262,7 @@ export function HeroSection() {
               className="rounded-full"
             >
               <Link to="/book" className="btn-primary group">
-                Book a Session
+                {cta1Label}
                 <motion.span
                   animate={{ x: [0, 3, 0] }}
                   transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut", delay: 3 }}
@@ -258,7 +271,7 @@ export function HeroSection() {
                 </motion.span>
               </Link>
             </motion.div>
-            <a href="#services" className="btn-secondary">Explore Services</a>
+            <a href="#services" className="btn-secondary">{cta2Label}</a>
           </motion.div>
 
           {/* Social proof */}
@@ -281,7 +294,7 @@ export function HeroSection() {
                 </motion.span>
               ))}
             </div>
-            <span>Trusted by 8,400+ clients across 47 countries</span>
+            <span>Trusted by {clientCount} {clientLabel} across {countryCount} countries</span>
           </motion.div>
 
         </div>

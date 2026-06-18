@@ -8,6 +8,7 @@ import { Reveal } from "@/components/site/Reveal";
 import { OfferTimer } from "@/components/site/OfferTimer";
 import { HOME_SERVICES } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 import { SERVICES_QUERY } from "@/lib/sanityQueries";
 
 const ICON_MAP = {
@@ -22,7 +23,6 @@ const ICON_MAP = {
   Moon, Sparkles,
 };
 
-// Normalise a Sanity service doc → same shape as the local constant
 function normalise(s) {
   return {
     slug:          s.slug?.current ?? s.slug ?? s._id,
@@ -40,8 +40,12 @@ function normalise(s) {
 
 export function ServicesSection() {
   const { data: allServices, loading } = useSanity(SERVICES_QUERY, null);
+  const { settings } = useSiteSettings();
 
-  // Use first 4 from Sanity if available, else fall back to hardcoded HOME_SERVICES
+  const sectionLabel    = settings?.servicesSectionLabel    ?? "Services";
+  const sectionHeading  = settings?.servicesSectionHeading  ?? "Consultations crafted with intention.";
+  const sectionSubtitle = settings?.servicesSectionSubtitle ?? null;
+
   const services = allServices
     ? allServices.slice(0, 4).map(normalise)
     : HOME_SERVICES;
@@ -56,28 +60,24 @@ export function ServicesSection() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
-        {/* Section header */}
         <Reveal className="text-center max-w-2xl mx-auto">
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">Services</span>
-          <h2 className="mt-4 text-4xl md:text-5xl">Consultations crafted with intention.</h2>
-          <p className="mt-5 text-muted-foreground">
-            Each offering is a focused, cinematic session — designed around what you actually need to know.
-          </p>
+          <span className="text-xs uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
+          <h2 className="mt-4 text-4xl md:text-5xl">{sectionHeading}</h2>
+          {sectionSubtitle && (
+            <p className="mt-5 text-muted-foreground">{sectionSubtitle}</p>
+          )}
         </Reveal>
 
-        {/* Countdown timer */}
         <Reveal className="mt-10">
           <OfferTimer />
         </Reveal>
 
-        {/* Loading skeleton */}
         {loading && (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="w-6 h-6 text-gold animate-spin" />
           </div>
         )}
 
-        {/* 4-card grid */}
         {!loading && (
           <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
             {services.map((s, i) => {
@@ -91,30 +91,21 @@ export function ServicesSection() {
                   >
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.07),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="relative z-10 flex flex-col h-full gap-3">
-                      {/* Icon */}
                       <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center group-hover:bg-primary/20 transition">
                         <Icon className="w-5 h-5" />
                       </div>
-
-                      {/* Badge */}
                       {s.badge && (
                         <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold">
                           {s.badge}
                         </span>
                       )}
-
-                      {/* Sold-out overlay */}
                       {s.isSoldOut && (
                         <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">
                           Sold Out
                         </span>
                       )}
-
-                      {/* Title + desc */}
                       <h3 className="text-xl leading-snug">{s.title}</h3>
                       <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 flex-1">{s.desc}</p>
-
-                      {/* Duration + price */}
                       <div className="mt-2 flex items-center justify-between border-t border-gold/10 pt-3">
                         <span className="flex items-center gap-1 text-xs text-gold">
                           <Clock className="w-3 h-3" />
@@ -122,9 +113,7 @@ export function ServicesSection() {
                         </span>
                         <div className="flex items-baseline gap-2">
                           {s.originalPrice && (
-                            <span className="text-xs text-muted-foreground line-through">
-                              {s.originalPrice}
-                            </span>
+                            <span className="text-xs text-muted-foreground line-through">{s.originalPrice}</span>
                           )}
                           <span className="font-semibold text-gold text-lg">{s.price}</span>
                         </div>
@@ -137,7 +126,6 @@ export function ServicesSection() {
           </div>
         )}
 
-        {/* View More CTA */}
         <Reveal className="mt-12 text-center">
           <Link
             to="/services"

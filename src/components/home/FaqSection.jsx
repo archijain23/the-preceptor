@@ -4,28 +4,29 @@ import { ChevronDown } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { FAQS } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 import { FAQ_QUERY } from "@/lib/sanityQueries";
 
-// Normalise a Sanity FAQ doc → same shape as local constant
 function normalise(f) {
-  return {
-    q: f.question ?? f.q,
-    a: f.answer   ?? f.a,
-  };
+  return { q: f.question ?? f.q, a: f.answer ?? f.a };
 }
 
 export function FaqSection() {
   const { data: cmsFaqs } = useSanity(FAQ_QUERY, null);
-  const faqs = cmsFaqs ? cmsFaqs.map(normalise) : FAQS;
+  const { settings } = useSiteSettings();
 
+  const sectionLabel   = settings?.faqSectionLabel   ?? "FAQ";
+  const sectionHeading = settings?.faqSectionHeading ?? "Common questions.";
+
+  const faqs = cmsFaqs ? cmsFaqs.map(normalise) : FAQS;
   const [open, setOpen] = useState(null);
 
   return (
     <section className="py-24 lg:py-32 relative">
       <div className="max-w-3xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center">
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">FAQ</span>
-          <h2 className="mt-4 text-4xl md:text-5xl">Common questions.</h2>
+          <span className="text-xs uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
+          <h2 className="mt-4 text-4xl md:text-5xl">{sectionHeading}</h2>
         </Reveal>
 
         <div className="mt-12 space-y-3">
