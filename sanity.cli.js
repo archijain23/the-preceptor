@@ -5,7 +5,7 @@
  */
 module.exports = {
   api: {
-    projectId: 'y9w7fo0ix',
+    projectId: '9w7fo0ix',
     dataset: 'production',
   },
   studioHost: 'thepreceptor',
