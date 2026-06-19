@@ -19,10 +19,8 @@ export const SITE = {
   domain:      "https://thepreceptorglobal.com",
   email:       "thepreceptor1111@gmail.com",
 
-  /** Absolute URL of the 1200×630 OG social card image.
-   *  Replace with a real hosted image once designed.
-   *  Until then this falls back gracefully (no broken tag). */
-  ogImage: "https://thepreceptorglobal.com/og-image.jpg",
+  /** Absolute URL of the 1200×630 OG social card image. */
+  ogImage: "https://thepreceptorglobal.com/og-image.webp",
 
   social: {
     instagram: "https://www.instagram.com/thepreceptor1111",
@@ -46,51 +44,51 @@ export const SITE = {
 export const PAGE_SEO = {
   home: {
     title:       "The Preceptor — Vedic Astrology Readings & Spiritual Consultations Online",
-    description: "Book a private Vedic astrology consultation online. Birth chart readings, career guidance, relationship insights & spiritual clarity — trusted by 2,500+ clients across 18+ countries.",
+    description: "Book a private Vedic astrology consultation online with The Preceptor — 7 years of experience, Psychology honors graduate. Birth chart readings, career & relationship clarity for seekers across the USA.",
     canonical:   `${SITE.domain}/`,
-    keywords:    "vedic astrology reading online USA, birth chart reading, astrology consultation online, personalized astrology guidance, the preceptor, the preceptor global, astrologer in USA",
+    keywords:    "vedic astrology reading online USA, birth chart reading, astrology consultation online, personalized astrology guidance, the preceptor, the preceptor global, best vedic astrologer USA, astrologer in California",
   },
 
   about: {
-    title:       "About — The Preceptor | Premium Astrology & Spiritual Guidance",
-    description: "Meet The Preceptor — a modern astrologer blending classical Vedic and Western traditions to deliver cinematic, deeply personal readings for high-intention seekers worldwide.",
+    title:       "About — The Preceptor | Vedic Astrology & Spiritual Guidance",
+    description: "Meet The Preceptor — a Psychology honors graduate with 7 years of dedicated Vedic and Western astrology practice. Blending astrological knowledge with psychological insight for deeply accurate readings.",
     canonical:   `${SITE.domain}/about`,
-    keywords:    "the preceptor global, vedic astrologer online, spiritual guidance astrology, professional astrologer, best vedic astrologer USA",
+    keywords:    "the preceptor global, vedic astrologer online, spiritual guidance astrology, professional astrologer, best vedic astrologer USA, astrologer 7 years experience",
   },
 
   book: {
     title:       "Book a Session — The Preceptor | Astrology Consultation Online",
-    description: "Reserve your private astrology session with The Preceptor. Vedic birth chart readings, relationship synastry, career guidance & spiritual consultations. Available worldwide.",
+    description: "Reserve your private astrology session with The Preceptor. Vedic birth chart readings, relationship synastry, career guidance & spiritual consultations — available across all US timezones.",
     canonical:   `${SITE.domain}/book`,
-    keywords:    "book astrology consultation online, paid astrology reading USA, professional astrologer near me online, astrology session booking, vedic astrology reading online",
+    keywords:    "book astrology consultation online, paid astrology reading USA, professional astrologer near me online, astrology session booking, vedic astrology reading online USA",
   },
 
   services: {
     title:       "Services — The Preceptor | Birth Chart, Synastry & Spiritual Readings",
-    description: "Explore all astrology services: Vedic birth chart readings, relationship synastry, career guidance, tarot readings, Kundli analysis & spiritual consultations — all online.",
+    description: "Explore all astrology services: Vedic birth chart (Kundli), relationship synastry, marriage guidance, career astrology, Sade Sati, Mahadasha, tarot readings & spiritual consultations — all online.",
     canonical:   `${SITE.domain}/services`,
-    keywords:    "birth chart reading astrologer, synastry astrology, kundli analysis online, tarot reading online, spiritual consultation astrology, deep astrology reading session",
+    keywords:    "birth chart reading astrologer, synastry astrology USA, kundli analysis online, tarot reading online, marriage astrology consultation, career astrology reading, deep astrology reading session, sade sati consultation",
   },
 
   testimonials: {
     title:       "Client Reviews — The Preceptor | Trusted Astrology Consultations",
-    description: "Read what 2,500+ clients across 18+ countries say about their astrology sessions with The Preceptor. Accurate, cinematic, and life-changing readings.",
+    description: "Read what clients across the USA and 18+ countries say about their astrology sessions with The Preceptor. Accurate, insightful, and deeply personal readings.",
     canonical:   `${SITE.domain}/testimonials`,
-    keywords:    "the preceptor reviews, astrology consultation reviews, best vedic astrologer reviews, accurate astrology reading online",
+    keywords:    "the preceptor reviews, astrology consultation reviews, best vedic astrologer reviews USA, accurate astrology reading online",
   },
 
   contact: {
     title:       "Contact — The Preceptor | Get in Touch",
-    description: "Reach out to The Preceptor for questions, collaborations, or to learn more about available astrology consultations and spiritual guidance sessions.",
+    description: "Reach out to The Preceptor for questions, collaborations, or to learn more about available astrology consultations and spiritual guidance sessions. Response within 24 hours.",
     canonical:   `${SITE.domain}/contact`,
-    keywords:    "contact the preceptor, astrology consultation enquiry, book astrologer online",
+    keywords:    "contact the preceptor, astrology consultation enquiry, book astrologer online USA",
   },
 
   qna: {
     title:       "Q&A — The Preceptor | Astrology Questions Answered",
-    description: "Frequently asked questions about Vedic astrology, birth chart readings, session formats, and what to expect from a consultation with The Preceptor.",
+    description: "Frequently asked questions about Vedic astrology, birth chart readings, relationship synastry, session formats, and what to expect from a consultation with The Preceptor.",
     canonical:   `${SITE.domain}/qna`,
-    keywords:    "astrology faq, vedic astrology questions, birth chart reading faq, astrology consultation questions",
+    keywords:    "astrology faq, vedic astrology questions USA, birth chart reading faq, astrology consultation questions, what to expect astrology reading",
   },
 
   shop: {

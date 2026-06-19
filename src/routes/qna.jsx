@@ -1,4 +1,5 @@
-import { Helmet } from "react-helmet-async";
+import SEO from "@/components/site/SEO";
+import { PAGE_SEO } from "@/content/seo";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus, Sparkles, MessageCircleQuestion, ArrowRight } from "lucide-react";
@@ -154,18 +155,7 @@ export default function QnAPage() {
 
   return (
     <>
-      <Helmet>
-        <title>Q&A — The Preceptor</title>
-        <meta
-          name="description"
-          content="Answers to common questions about astrology consultations, booking, readings, and The Preceptor's approach."
-        />
-        <meta property="og:title" content="Q&A — The Preceptor" />
-        <meta
-          property="og:description"
-          content="Everything you need to know about sessions, astrology, logistics, and readings."
-        />
-      </Helmet>
+      <SEO {...PAGE_SEO.qna} />
 
       <div className="bg-hero starfield min-h-screen relative overflow-hidden">
         {/* Ambient glow */}

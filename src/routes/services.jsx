@@ -1,4 +1,5 @@
-import { Helmet } from "react-helmet-async";
+import SEO from "@/components/site/SEO";
+import { PAGE_SEO } from "@/content/seo";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -63,12 +64,7 @@ export default function ServicesPage() {
 
   return (
     <>
-      <Helmet>
-        <title>Astrology Services — The Preceptor</title>
-        <meta name="description" content="Explore birth chart readings, relationship consultations, marriage consultation, career astrology, Mahadasha guidance, Sade Sati, and more. Premium 60-minute sessions for discerning seekers." />
-        <meta property="og:title" content="Astrology Services — The Preceptor" />
-        <meta property="og:description" content="Premium astrology consultation services — individually crafted for clarity in love, career, and life's defining chapters." />
-      </Helmet>
+      <SEO {...PAGE_SEO.services} />
 
       <main className="min-h-screen">
         {/* Hero */}
