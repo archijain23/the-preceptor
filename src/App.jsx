@@ -7,19 +7,11 @@ import Nav from "./components/site/Nav";
 import Footer from "./components/site/Footer";
 import TorchCursor from "./components/site/TorchCursor";
 import ScrollToTop from "./components/site/ScrollToTop";
+import AdminPortal from "./components/site/AdminPortal";
 import { SITE } from "./content/seo";
 
-/**
- * Route-level code splitting via React.lazy().
- *
- * Home is imported eagerly — it is the entry page and must never
- * show a loading flash on first visit.
- *
- * All other routes are lazy — their JS chunks are downloaded only
- * when the user first navigates to that route, keeping the initial
- * bundle as small as possible.
- */
-import Home from "./routes/index"; // eager — entry page
+// Home is imported eagerly — entry page, must never flash on first visit
+import Home from "./routes/index";
 
 const About        = lazy(() => import("./routes/about"));
 const Book         = lazy(() => import("./routes/book"));
@@ -33,10 +25,6 @@ const Terms        = lazy(() => import("./routes/terms"));
 const NotFound     = lazy(() => import("./routes/not-found"));
 const Admin        = lazy(() => import("./routes/admin"));
 
-/**
- * Minimal loading fallback shown by Suspense while a route chunk loads.
- * Matches the site's dark cosmic aesthetic — no jarring flash of white.
- */
 function CosmicLoader() {
   return (
     <div
@@ -73,9 +61,6 @@ function CosmicLoader() {
   );
 }
 
-/**
- * Global JSON-LD Organisation schema — injected once at the app root.
- */
 const orgSchema = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
@@ -106,8 +91,8 @@ const orgSchema = {
 };
 
 export default function App() {
-  const location  = useLocation();
-  const isAdmin   = location.pathname.startsWith("/command-center");
+  const location = useLocation();
+  const isAdmin  = location.pathname.startsWith("/command-center");
 
   return (
     <ErrorBoundary>
@@ -124,7 +109,9 @@ export default function App() {
         <TorchCursor />
         <ScrollToTop />
 
-        {/* Nav and Footer are hidden on the admin route */}
+        {/* Secret keyboard shortcut portal — Shift+Shift+P — invisible until triggered */}
+        {!isAdmin && <AdminPortal />}
+
         {!isAdmin && <Nav />}
 
         <main className={isAdmin ? "flex-1" : "flex-1 pt-20"}>
