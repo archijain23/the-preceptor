@@ -135,13 +135,14 @@
     --transition-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* ── Smooth scroll with fixed-nav offset ──────────────────────────────
-     scroll-behavior: smooth  → anchor links (#section) glide, not jump.
+  /* ── Anchor offset for fixed nav ──────────────────────────────────────
      scroll-padding-top: 5rem → offsets the 80px (h-20) fixed header so
      targeted sections are never hidden behind the nav bar.
+     NOTE: scroll-behavior: smooth has been removed — Lenis handles all
+     smooth scrolling via JS (src/hooks/useLenis.js) for full control over
+     speed (lerp), easing, and wheel sensitivity.
   ──────────────────────────────────────────────────────────────────── */
   html {
-    scroll-behavior: smooth;
     scroll-padding-top: 5rem; /* matches the h-20 (80px) fixed nav height */
   }
 
@@ -608,15 +609,6 @@
 
 /* ════════════════════════════════════════════════════════════════
    COSMIC SCROLLBAR
-   — Thin, dark-themed, gold-accented.
-   — 6px width: slim and modern, not the old chunky 10px.
-   — Track: fully transparent — matches the dark cosmic bg.
-   — Thumb: rich gold at 55% opacity — clearly visible but not
-     aggressive. Hover brightens to 80% for clear feedback.
-   — Firefox: scrollbar-color uses the same gold token.
-   — border trick (background-clip: padding-box + transparent
-     border): creates a visual gap between thumb and track edge,
-     making it look even lighter and more refined on dark BGs.
 ════════════════════════════════════════════════════════════════ */
 html {
   scrollbar-color: oklch(0.82 0.12 85 / 0.55) transparent;
@@ -633,7 +625,6 @@ html {
 ::-webkit-scrollbar-thumb {
   background: oklch(0.82 0.12 85 / 0.55);
   border-radius: 999px;
-  /* 1px transparent border gives a subtle floating effect */
   border: 1px solid transparent;
   background-clip: padding-box;
   transition: background 0.2s ease;

@@ -9,6 +9,7 @@ import TorchCursor from "./components/site/TorchCursor";
 import ScrollToTop from "./components/site/ScrollToTop";
 import AdminPortal from "./components/site/AdminPortal";
 import { SITE } from "./content/seo";
+import { useLenis } from "./hooks/useLenis";
 
 // Home is imported eagerly — entry page, must never flash on first visit
 import Home from "./routes/index";
@@ -93,6 +94,9 @@ const orgSchema = {
 export default function App() {
   const location = useLocation();
   const isAdmin  = location.pathname.startsWith("/command-center");
+
+  // Initialise Lenis smooth scroll — replaces CSS scroll-behavior: smooth
+  useLenis();
 
   return (
     <ErrorBoundary>
