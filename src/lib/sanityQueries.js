@@ -1,12 +1,11 @@
-import { groq } from '@sanity/client';
+// groq is a standalone tagged-template helper — NOT exported from @sanity/client
+import groq from 'groq';
 
 export const TESTIMONIALS_QUERY = groq`
   *[_type == "testimonial"] | order(coalesce(order, 9999) asc, _createdAt asc) {
     _id,
     name,
-    // prefer canonical field, fall back to legacy alias
     "location": coalesce(location, country),
-    // prefer canonical field, fall back to legacy alias
     "review":   coalesce(review, text),
     rating,
     service,
