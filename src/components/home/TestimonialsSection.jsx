@@ -23,6 +23,11 @@ function normalise(t) {
   };
 }
 
+// Fixed card height shared between image and text cards
+const CARD_HEIGHT = 520;
+// Height reserved at the bottom for the name/controls strip
+const STRIP_H = 72;
+
 export function TestimonialsSection() {
   const { data: cmsTestimonials } = useSanity(TESTIMONIALS_QUERY, null);
   const { settings } = useSiteSettings();
@@ -45,9 +50,9 @@ export function TestimonialsSection() {
   const hasImage = Boolean(t?.screenshotUrl);
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setIdx((c) => (c + 1) % testimonials.length);
-    }, SLIDE_INTERVAL);
+    const timer = window.setInterval(() =>
+      setIdx((c) => (c + 1) % testimonials.length)
+    , SLIDE_INTERVAL);
     return () => window.clearInterval(timer);
   }, [testimonials.length]);
 
@@ -61,14 +66,13 @@ export function TestimonialsSection() {
     </button>
   );
 
-  const dots = (
+  const Dots = () => (
     <div className="flex items-center gap-1.5">
       {testimonials.map((_, i) => (
         <button key={i} onClick={() => setIdx(i)} aria-label={`Review ${i + 1}`}
           className={`rounded-full transition-all ${
             i === idx ? "w-6 h-2 bg-gold" : "w-2 h-2 bg-white/30"
-          }`}
-        />
+          }`} />
       ))}
     </div>
   );
@@ -88,112 +92,122 @@ export function TestimonialsSection() {
 
         <Reveal delay={0.1}>
           <AnimatePresence mode="wait">
-            <motion.div key={idx}
+            <motion.div
+              key={idx}
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.97 }}
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="mt-14 glass-card rounded-3xl overflow-hidden relative"
+              style={{ height: `${CARD_HEIGHT}px` }}
             >
               {hasImage ? (
-                /* ─────────────────────────────────────────────────
-                   SCREENSHOT CARD
-                   Full-width image, tall aspect ratio, gradient
-                   overlay at bottom with name + controls
-                ───────────────────────────────────────────────── */
-                <div className="relative w-full">
-                  {/* Image fills the card width, scrollable tall screenshot */}
-                  <div
-                    className="w-full overflow-hidden"
-                    style={{ maxHeight: "520px", position: "relative" }}
-                  >
-                    <img
-                      src={t.screenshotUrl}
-                      alt={t.screenshotAlt}
-                      loading="lazy"
-                      style={{
-                        width: "100%",
-                        height: "520px",
-                        objectFit: "cover",
-                        objectPosition: "top",
-                        display: "block",
-                      }}
-                    />
-                    {/* Gradient fade at bottom so text is always readable */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        background:
-                          "linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.85) 100%)",
-                        pointerEvents: "none",
-                      }}
-                    />
+                /* ─── SCREENSHOT CARD ───────────────────────────
+                   The outer div is the fixed-height card.
+                   Image area = card height minus strip.
+                   Image is width:100% height:auto so it shows
+                   fully at its natural aspect; overflow scrolls
+                   inside the clipped image zone.
+                ─────────────────────────────────────────────── */
+                <div style={{ position: "relative", width: "100%", height: "100%" }}>
+
+                  {/* Scrollable image area — full content visible on scroll */}
+                  <div style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: `${STRIP_H}px`,
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                    /* hide scrollbar visually but keep it functional */
+                    scrollbarWidth: "none",
+                  }}>
+                    <style>{`.ss-img-scroll::-webkit-scrollbar{display:none}`}</style>
+                    <div className="ss-img-scroll" style={{ width: "100%", height: "100%", overflowY: "auto", scrollbarWidth: "none" }}>
+                      <img
+                        src={t.screenshotUrl}
+                        alt={t.screenshotAlt}
+                        loading="lazy"
+                        style={{
+                          width: "100%",
+                          height: "auto",     /* natural aspect — no cropping */
+                          display: "block",
+                          minHeight: "100%",
+                        }}
+                      />
+                    </div>
                   </div>
 
-                  {/* Name + controls overlaid on gradient */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      padding: "1.5rem 2rem",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: "1rem",
-                    }}
-                  >
+                  {/* Subtle top-to-transparent fade so image blends into card */}
+                  <div style={{
+                    position: "absolute",
+                    top: 0, left: 0, right: 0,
+                    height: "60px",
+                    background: "linear-gradient(to bottom, rgba(0,0,0,0.35), transparent)",
+                    pointerEvents: "none",
+                    zIndex: 1,
+                  }} />
+
+                  {/* Strong bottom gradient behind the strip */}
+                  <div style={{
+                    position: "absolute",
+                    left: 0, right: 0,
+                    bottom: 0,
+                    height: `${STRIP_H + 60}px`,
+                    background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.92) 55%)",
+                    pointerEvents: "none",
+                    zIndex: 1,
+                  }} />
+
+                  {/* Name + controls strip */}
+                  <div style={{
+                    position: "absolute",
+                    bottom: 0, left: 0, right: 0,
+                    height: `${STRIP_H}px`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "0 1.75rem",
+                    gap: "1rem",
+                    zIndex: 2,
+                  }}>
                     {/* Avatar + name */}
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                      <div
-                        style={{
-                          width: "2.5rem",
-                          height: "2.5rem",
-                          borderRadius: "9999px",
-                          background: "rgba(212,175,55,0.25)",
-                          border: "1px solid rgba(212,175,55,0.5)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "#d4af37",
-                          fontSize: "0.875rem",
-                          fontWeight: 600,
-                          flexShrink: 0,
-                        }}
-                      >
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
+                      <div style={{
+                        width: "2.25rem", height: "2.25rem",
+                        borderRadius: "9999px",
+                        background: "rgba(212,175,55,0.22)",
+                        border: "1px solid rgba(212,175,55,0.45)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        color: "#d4af37", fontSize: "0.8rem", fontWeight: 600, flexShrink: 0,
+                      }}>
                         {t.avatarInitial || t.name.charAt(0).toUpperCase()}
                       </div>
                       <div style={{ textAlign: "left" }}>
-                        <p style={{ color: "#d4af37", fontFamily: "serif", fontWeight: 500, fontSize: "1rem", lineHeight: 1.2 }}>
+                        <p style={{ color: "#d4af37", fontFamily: "serif", fontWeight: 500, fontSize: "0.95rem", lineHeight: 1.2 }}>
                           {t.name}
                         </p>
                         {t.country && (
-                          <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.75rem", marginTop: "0.1rem" }}>
+                          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.7rem", marginTop: "0.1rem" }}>
                             {t.country}
                           </p>
                         )}
                       </div>
                     </div>
 
-                    {/* Controls */}
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                      <NavBtn onClick={goPrev} label="Previous">
-                        <ArrowLeft className="w-4 h-4" />
-                      </NavBtn>
-                      {dots}
-                      <NavBtn onClick={goNext} label="Next">
-                        <ArrowRight className="w-4 h-4" />
-                      </NavBtn>
+                    {/* Nav controls */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                      <NavBtn onClick={goPrev} label="Previous"><ArrowLeft className="w-4 h-4" /></NavBtn>
+                      <Dots />
+                      <NavBtn onClick={goNext} label="Next"><ArrowRight className="w-4 h-4" /></NavBtn>
                     </div>
                   </div>
                 </div>
+
               ) : (
-                /* ─────────────────────────────────────────────────
-                   TEXT QUOTE CARD (unchanged)
-                ───────────────────────────────────────────────── */
-                <div className="p-12 relative z-10">
+                /* ─── TEXT QUOTE CARD ── unchanged look ─────── */
+                <div className="p-12 relative z-10 h-full flex flex-col justify-center">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.07),transparent_40%)] pointer-events-none" />
                   <Quote className="w-10 h-10 text-gold/30 mx-auto" />
                   <p className="mt-6 font-serif text-2xl md:text-3xl leading-relaxed">
@@ -210,13 +224,9 @@ export function TestimonialsSection() {
                       <p className="text-xs text-muted-foreground">{t?.country}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <NavBtn onClick={goPrev} label="Previous">
-                        <ArrowLeft className="w-4 h-4" />
-                      </NavBtn>
-                      {dots}
-                      <NavBtn onClick={goNext} label="Next">
-                        <ArrowRight className="w-4 h-4" />
-                      </NavBtn>
+                      <NavBtn onClick={goPrev} label="Previous"><ArrowLeft className="w-4 h-4" /></NavBtn>
+                      <Dots />
+                      <NavBtn onClick={goNext} label="Next"><ArrowRight className="w-4 h-4" /></NavBtn>
                     </div>
                   </div>
                 </div>
