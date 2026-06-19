@@ -20,7 +20,15 @@ export default defineConfig({
         S.list()
           .title('Content')
           .items([
-            S.singleton('siteSettings', 'Site Settings', siteSettingsSchema.name),
+            S.listItem()
+              .title('Site Settings')
+              .id('siteSettings')
+              .child(
+                S.document()
+                  .schemaType('siteSettings')
+                  .documentId('siteSettings')
+                  .title('Site Settings')
+              ),
             S.divider(),
             S.documentTypeListItem('service').title('Services'),
             S.documentTypeListItem('testimonial').title('Testimonials'),
