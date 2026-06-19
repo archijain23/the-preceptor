@@ -7,6 +7,7 @@ import { TESTIMONIALS } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { TESTIMONIALS_QUERY } from "@/lib/sanityQueries";
+import { sanityImage, preloadImage } from "@/lib/sanityImage";
 
 const SLIDE_INTERVAL = 6000;
 
@@ -18,19 +19,20 @@ function normalise(t) {
     rating:        t.rating   ?? 5,
     avatarInitial: t.avatarInitial ?? "",
     featured:      t.featured ?? false,
-    screenshotUrl: t.screenshotImage?.asset?.url ?? null,
+    // Apply CDN transforms: 900px wide, 80% quality, auto WebP/AVIF
+    screenshotUrl: t.screenshotImage?.asset?.url
+      ? sanityImage(t.screenshotImage.asset.url, { w: 900, q: 80 })
+      : null,
     screenshotAlt: t.screenshotImage?.alt ?? "Client testimonial screenshot",
   };
 }
 
-// Fixed card height shared between image and text cards
 const CARD_HEIGHT = 520;
-// Height reserved at the bottom for the name/controls strip
-const STRIP_H = 72;
+const STRIP_H    = 72;
 
 export function TestimonialsSection() {
   const { data: cmsTestimonials } = useSanity(TESTIMONIALS_QUERY, null);
-  const { settings } = useSiteSettings();
+  const { settings }              = useSiteSettings();
 
   const sectionLabel   = settings?.testimonialsSectionLabel   ?? "Testimonials";
   const sectionHeading = settings?.testimonialsSectionHeading ?? "Voices from across the world.";
@@ -47,12 +49,22 @@ export function TestimonialsSection() {
   useEffect(() => { setIdx(0); }, [testimonials.length]);
 
   const t = testimonials[idx] ?? testimonials[0];
-  const hasImage = Boolean(t?.screenshotUrl);
 
+  // ── Preload adjacent images so carousel advances without a flash ──
   useEffect(() => {
-    const timer = window.setInterval(() =>
-      setIdx((c) => (c + 1) % testimonials.length)
-    , SLIDE_INTERVAL);
+    if (testimonials.length < 2) return;
+    const nextIdx = (idx + 1) % testimonials.length;
+    const prevIdx = (idx + testimonials.length - 1) % testimonials.length;
+    preloadImage(testimonials[nextIdx]?.screenshotUrl);
+    preloadImage(testimonials[prevIdx]?.screenshotUrl);
+  }, [idx, testimonials]);
+
+  // ── Auto-advance ──
+  useEffect(() => {
+    const timer = window.setInterval(
+      () => setIdx((c) => (c + 1) % testimonials.length),
+      SLIDE_INTERVAL
+    );
     return () => window.clearInterval(timer);
   }, [testimonials.length]);
 
@@ -77,6 +89,8 @@ export function TestimonialsSection() {
     </div>
   );
 
+  const hasImage = Boolean(t?.screenshotUrl);
+
   return (
     <section className="py-32 relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none section-glow-testimonials" aria-hidden />
@@ -97,86 +111,60 @@ export function TestimonialsSection() {
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.97 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               className="mt-14 glass-card rounded-3xl overflow-hidden relative"
               style={{ height: `${CARD_HEIGHT}px` }}
             >
               {hasImage ? (
-                /* ─── SCREENSHOT CARD ───────────────────────────
-                   The outer div is the fixed-height card.
-                   Image area = card height minus strip.
-                   Image is width:100% height:auto so it shows
-                   fully at its natural aspect; overflow scrolls
-                   inside the clipped image zone.
-                ─────────────────────────────────────────────── */
                 <div style={{ position: "relative", width: "100%", height: "100%" }}>
 
-                  {/* Scrollable image area — full content visible on scroll */}
+                  {/* Scrollable image zone */}
                   <div style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
+                    position: "absolute", top: 0, left: 0, right: 0,
                     bottom: `${STRIP_H}px`,
-                    overflowY: "auto",
-                    overflowX: "hidden",
-                    /* hide scrollbar visually but keep it functional */
+                    overflowY: "auto", overflowX: "hidden",
                     scrollbarWidth: "none",
                   }}>
                     <style>{`.ss-img-scroll::-webkit-scrollbar{display:none}`}</style>
-                    <div className="ss-img-scroll" style={{ width: "100%", height: "100%", overflowY: "auto", scrollbarWidth: "none" }}>
+                    <div className="ss-img-scroll" style={{ overflowY: "auto", scrollbarWidth: "none" }}>
                       <img
                         src={t.screenshotUrl}
                         alt={t.screenshotAlt}
-                        loading="lazy"
-                        style={{
-                          width: "100%",
-                          height: "auto",     /* natural aspect — no cropping */
-                          display: "block",
-                          minHeight: "100%",
-                        }}
+                        // Active slide: eager + high priority — do NOT lazy-load what's visible
+                        loading="eager"
+                        fetchpriority="high"
+                        decoding="async"
+                        style={{ width: "100%", height: "auto", display: "block", minHeight: "100%" }}
                       />
                     </div>
                   </div>
 
-                  {/* Subtle top-to-transparent fade so image blends into card */}
+                  {/* Top fade */}
                   <div style={{
-                    position: "absolute",
-                    top: 0, left: 0, right: 0,
-                    height: "60px",
+                    position: "absolute", top: 0, left: 0, right: 0, height: "60px",
                     background: "linear-gradient(to bottom, rgba(0,0,0,0.35), transparent)",
-                    pointerEvents: "none",
-                    zIndex: 1,
+                    pointerEvents: "none", zIndex: 1,
                   }} />
 
-                  {/* Strong bottom gradient behind the strip */}
+                  {/* Bottom gradient */}
                   <div style={{
-                    position: "absolute",
-                    left: 0, right: 0,
-                    bottom: 0,
+                    position: "absolute", left: 0, right: 0, bottom: 0,
                     height: `${STRIP_H + 60}px`,
                     background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.92) 55%)",
-                    pointerEvents: "none",
-                    zIndex: 1,
+                    pointerEvents: "none", zIndex: 1,
                   }} />
 
                   {/* Name + controls strip */}
                   <div style={{
-                    position: "absolute",
-                    bottom: 0, left: 0, right: 0,
+                    position: "absolute", bottom: 0, left: 0, right: 0,
                     height: `${STRIP_H}px`,
-                    display: "flex",
-                    alignItems: "center",
+                    display: "flex", alignItems: "center",
                     justifyContent: "space-between",
-                    padding: "0 1.75rem",
-                    gap: "1rem",
-                    zIndex: 2,
+                    padding: "0 1.75rem", gap: "1rem", zIndex: 2,
                   }}>
-                    {/* Avatar + name */}
                     <div style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
                       <div style={{
-                        width: "2.25rem", height: "2.25rem",
-                        borderRadius: "9999px",
+                        width: "2.25rem", height: "2.25rem", borderRadius: "9999px",
                         background: "rgba(212,175,55,0.22)",
                         border: "1px solid rgba(212,175,55,0.45)",
                         display: "flex", alignItems: "center", justifyContent: "center",
@@ -195,8 +183,6 @@ export function TestimonialsSection() {
                         )}
                       </div>
                     </div>
-
-                    {/* Nav controls */}
                     <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
                       <NavBtn onClick={goPrev} label="Previous"><ArrowLeft className="w-4 h-4" /></NavBtn>
                       <Dots />
@@ -206,7 +192,6 @@ export function TestimonialsSection() {
                 </div>
 
               ) : (
-                /* ─── TEXT QUOTE CARD ── unchanged look ─────── */
                 <div className="p-12 relative z-10 h-full flex flex-col justify-center">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.07),transparent_40%)] pointer-events-none" />
                   <Quote className="w-10 h-10 text-gold/30 mx-auto" />

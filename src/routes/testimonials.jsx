@@ -7,13 +7,14 @@ import { TESTIMONIALS } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { TESTIMONIALS_QUERY } from "@/lib/sanityQueries";
+import { sanityImage, preloadImage } from "@/lib/sanityImage";
 
-const CAROUSEL_COUNT   = 5;
-const SLIDE_INTERVAL   = 6000;
-const CAROUSEL_H       = 520;   // carousel card height (same as home)
-const CAROUSEL_STRIP   = 72;    // carousel name/controls strip
-const GRID_H           = 400;   // grid card height
-const GRID_STRIP       = 64;    // grid name strip
+const CAROUSEL_COUNT = 5;
+const SLIDE_INTERVAL = 6000;
+const CAROUSEL_H     = 520;
+const CAROUSEL_STRIP = 72;
+const GRID_H         = 400;
+const GRID_STRIP     = 64;
 
 function normalise(t) {
   return {
@@ -25,14 +26,14 @@ function normalise(t) {
     service:       t.service  ?? "",
     avatarInitial: t.avatarInitial ?? "",
     featured:      t.featured ?? false,
-    screenshotUrl: t.screenshotImage?.asset?.url ?? null,
+    screenshotUrl: t.screenshotImage?.asset?.url
+      ? sanityImage(t.screenshotImage.asset.url, { w: 900, q: 80 })
+      : null,
     screenshotAlt: t.screenshotImage?.alt ?? "Client testimonial screenshot",
   };
 }
 
-/* ───────────────────────────────────────────────────────────────────────
-   SHARED PRIMITIVES — exact same as TestimonialsSection.jsx
-─────────────────────────────────────────────────────────────────────── */
+/* ─── SHARED PRIMITIVES ─────────────────────────────────────────────────── */
 
 function NavBtn({ onClick, label, children }) {
   return (
@@ -56,15 +57,11 @@ function Dots({ total, current, onDot }) {
   );
 }
 
-/** Screenshot zone: scrollable image + gradient overlay + name strip.
- *  cardH and stripH let the same component serve both carousel and grid. */
-function ScreenshotCard({ r, cardH, stripH, showControls = false, onPrev, onNext, total, current, onDot }) {
+function ScreenshotCard({ r, cardH, stripH, isActive = false, showControls = false, onPrev, onNext, total, current, onDot }) {
   return (
-    <div
-      className="glass-card rounded-3xl overflow-hidden relative"
-      style={{ height: `${cardH}px` }}
-    >
-      {/* ─ Scrollable image zone ─ */}
+    <div className="glass-card rounded-3xl overflow-hidden relative" style={{ height: `${cardH}px` }}>
+
+      {/* Scrollable image zone */}
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0,
         bottom: `${stripH}px`,
@@ -76,7 +73,11 @@ function ScreenshotCard({ r, cardH, stripH, showControls = false, onPrev, onNext
           <img
             src={r.screenshotUrl}
             alt={r.screenshotAlt}
-            loading="lazy"
+            // Active (visible) slide: eager + high priority
+            // Grid thumbnails: lazy (below fold)
+            loading={isActive ? "eager" : "lazy"}
+            fetchpriority={isActive ? "high" : "low"}
+            decoding="async"
             style={{ width: "100%", height: "auto", display: "block", minHeight: "100%" }}
           />
         </div>
@@ -105,7 +106,6 @@ function ScreenshotCard({ r, cardH, stripH, showControls = false, onPrev, onNext
         justifyContent: "space-between",
         padding: "0 1.75rem", gap: "1rem", zIndex: 2,
       }}>
-        {/* Avatar + name */}
         <div style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
           <div style={{
             width: "2.25rem", height: "2.25rem", borderRadius: "9999px",
@@ -128,7 +128,6 @@ function ScreenshotCard({ r, cardH, stripH, showControls = false, onPrev, onNext
           </div>
         </div>
 
-        {/* Controls (carousel only) OR service badge (grid) */}
         {showControls ? (
           <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
             <NavBtn onClick={onPrev} label="Previous"><ArrowLeft className="w-4 h-4" /></NavBtn>
@@ -145,7 +144,6 @@ function ScreenshotCard({ r, cardH, stripH, showControls = false, onPrev, onNext
   );
 }
 
-/** Text quote card — same glass-card, same rounded-3xl */
 function TextCard({ r, cardH, showControls = false, onPrev, onNext, total, current, onDot }) {
   return (
     <div
@@ -181,12 +179,10 @@ function TextCard({ r, cardH, showControls = false, onPrev, onNext, total, curre
   );
 }
 
-/* ───────────────────────────────────────────────────────────────────────
-   PAGE
-─────────────────────────────────────────────────────────────────────── */
+/* ─── PAGE ───────────────────────────────────────────────────────────────── */
 export default function TestimonialsPage() {
   const { data: cmsTestimonials } = useSanity(TESTIMONIALS_QUERY, null);
-  const { settings } = useSiteSettings();
+  const { settings }              = useSiteSettings();
 
   const reviews = cmsTestimonials && cmsTestimonials.length > 0
     ? cmsTestimonials.map(normalise)
@@ -201,11 +197,23 @@ export default function TestimonialsPage() {
   const activeReview = featuredReviews[activeIndex] ?? featuredReviews[0];
 
   useEffect(() => { setActiveIndex(0); }, [reviews.length]);
+
+  // ── Preload adjacent carousel images ──
+  useEffect(() => {
+    if (featuredReviews.length < 2) return;
+    const nextIdx = (activeIndex + 1) % featuredReviews.length;
+    const prevIdx = (activeIndex + featuredReviews.length - 1) % featuredReviews.length;
+    preloadImage(featuredReviews[nextIdx]?.screenshotUrl);
+    preloadImage(featuredReviews[prevIdx]?.screenshotUrl);
+  }, [activeIndex, featuredReviews]);
+
+  // ── Auto-advance ──
   useEffect(() => {
     if (!featuredReviews.length) return;
-    const timer = window.setInterval(() =>
-      setActiveIndex((c) => (c + 1) % featuredReviews.length)
-    , SLIDE_INTERVAL);
+    const timer = window.setInterval(
+      () => setActiveIndex((c) => (c + 1) % featuredReviews.length),
+      SLIDE_INTERVAL
+    );
     return () => window.clearInterval(timer);
   }, [featuredReviews.length]);
 
@@ -235,7 +243,7 @@ export default function TestimonialsPage() {
             <p className="mt-5 text-muted-foreground">Trust earned, one consultation at a time.</p>
           </Reveal>
 
-          {/* ── Featured carousel ─────────────────────────────────────── */}
+          {/* ── Featured carousel ── */}
           {featuredReviews.length > 0 && (
             <div className="mt-20">
               <Reveal>
@@ -250,7 +258,7 @@ export default function TestimonialsPage() {
                     initial={{ opacity: 0, scale: 0.97 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.97 }}
-                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                     className="mt-10"
                   >
                     {activeReview?.screenshotUrl ? (
@@ -258,6 +266,7 @@ export default function TestimonialsPage() {
                         r={activeReview}
                         cardH={CAROUSEL_H}
                         stripH={CAROUSEL_STRIP}
+                        isActive
                         showControls
                         onPrev={goPrevious}
                         onNext={goNext}
@@ -283,7 +292,7 @@ export default function TestimonialsPage() {
             </div>
           )}
 
-          {/* ── More reviews grid ─────────────────────────────────────── */}
+          {/* ── More reviews grid ── */}
           {moreReviews.length > 0 && (
             <div className="mt-16">
               <Reveal className="text-center max-w-3xl mx-auto">
@@ -304,7 +313,7 @@ export default function TestimonialsPage() {
             </div>
           )}
 
-          {/* ── Video testimonials placeholder ─────────────────────────── */}
+          {/* ── Video testimonials placeholder ── */}
           <Reveal>
             <div className="mt-24 text-center">
               <span className="text-xs uppercase tracking-[0.3em] text-gold">Video Stories</span>
