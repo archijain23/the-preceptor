@@ -1,5 +1,8 @@
-// groq is a standalone tagged-template helper — NOT exported from @sanity/client
-import groq from 'groq';
+// Plain tagged-template literals work fine for GROQ — no extra package needed.
+// The groq tag only provides syntax highlighting in editors; it is not required at runtime.
+
+const groq = (strings, ...values) =>
+  strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
 
 export const TESTIMONIALS_QUERY = groq`
   *[_type == "testimonial"] | order(coalesce(order, 9999) asc, _createdAt asc) {
