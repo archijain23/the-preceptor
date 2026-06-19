@@ -7,7 +7,6 @@ export const siteConfig = {
   description:
     "Cinematic, deeply personal astrology consultations for high-intention seekers — clarity in love, career, and life's defining chapters.",
   email: "hello@thepreceptor.com",
-  phone: "+1 (212) 555-0117",
   social: {
     instagram: "https://instagram.com/thepreceptor",
     youtube: "https://youtube.com/@thepreceptor",

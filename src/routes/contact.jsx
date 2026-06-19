@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send, Instagram, Youtube, Linkedin, Clock, Globe2, ShieldCheck, Sparkles, ChevronDown, ArrowRight } from "lucide-react";
+import { Mail, MapPin, Send, Instagram, Youtube, Linkedin, Clock, Globe2, ShieldCheck, Sparkles, ChevronDown, ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { siteConfig } from "@/content/site";
 
@@ -19,7 +19,6 @@ export default function ContactPageWrapper() {
   );
 }
 
-// Native JS validation — no zod dependency needed
 function validateForm(data) {
   const errors = {};
   if (!data.name || data.name.trim().length < 2) errors.name = "Please enter your full name";
@@ -29,7 +28,7 @@ function validateForm(data) {
   return errors;
 }
 
-const initial = { name: "", email: "", phone: "", country: "", consultationType: "", subject: "", message: "" };
+const initial = { name: "", email: "", country: "", consultationType: "", subject: "", message: "" };
 
 const consultationTypes = [
   "Birth Chart Reading",
@@ -130,9 +129,8 @@ function ContactPage() {
             <Reveal delay={0.1}>
               <ul className="space-y-6">
                 {[
-                  { Icon: Mail, label: "Email", value: siteConfig.email, href: `mailto:${siteConfig.email}` },
-                  { Icon: Phone, label: "Phone", value: siteConfig.phone, href: `tel:${siteConfig.phone.replace(/[^+\d]/g, "")}` },
-                  { Icon: MapPin, label: "Studio", value: "Worldwide \u00b7 Online consultations" },
+                  { Icon: Mail,    label: "Email",  value: siteConfig.email, href: `mailto:${siteConfig.email}` },
+                  { Icon: MapPin,  label: "Studio", value: "Worldwide · Online consultations" },
                 ].map(({ Icon, label, value, href }) => (
                   <li key={label} className="flex items-start gap-4">
                     <span className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-gold shrink-0">
@@ -157,8 +155,8 @@ function ContactPage() {
                 <div className="flex gap-3">
                   {[
                     { Icon: Instagram, href: siteConfig.social.instagram, label: "Instagram" },
-                    { Icon: Youtube, href: siteConfig.social.youtube, label: "YouTube" },
-                    { Icon: Linkedin, href: siteConfig.social.linkedin, label: "LinkedIn" },
+                    { Icon: Youtube,   href: siteConfig.social.youtube,   label: "YouTube" },
+                    { Icon: Linkedin,  href: siteConfig.social.linkedin,  label: "LinkedIn" },
                   ].map(({ Icon, href, label }) => (
                     <a
                       key={label}
@@ -199,10 +197,7 @@ function ContactPage() {
                 <Field label="Email" error={errors.email}>
                   <input type="email" value={data.email} onChange={update("email")} className={inputCls} placeholder="you@email.com" />
                 </Field>
-                <Field label="Phone (optional)" error={errors.phone}>
-                  <input value={data.phone} onChange={update("phone")} className={inputCls} placeholder="+1 (555) 000-0000" />
-                </Field>
-                <Field label="Country (optional)" error={errors.country}>
+                <Field label="Country (optional)" error={errors.country} className="sm:col-span-2">
                   <input value={data.country} onChange={update("country")} className={inputCls} placeholder="United States" />
                 </Field>
                 <Field label="Consultation Type" error={errors.consultationType} className="sm:col-span-2">
@@ -218,7 +213,7 @@ function ContactPage() {
                   <input value={data.subject} onChange={update("subject")} className={inputCls} placeholder="What can we help you with?" />
                 </Field>
                 <Field label="Your Message" error={errors.message} className="sm:col-span-2">
-                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what's on your mind\u2026" />
+                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what's on your mind…" />
                 </Field>
               </div>
 
@@ -236,7 +231,7 @@ function ContactPage() {
         </div>
       </section>
 
-      {/* FAQ / reassurance */}
+      {/* FAQ */}
       <section className="relative py-24 md:py-32 bg-deep overflow-hidden">
         <div className="absolute inset-0 bg-hero opacity-40 pointer-events-none" />
         <div className="relative max-w-4xl mx-auto px-6 lg:px-10">

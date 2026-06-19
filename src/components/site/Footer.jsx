@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Instagram, Mail, MapPin, Phone } from "lucide-react";
+import { Instagram, Mail, MapPin } from "lucide-react";
 import { siteConfig, footerLinks } from "@/content/site";
 
 export default function Footer() {
@@ -46,10 +46,6 @@ export default function Footer() {
             <li className="flex items-start gap-3">
               <Mail className="w-4 h-4 mt-0.5 text-gold/70 shrink-0" />
               <a href={`mailto:${siteConfig.email}`} className="hover:text-foreground transition">{siteConfig.email}</a>
-            </li>
-            <li className="flex items-start gap-3">
-              <Phone className="w-4 h-4 mt-0.5 text-gold/70 shrink-0" />
-              <a href={`tel:${siteConfig.phone.replace(/[^+\d]/g, "")}`} className="hover:text-foreground transition">{siteConfig.phone}</a>
             </li>
             <li className="flex items-start gap-3">
               <MapPin className="w-4 h-4 mt-0.5 text-gold/70 shrink-0" />
