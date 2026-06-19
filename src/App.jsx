@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import ErrorBoundary from "./components/site/ErrorBoundary";
@@ -31,6 +31,7 @@ const QnA          = lazy(() => import("./routes/qna"));
 const Privacy      = lazy(() => import("./routes/privacy"));
 const Terms        = lazy(() => import("./routes/terms"));
 const NotFound     = lazy(() => import("./routes/not-found"));
+const Admin        = lazy(() => import("./routes/admin"));
 
 /**
  * Minimal loading fallback shown by Suspense while a route chunk loads.
@@ -105,6 +106,9 @@ const orgSchema = {
 };
 
 export default function App() {
+  const location  = useLocation();
+  const isAdmin   = location.pathname.startsWith("/command-center");
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen flex flex-col">
@@ -118,32 +122,31 @@ export default function App() {
         <div id="cosmic-grain" aria-hidden="true" />
 
         <TorchCursor />
-
-        {/* ✦ Resets scroll to (0,0) on every route change — must be
-            inside BrowserRouter (via main.jsx) but outside <Routes>. */}
         <ScrollToTop />
 
-        <Nav />
+        {/* Nav and Footer are hidden on the admin route */}
+        {!isAdmin && <Nav />}
 
-        <main className="flex-1 pt-20">
+        <main className={isAdmin ? "flex-1" : "flex-1 pt-20"}>
           <Suspense fallback={<CosmicLoader />}>
             <Routes>
-              <Route path="/"             element={<Home />} />
-              <Route path="/about"        element={<About />} />
-              <Route path="/book"         element={<Book />} />
-              <Route path="/contact"      element={<Contact />} />
-              <Route path="/services"     element={<Services />} />
-              <Route path="/testimonials" element={<Testimonials />} />
-              <Route path="/shop"         element={<Shop />} />
-              <Route path="/qna"          element={<QnA />} />
-              <Route path="/privacy"      element={<Privacy />} />
-              <Route path="/terms"        element={<Terms />} />
-              <Route path="*"             element={<NotFound />} />
+              <Route path="/"               element={<Home />} />
+              <Route path="/about"          element={<About />} />
+              <Route path="/book"           element={<Book />} />
+              <Route path="/contact"        element={<Contact />} />
+              <Route path="/services"       element={<Services />} />
+              <Route path="/testimonials"   element={<Testimonials />} />
+              <Route path="/shop"           element={<Shop />} />
+              <Route path="/qna"            element={<QnA />} />
+              <Route path="/privacy"        element={<Privacy />} />
+              <Route path="/terms"          element={<Terms />} />
+              <Route path="/command-center" element={<Admin />} />
+              <Route path="*"               element={<NotFound />} />
             </Routes>
           </Suspense>
         </main>
 
-        <Footer />
+        {!isAdmin && <Footer />}
       </div>
     </ErrorBoundary>
   );
