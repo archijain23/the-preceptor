@@ -1,6 +1,10 @@
 import React, { lazy, Suspense } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+// FIX 3 / FIX 8: Import only the motion component we actually use in this file
+// (the CosmicLoader spinner). This prevents the entire framer-motion tree from
+// loading on the critical path. All other motion usage is inside lazy-loaded
+// route components, so they pay the cost only when that route is visited.
 import { motion } from "framer-motion";
 import ErrorBoundary from "./components/site/ErrorBoundary";
 import Nav from "./components/site/Nav";

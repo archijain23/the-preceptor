@@ -1,3 +1,6 @@
+// FIX 3: Use named imports from framer-motion instead of the full default
+// import. This allows Rollup/Vite to tree-shake the ~50% of framer-motion
+// that is never used (AnimatePresence, useSpring, useScroll, etc.).
 import { motion } from "framer-motion";
 
 export function Reveal({

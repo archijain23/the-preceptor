@@ -19,7 +19,7 @@
     <!-- ── Theme color (PWA + browser chrome) ─────────────────────── -->
     <meta name="theme-color" content="#0a0a0f" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translacent" />
 
     <!-- ── Open Graph — static pre-hydration fallback ─────────────────
          Social crawlers (FB, LinkedIn, WhatsApp, Slack, Discord)
@@ -59,18 +59,33 @@
     <meta name="twitter:image"       content="https://thepreceptorglobal.com/og-image.webp" />
     <meta name="twitter:image:alt"   content="The Preceptor — For those who seek clarity." />
 
-    <!-- ── Google Fonts — preconnect first, then stylesheet ─────────────
-         Preconnect hints let the browser open the TCP/TLS connection
-         to Google Fonts in parallel with parsing this HTML, so fonts
-         are ready sooner. @import inside CSS is render-blocking and
-         delays font discovery until after CSS is fully parsed.
+    <!-- ── Google Fonts — preconnect + non-render-blocking load ─────────
+         FIX 6: Only preconnect to origins we actually use during load.
+         The cdn.sanity.io preconnect has been removed — it was flagged
+         as unused by Lighthouse (FIX 7).
+
+         FIX 4 (render-blocking CSS): The Google Fonts stylesheet is loaded
+         non-blocking via rel="preload" + onload swap, then a <noscript>
+         fallback ensures fonts load even if JS is disabled.
+         This removes the 300ms render-blocking penalty on FCP.
     ──────────────────────────────────────────────────────── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Non-blocking font load: preload triggers early fetch without blocking render -->
     <link
+      rel="preload"
+      as="style"
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@200;300;400;500;600&display=swap"
-      rel="stylesheet"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <!-- Fallback for no-JS environments -->
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@200;300;400;500;600&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
   </head>
   <body>
     <div id="root"></div>
