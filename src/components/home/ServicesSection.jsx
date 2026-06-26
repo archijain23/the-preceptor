@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  Star, Briefcase, Heart, Moon, Sparkles, BookOpen,
-  Compass, ArrowRight, Clock, Loader2,
-} from "lucide-react";
+  IconStar, IconBriefcase, IconHeart, IconMoon, IconSparkles, IconBookOpen,
+  IconCompass, IconArrowRight, IconClock, IconLoader2,
+} from "@/components/icons";
 import { Reveal } from "@/components/site/Reveal";
 import { OfferTimer } from "@/components/site/OfferTimer";
 import { HOME_SERVICES } from "@/utils/constants";
@@ -12,15 +12,15 @@ import { useSiteSettings } from "@/lib/useSiteSettings";
 import { SERVICES_QUERY } from "@/lib/sanityQueries";
 
 const ICON_MAP = {
-  Star, BookOpen, Heart,
-  HeartHandshake: Heart,
-  Rings: Moon,
-  Briefcase,
-  Saturn: Sparkles,
-  Hourglass: Moon,
-  Orbit: Sparkles,
-  Compass,
-  Moon, Sparkles,
+  Star: IconStar, BookOpen: IconBookOpen, Heart: IconHeart,
+  HeartHandshake: IconHeart,
+  Rings: IconMoon,
+  Briefcase: IconBriefcase,
+  Saturn: IconSparkles,
+  Hourglass: IconMoon,
+  Orbit: IconSparkles,
+  Compass: IconCompass,
+  Moon: IconMoon, Sparkles: IconSparkles,
 };
 
 function normalise(s) {
@@ -74,14 +74,14 @@ export function ServicesSection() {
 
         {loading && (
           <div className="flex justify-center items-center py-20">
-            <Loader2 className="w-6 h-6 text-gold animate-spin" />
+            <IconLoader2 className="w-6 h-6 text-gold animate-spin" />
           </div>
         )}
 
         {!loading && (
           <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
             {services.map((s, i) => {
-              const Icon = ICON_MAP[s.icon] || Star;
+              const Icon = ICON_MAP[s.icon] || IconStar;
               return (
                 <Reveal key={s.slug} delay={i * 0.07}>
                   <motion.div
@@ -108,7 +108,7 @@ export function ServicesSection() {
                       <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 flex-1">{s.desc}</p>
                       <div className="mt-2 flex items-center justify-between border-t border-gold/10 pt-3">
                         <span className="flex items-center gap-1 text-xs text-gold">
-                          <Clock className="w-3 h-3" />
+                          <IconClock className="w-3 h-3" />
                           {s.duration}
                         </span>
                         <div className="flex items-baseline gap-2">
@@ -132,7 +132,7 @@ export function ServicesSection() {
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full border border-gold/40 text-gold hover:bg-gold/10 transition font-medium text-sm tracking-wide group"
           >
             View All Services
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </Reveal>
       </div>

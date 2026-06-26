@@ -1,11 +1,10 @@
 import { motion } from "framer-motion";
 import { useMemo } from "react";
-import { ArrowRight, Star, Sparkles } from "lucide-react";
+import { IconArrowRight, IconStar, IconSparkles } from "@/components/icons";
 import { Link } from "react-router-dom";
 import heroImg from "@/assets/hero-section.jpg";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 
-// ── Ambient drifting gold particle ──────────────────────────────────────────
 function Particle({ x, y, size, delay, duration, drift }) {
   return (
     <motion.span
@@ -38,15 +37,14 @@ function Particle({ x, y, size, delay, duration, drift }) {
   );
 }
 
-// ── Word-by-word staggered heading ───────────────────────────────────────────
 function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
   const words1 = line1.split(" ");
   const words2 = line2Gold.split(" ");
 
   const wordVariant = {
-    hidden: { opacity: 0, x: -22, filter: "blur(4px)" },
+    hidden: { opacity: 0, x: -22 },
     visible: (i) => ({
-      opacity: 1, x: 0, filter: "blur(0px)",
+      opacity: 1, x: 0,
       transition: { delay: delay + i * 0.09, duration: 0.75, ease: [0.22, 1, 0.36, 1] },
     }),
   };
@@ -96,7 +94,6 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
 export function HeroSection() {
   const { settings } = useSiteSettings();
 
-  // CMS values with hardcoded fallbacks
   const badgeText    = settings?.heroBadgeText    ?? "Premium Astrology";
   const heading1     = settings?.heroHeading1     ?? "Modern guidance,";
   const heading2Gold = settings?.heroHeading2Gold ?? "written in the stars.";
@@ -122,8 +119,6 @@ export function HeroSection() {
 
   return (
     <section className="relative overflow-hidden min-h-[100svh] flex items-center">
-
-      {/* Nebula gradient */}
       <div
         className="absolute inset-0"
         style={{
@@ -134,16 +129,10 @@ export function HeroSection() {
           ].join(", "),
         }}
       />
-
-      {/* Starfield */}
       <div className="absolute inset-0 starfield starfield-glow" aria-hidden />
-
-      {/* Particles */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden>
         {particles.map((p) => <Particle key={p.id} {...p} />)}
       </div>
-
-      {/* Purple nebula fog */}
       <motion.div
         aria-hidden
         initial={{ opacity: 0 }}
@@ -152,8 +141,6 @@ export function HeroSection() {
         className="absolute -top-24 -left-24 w-[65%] h-[85%] pointer-events-none blur-3xl"
         style={{ background: "radial-gradient(ellipse at center, oklch(0.52 0.09 295 / 0.30), transparent 62%)" }}
       />
-
-      {/* Amber nebula fog */}
       <motion.div
         aria-hidden
         initial={{ opacity: 0 }}
@@ -162,8 +149,6 @@ export function HeroSection() {
         className="absolute bottom-0 right-0 w-[58%] h-[65%] pointer-events-none blur-3xl"
         style={{ background: "radial-gradient(ellipse at center, oklch(0.38 0.10 38 / 0.22), transparent 60%)" }}
       />
-
-      {/* Hero figure */}
       <motion.div
         initial={{ opacity: 0, y: 48, scale: 1.06 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -203,24 +188,16 @@ export function HeroSection() {
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, oklch(0.10 0.025 270) 0%, oklch(0.10 0.025 270 / 0.45) 15%, transparent 45%)" }} />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, oklch(0.10 0.025 270 / 0.6) 0%, transparent 30%)" }} />
       </motion.div>
-
-      {/* Left readability gradient */}
       <div
         className="absolute inset-y-0 left-0 pointer-events-none w-full lg:w-[58%]"
         style={{ background: "linear-gradient(to right, oklch(0.10 0.025 270) 38%, oklch(0.10 0.025 270 / 0.75) 58%, transparent 100%)" }}
       />
-
-      {/* Page vignette */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{ background: "linear-gradient(to bottom, oklch(0.10 0.025 270 / 0.5) 0%, transparent 18%, transparent 75%, oklch(0.10 0.025 270) 100%)" }}
       />
-
-      {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 lg:px-10 pt-28 pb-20 sm:pt-32 sm:pb-24 lg:py-40 w-full">
         <div className="max-w-full sm:max-w-[44rem] lg:max-w-[46rem]">
-
-          {/* Badge */}
           <motion.span
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -231,14 +208,13 @@ export function HeroSection() {
               animate={{ rotate: [0, 18, -12, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 3 }}
             >
-              <Sparkles className="w-3 h-3" />
+              <IconSparkles className="w-3 h-3" />
             </motion.span>
             {badgeText}
           </motion.span>
 
           <StaggeredHeading line1={heading1} line2Gold={heading2Gold} delay={0.45} />
 
-          {/* Body copy */}
           <motion.p
             initial={{ opacity: 0, x: -18 }}
             animate={{ opacity: 1, x: 0 }}
@@ -249,7 +225,6 @@ export function HeroSection() {
             {bodyCopy}
           </motion.p>
 
-          {/* CTAs */}
           <motion.div
             initial={{ opacity: 0, x: -14 }}
             animate={{ opacity: 1, x: 0 }}
@@ -267,14 +242,13 @@ export function HeroSection() {
                   animate={{ x: [0, 3, 0] }}
                   transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut", delay: 3 }}
                 >
-                  <ArrowRight className="w-4 h-4" />
+                  <IconArrowRight className="w-4 h-4" />
                 </motion.span>
               </Link>
             </motion.div>
             <a href="#services" className="btn-secondary">{cta2Label}</a>
           </motion.div>
 
-          {/* Social proof */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -290,17 +264,15 @@ export function HeroSection() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.9 + i * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <Star className="w-4 h-4 fill-gold text-gold" />
+                  <IconStar className="w-4 h-4 fill-gold text-gold" />
                 </motion.span>
               ))}
             </div>
             <span>Trusted by {clientCount} {clientLabel} across {countryCount} countries</span>
           </motion.div>
-
         </div>
       </div>
 
-      {/* Scroll cue */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ y: [0, 9, 0], opacity: [0, 0.5, 0.75, 0.4] }}
@@ -318,7 +290,6 @@ export function HeroSection() {
           style={{ background: "oklch(0.82 0.12 85 / 0.45)" }}
         />
       </motion.div>
-
     </section>
   );
 }

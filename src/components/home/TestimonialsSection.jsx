@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Star, Quote } from "lucide-react";
+import { IconArrowLeft, IconArrowRight, IconStar, IconQuote } from "@/components/icons";
 import { Link } from "react-router-dom";
 import { Reveal } from "@/components/site/Reveal";
 import { TESTIMONIALS } from "@/utils/constants";
@@ -19,7 +19,6 @@ function normalise(t) {
     rating:        t.rating   ?? 5,
     avatarInitial: t.avatarInitial ?? "",
     featured:      t.featured ?? false,
-    // Apply CDN transforms: 900px wide, 80% quality, auto WebP/AVIF
     screenshotUrl: t.screenshotImage?.asset?.url
       ? sanityImage(t.screenshotImage.asset.url, { w: 900, q: 80 })
       : null,
@@ -50,7 +49,6 @@ export function TestimonialsSection() {
 
   const t = testimonials[idx] ?? testimonials[0];
 
-  // ── Preload adjacent images so carousel advances without a flash ──
   useEffect(() => {
     if (testimonials.length < 2) return;
     const nextIdx = (idx + 1) % testimonials.length;
@@ -59,7 +57,6 @@ export function TestimonialsSection() {
     preloadImage(testimonials[prevIdx]?.screenshotUrl);
   }, [idx, testimonials]);
 
-  // ── Auto-advance ──
   useEffect(() => {
     const timer = window.setInterval(
       () => setIdx((c) => (c + 1) % testimonials.length),
@@ -117,8 +114,6 @@ export function TestimonialsSection() {
             >
               {hasImage ? (
                 <div style={{ position: "relative", width: "100%", height: "100%" }}>
-
-                  {/* Scrollable image zone */}
                   <div style={{
                     position: "absolute", top: 0, left: 0, right: 0,
                     bottom: `${STRIP_H}px`,
@@ -130,7 +125,6 @@ export function TestimonialsSection() {
                       <img
                         src={t.screenshotUrl}
                         alt={t.screenshotAlt}
-                        // Active slide: eager + high priority — do NOT lazy-load what's visible
                         loading="eager"
                         fetchpriority="high"
                         decoding="async"
@@ -138,23 +132,17 @@ export function TestimonialsSection() {
                       />
                     </div>
                   </div>
-
-                  {/* Top fade */}
                   <div style={{
                     position: "absolute", top: 0, left: 0, right: 0, height: "60px",
                     background: "linear-gradient(to bottom, rgba(0,0,0,0.35), transparent)",
                     pointerEvents: "none", zIndex: 1,
                   }} />
-
-                  {/* Bottom gradient */}
                   <div style={{
                     position: "absolute", left: 0, right: 0, bottom: 0,
                     height: `${STRIP_H + 60}px`,
                     background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.92) 55%)",
                     pointerEvents: "none", zIndex: 1,
                   }} />
-
-                  {/* Name + controls strip */}
                   <div style={{
                     position: "absolute", bottom: 0, left: 0, right: 0,
                     height: `${STRIP_H}px`,
@@ -184,23 +172,22 @@ export function TestimonialsSection() {
                       </div>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-                      <NavBtn onClick={goPrev} label="Previous"><ArrowLeft className="w-4 h-4" /></NavBtn>
+                      <NavBtn onClick={goPrev} label="Previous"><IconArrowLeft className="w-4 h-4" /></NavBtn>
                       <Dots />
-                      <NavBtn onClick={goNext} label="Next"><ArrowRight className="w-4 h-4" /></NavBtn>
+                      <NavBtn onClick={goNext} label="Next"><IconArrowRight className="w-4 h-4" /></NavBtn>
                     </div>
                   </div>
                 </div>
-
               ) : (
                 <div className="p-12 relative z-10 h-full flex flex-col justify-center">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.07),transparent_40%)] pointer-events-none" />
-                  <Quote className="w-10 h-10 text-gold/30 mx-auto" />
+                  <IconQuote className="w-10 h-10 text-gold/30 mx-auto" />
                   <p className="mt-6 font-serif text-2xl md:text-3xl leading-relaxed">
                     &ldquo;{t?.text}&rdquo;
                   </p>
                   <div className="mt-8 flex justify-center gap-1">
                     {[...Array(t?.rating ?? 5)].map((_, k) => (
-                      <Star key={k} className="w-4 h-4 fill-gold text-gold" />
+                      <IconStar key={k} className="w-4 h-4 fill-gold text-gold" />
                     ))}
                   </div>
                   <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -209,9 +196,9 @@ export function TestimonialsSection() {
                       <p className="text-xs text-muted-foreground">{t?.country}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <NavBtn onClick={goPrev} label="Previous"><ArrowLeft className="w-4 h-4" /></NavBtn>
+                      <NavBtn onClick={goPrev} label="Previous"><IconArrowLeft className="w-4 h-4" /></NavBtn>
                       <Dots />
-                      <NavBtn onClick={goNext} label="Next"><ArrowRight className="w-4 h-4" /></NavBtn>
+                      <NavBtn onClick={goNext} label="Next"><IconArrowRight className="w-4 h-4" /></NavBtn>
                     </div>
                   </div>
                 </div>
@@ -222,7 +209,7 @@ export function TestimonialsSection() {
           <div className="mt-8 flex justify-center">
             <Link to="/testimonials"
               className="inline-flex items-center gap-2 text-gold font-medium hover:text-foreground transition">
-              View more testimonials <ArrowRight className="w-4 h-4" />
+              View more testimonials <IconArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </Reveal>

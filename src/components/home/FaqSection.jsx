@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { IconChevronDown } from "@/components/icons";
 import { Reveal } from "@/components/site/Reveal";
 import { FAQS } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
@@ -44,7 +44,7 @@ export function FaqSection() {
                     transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                     className="shrink-0 text-gold"
                   >
-                    <ChevronDown className="w-5 h-5" />
+                    <IconChevronDown className="w-5 h-5" />
                   </motion.div>
                 </button>
                 <AnimatePresence initial={false}>

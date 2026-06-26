@@ -1,8 +1,8 @@
-import { Award, Sparkles, Star, Moon, Compass, BookOpen, Heart, Briefcase } from "lucide-react";
+import { IconAward, IconSparkles, IconStar, IconMoon, IconCompass, IconBookOpen, IconHeart, IconBriefcase } from "@/components/icons";
 import { Reveal } from "@/components/site/Reveal";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 
-const ICON_MAP = { Award, Sparkles, Star, Moon, Compass, BookOpen, Heart, Briefcase };
+const ICON_MAP = { Award: IconAward, Sparkles: IconSparkles, Star: IconStar, Moon: IconMoon, Compass: IconCompass, BookOpen: IconBookOpen, Heart: IconHeart, Briefcase: IconBriefcase };
 
 const DEFAULT_ITEMS = [
   { icon: "Award",    title: "12 Years of Practice", desc: "Refined over thousands of sessions across Vedic, Western, and symbolic traditions." },
@@ -27,7 +27,7 @@ export function ExperienceSection({ qnaImg }) {
           </h2>
           <div className="mt-8 space-y-5">
             {items.map((item, i) => {
-              const Icon = ICON_MAP[item.icon] ?? Star;
+              const Icon = ICON_MAP[item.icon] ?? IconStar;
               return (
                 <Reveal key={item.title} delay={0.08 + i * 0.07}>
                   <div className="flex items-start gap-5 glass-card rounded-2xl p-5">

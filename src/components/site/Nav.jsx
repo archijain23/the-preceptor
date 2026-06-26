@@ -1,6 +1,6 @@
 import { NavLink, Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { IconMenu, IconX } from "@/components/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { navLinks, siteConfig } from "@/content/site";
 
@@ -9,8 +9,6 @@ const mobileFooterLinks = [
   { to: "/terms",   label: "Terms & Conditions" },
 ];
 
-// ── Animation variants ─────────────────────────────────────────────────────
-// Header: simple clean fade-drop — one motion, no drama.
 const headerVariants = {
   hidden:  { y: -8, opacity: 0 },
   visible: {
@@ -20,14 +18,12 @@ const headerVariants = {
   },
 };
 
-// Mobile overlay: elegant fade only — no sliding, no scaling.
 const overlayVariants = {
   hidden:  { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3, ease: "easeOut" } },
   exit:    { opacity: 0, transition: { duration: 0.22, ease: "easeIn" } },
 };
 
-// Mobile nav items: stagger from opacity only — no y movement (cleaner).
 const itemVariants = {
   hidden:  { opacity: 0 },
   visible: (i) => ({
@@ -48,10 +44,8 @@ export default function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close mobile nav on route change
   useEffect(() => { setOpen(false); }, [location.pathname]);
 
-  // Lock body scroll when mobile nav is open
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -59,7 +53,6 @@ export default function Nav() {
 
   return (
     <>
-      {/* ── Desktop / main header ───────────────────────────────────── */}
       <motion.header
         variants={headerVariants}
         initial="hidden"
@@ -71,16 +64,11 @@ export default function Nav() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
-
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
-            <span className="text-gold font-serif text-2xl group-hover:rotate-12 transition-transform duration-500">
-              ✦
-            </span>
+            <span className="text-gold font-serif text-2xl group-hover:rotate-12 transition-transform duration-500">✦</span>
             <span className="font-serif text-xl tracking-wide">{siteConfig.name}</span>
           </Link>
 
-          {/* Desktop nav links */}
           <nav className="hidden lg:flex items-center gap-10" aria-label="Primary navigation">
             {navLinks.map((l) => (
               <NavLink
@@ -93,12 +81,10 @@ export default function Nav() {
                 }
               >
                 {l.label}
-                {/* Slim gold underline on hover / active */}
                 <span
                   className="absolute -bottom-2 left-0 right-0 h-px scale-x-0 group-hover:scale-x-100 transition-transform duration-400"
                   style={{
-                    background:
-                      "linear-gradient(to right, transparent, oklch(0.82 0.12 85 / 0.7), transparent)",
+                    background: "linear-gradient(to right, transparent, oklch(0.82 0.12 85 / 0.7), transparent)",
                     transformOrigin: "center",
                   }}
                 />
@@ -106,7 +92,6 @@ export default function Nav() {
             ))}
           </nav>
 
-          {/* Desktop CTA */}
           <Link
             to="/book"
             className="hidden lg:inline-flex items-center px-6 py-2.5 rounded-full bg-primary text-primary-foreground btn-text hover:scale-[1.03] hover:shadow-gold transition-all duration-300"
@@ -114,7 +99,6 @@ export default function Nav() {
             Book a Session
           </Link>
 
-          {/* Hamburger — morphs Menu ↔ X */}
           <button
             className="lg:hidden text-foreground relative w-10 h-10 flex items-center justify-center"
             onClick={() => setOpen((v) => !v)}
@@ -127,20 +111,19 @@ export default function Nav() {
               transition={{ duration: 0.2 }}
               className="absolute"
             >
-              <Menu className="w-6 h-6" />
+              <IconMenu className="w-6 h-6" />
             </motion.span>
             <motion.span
               animate={{ rotate: open ? 0 : -90, opacity: open ? 1 : 0 }}
               transition={{ duration: 0.2 }}
               className="absolute"
             >
-              <X className="w-6 h-6" />
+              <IconX className="w-6 h-6" />
             </motion.span>
           </button>
         </div>
       </motion.header>
 
-      {/* ── Mobile full-screen overlay ──────────────────────────────── */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -154,22 +137,13 @@ export default function Nav() {
             exit="exit"
             className="lg:hidden fixed inset-0 z-40 bg-background/96 backdrop-blur-2xl"
           >
-            {/* Subtle nebula tint behind links */}
             <div className="absolute inset-0 bg-hero opacity-50 pointer-events-none" />
-
             <nav
               className="relative h-full flex flex-col items-center justify-center gap-7 px-8"
               aria-label="Mobile primary navigation"
             >
-              {/* Primary links */}
               {navLinks.map((l, i) => (
-                <motion.div
-                  key={l.to}
-                  custom={i}
-                  variants={itemVariants}
-                  initial="hidden"
-                  animate="visible"
-                >
+                <motion.div key={l.to} custom={i} variants={itemVariants} initial="hidden" animate="visible">
                   <Link
                     to={l.to}
                     onClick={() => setOpen(false)}
@@ -179,15 +153,7 @@ export default function Nav() {
                   </Link>
                 </motion.div>
               ))}
-
-              {/* Book CTA */}
-              <motion.div
-                custom={navLinks.length}
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                className="mt-4"
-              >
+              <motion.div custom={navLinks.length} variants={itemVariants} initial="hidden" animate="visible" className="mt-4">
                 <Link
                   to="/book"
                   onClick={() => setOpen(false)}
@@ -196,8 +162,6 @@ export default function Nav() {
                   Book a Session
                 </Link>
               </motion.div>
-
-              {/* Legal links at bottom */}
               <motion.div
                 custom={navLinks.length + 1}
                 variants={itemVariants}

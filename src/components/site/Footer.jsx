@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import { Instagram, Mail, MapPin } from "lucide-react";
+import { IconInstagram, IconMail, IconMapPin } from "@/components/icons";
 import { siteConfig, footerLinks } from "@/content/site";
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-border/60 mt-32 bg-deep overflow-hidden">
+    <footer className="relative border-t border-border/60 mt-32 bg-deep overflow-hidden" style={{ minHeight: "400px" }}>
       <div className="absolute inset-0 bg-hero opacity-40 pointer-events-none" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
 
@@ -19,8 +19,8 @@ export default function Footer() {
           </p>
           <div className="flex gap-3 mt-8">
             {[
-              { Icon: Instagram, href: siteConfig.social.instagram, label: "Instagram" },
-              { Icon: Mail, href: `mailto:${siteConfig.email}`, label: "Email" },
+              { Icon: IconInstagram, href: siteConfig.social.instagram, label: "Instagram" },
+              { Icon: IconMail, href: `mailto:${siteConfig.email}`, label: "Email" },
             ].map(({ Icon, href, label }) => (
               <a key={label} href={href} aria-label={label} className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-muted-foreground hover:text-gold hover:scale-110 hover:shadow-gold transition-all duration-300">
                 <Icon className="w-4 h-4" />
@@ -44,11 +44,11 @@ export default function Footer() {
           <h4 className="text-xs uppercase tracking-[0.3em] text-gold mb-6">Contact</h4>
           <ul className="space-y-4 text-sm text-muted-foreground">
             <li className="flex items-start gap-3">
-              <Mail className="w-4 h-4 mt-0.5 text-gold/70 shrink-0" />
+              <IconMail className="w-4 h-4 mt-0.5 text-gold/70 shrink-0" />
               <a href={`mailto:${siteConfig.email}`} className="hover:text-foreground transition">{siteConfig.email}</a>
             </li>
             <li className="flex items-start gap-3">
-              <MapPin className="w-4 h-4 mt-0.5 text-gold/70 shrink-0" />
+              <IconMapPin className="w-4 h-4 mt-0.5 text-gold/70 shrink-0" />
               Worldwide · Private online sessions
             </li>
           </ul>
