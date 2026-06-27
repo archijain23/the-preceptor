@@ -59,6 +59,21 @@
     <meta name="twitter:image"       content="https://thepreceptorglobal.com/og-image.webp" />
     <meta name="twitter:image:alt"   content="The Preceptor — For those who seek clarity." />
 
+    <!-- ── P1: Font preload — collapse 3-hop GFonts chain to 1 hop ──────
+         These preload the exact woff2 files the browser will need for
+         above-the-fold text (Fraunces for headings, Inter for body).
+         Must sit BEFORE the GFonts stylesheet so the browser starts
+         fetching the actual font bytes during HTML parse, not after
+         CSS download + parse completes.
+         crossorigin is required even for same-origin font preloads.
+    ──────────────────────────────────────────────────────────────── -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="https://fonts.gstatic.com/s/fraunces/v31/6NUt8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnDSg.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="https://fonts.gstatic.com/s/fraunces/v31/6NUt8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnBSg.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" />
+
     <!-- ── Google Fonts — preconnect first, then stylesheet ─────────────
          Preconnect hints let the browser open the TCP/TLS connection
          to Google Fonts in parallel with parsing this HTML, so fonts

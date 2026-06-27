@@ -208,6 +208,10 @@
   background-image: var(--gradient-page);
   background-size: cover;
   background-position: center;
+  /* P2: promote to dedicated GPU compositor layer — eliminates full-page
+     repaint on every scroll frame caused by this fixed-position element */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 #cosmic-grain {
@@ -219,6 +223,11 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 200px 200px;
+  /* P2: promote to dedicated GPU compositor layer — the SVG feTurbulence
+     filter is expensive; isolating this layer prevents it from triggering
+     repaints on the rest of the document during scroll */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -435,10 +444,17 @@
       radial-gradient(1.6px 1.6px at 90% 30%, oklch(0.88 0.08 88 / 0.75), transparent);
   }
 
+  /* P3: backdrop-filter:blur() removed from .glass-card and .glass-card-strong.
+     On this dark fixed-background theme the blur effect is imperceptible
+     (nothing visible behind the cards to blur) but costs a full GPU
+     compositing layer per card instance. Replaced with a marginally more
+     opaque solid background — visually identical at any viewport. */
   .glass-card {
-    background: var(--gradient-card);
-    backdrop-filter: blur(16px) saturate(1.3);
-    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+    background: linear-gradient(
+      160deg,
+      oklch(0.19 0.028 270 / 0.92),
+      oklch(0.14 0.024 270 / 0.80)
+    );
     border: 1px solid oklch(1 0 0 / 0.07);
     box-shadow:
       0 1px 0 oklch(1 0 0 / 0.05) inset,
@@ -448,11 +464,9 @@
   .glass-card-strong {
     background: linear-gradient(
       160deg,
-      oklch(0.22 0.030 270 / 0.85),
-      oklch(0.16 0.025 270 / 0.70)
+      oklch(0.22 0.030 270 / 0.92),
+      oklch(0.16 0.025 270 / 0.80)
     );
-    backdrop-filter: blur(20px) saturate(1.4);
-    -webkit-backdrop-filter: blur(20px) saturate(1.4);
     border: 1px solid oklch(1 0 0 / 0.09);
     box-shadow:
       0 1px 0 oklch(1 0 0 / 0.06) inset,
