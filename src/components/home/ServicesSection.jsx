@@ -10,6 +10,7 @@ import { HOME_SERVICES } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { SERVICES_QUERY } from "@/lib/sanityQueries";
+import { useOfferActive } from "@/lib/useOfferActive";
 
 const ICON_MAP = {
   Star: IconStar, BookOpen: IconBookOpen, Heart: IconHeart,
@@ -41,6 +42,7 @@ function normalise(s) {
 export function ServicesSection() {
   const { data: allServices, loading } = useSanity(SERVICES_QUERY, null);
   const { settings } = useSiteSettings();
+  const offerActive = useOfferActive();
 
   const sectionLabel    = settings?.servicesSectionLabel    ?? "Services";
   const sectionHeading  = settings?.servicesSectionHeading  ?? "Consultations crafted with intention.";
@@ -82,6 +84,9 @@ export function ServicesSection() {
           <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
             {services.map((s, i) => {
               const Icon = ICON_MAP[s.icon] || IconStar;
+              // When offer is active: show discounted price + struck-through original.
+              // When offer has expired: show only the original price (no strikethrough).
+              const displayPrice = (!offerActive && s.originalPrice) ? s.originalPrice : s.price;
               return (
                 <Reveal key={s.slug} delay={i * 0.07}>
                   <motion.div
@@ -112,10 +117,10 @@ export function ServicesSection() {
                           {s.duration}
                         </span>
                         <div className="flex items-baseline gap-2">
-                          {s.originalPrice && (
+                          {offerActive && s.originalPrice && (
                             <span className="text-xs text-muted-foreground line-through">{s.originalPrice}</span>
                           )}
-                          <span className="font-semibold text-gold text-lg">{s.price}</span>
+                          <span className="font-semibold text-gold text-lg">{displayPrice}</span>
                         </div>
                       </div>
                     </div>

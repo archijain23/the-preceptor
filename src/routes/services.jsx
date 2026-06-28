@@ -12,6 +12,7 @@ import { SERVICES, SITE } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { SERVICES_QUERY } from "@/lib/sanityQueries";
+import { useOfferActive } from "@/lib/useOfferActive";
 
 const ICON_MAP = {
   Star, BookOpen, Heart,
@@ -54,6 +55,7 @@ function normaliseService(s) {
 export default function ServicesPage() {
   const { data: cmsServices, loading } = useSanity(SERVICES_QUERY, null);
   const { settings } = useSiteSettings();
+  const offerActive = useOfferActive();
 
   // Use CMS data when available; fall back to constants
   const services = cmsServices && cmsServices.length > 0
@@ -125,6 +127,9 @@ export default function ServicesPage() {
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {services.map((s, i) => {
                   const Icon = ICON_MAP[s.icon] || Star;
+                  // When offer is active: show discounted price + struck-through original.
+                  // When offer has expired: show only the original price (no strikethrough).
+                  const displayPrice = (!offerActive && s.originalPrice) ? s.originalPrice : s.price;
                   return (
                     <Reveal key={s.slug} delay={i * 0.06}>
                       <motion.div
@@ -155,12 +160,12 @@ export default function ServicesPage() {
                               {s.duration}
                             </span>
                             <div className="flex items-baseline gap-2">
-                              {s.originalPrice && (
+                              {offerActive && s.originalPrice && (
                                 <span className="text-sm text-muted-foreground line-through">
                                   {s.originalPrice}
                                 </span>
                               )}
-                              <span className="font-serif text-xl text-gold">{s.price}</span>
+                              <span className="font-serif text-xl text-gold">{displayPrice}</span>
                             </div>
                           </div>
 
